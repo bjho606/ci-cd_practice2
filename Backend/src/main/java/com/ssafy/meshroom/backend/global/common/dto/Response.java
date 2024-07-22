@@ -1,5 +1,4 @@
-package com.ssafy.meshroom.backend.domain.session.dto;
-
+package com.ssafy.meshroom.backend.global.common.dto;
 
 import lombok.*;
 
