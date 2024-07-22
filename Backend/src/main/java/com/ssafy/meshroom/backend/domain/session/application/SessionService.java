@@ -6,6 +6,7 @@ import com.ssafy.meshroom.backend.domain.contents.domain.ContentsOrder;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.dto.Response;
 import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateResponse;
+import com.ssafy.meshroom.backend.domain.session.dto.SubSessionCreateResponse;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -55,4 +56,22 @@ public class SessionService {
                 );
     }
 
+    public Response<SubSessionCreateResponse> createSubSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        Session session = openvidu.createSession();
+
+        com.ssafy.meshroom.backend.domain.session.domain.Session savedSession = sessionRepository.save(
+                com.ssafy.meshroom.backend.domain.session.domain.Session.builder()
+                        .sessionId(session.getSessionId())
+                        .url("url")
+                        .isMain(true)
+                        .maxUserCount(60L)
+                        .maxSubuserCount(10L)
+                        .mainSession(sessionId)
+                        .build()
+        );
+
+        return new Response<SubSessionCreateResponse>(true,2010L, "test",
+                new SubSessionCreateResponse(session.getSessionId())
+        );
+    }
 }

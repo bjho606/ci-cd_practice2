@@ -4,6 +4,7 @@ import com.ssafy.meshroom.backend.domain.session.application.SessionService;
 import com.ssafy.meshroom.backend.domain.session.dto.Response;
 import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateRequest;
 import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateResponse;
+import com.ssafy.meshroom.backend.domain.session.dto.SubSessionCreateResponse;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,11 @@ public class SessionController {
     /*
     * 하위 세션 생성
     * */
+    @PostMapping("/{sessionId}")
+    public ResponseEntity<Response<SubSessionCreateResponse>> createSessions(@PathVariable String sessionId)
+            throws OpenViduJavaClientException, OpenViduHttpException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(sessionService.createSubSession(sessionId));
+    }
 
     /*
     * 메인 세션 및 하위세션 정보 반환
