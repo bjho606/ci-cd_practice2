@@ -8,3 +8,6 @@ spring:
 log:
   config:
     mode: local
+jwt:
+  issuer: kkh
+  secret_key: test_security

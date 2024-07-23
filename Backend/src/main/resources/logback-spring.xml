@@ -77,7 +77,7 @@
             <!--     참조할 appender - STDOUT -->
             <appender-ref ref="STDOUT" />
         </root>
-        <logger name="com.example.springlogs" level="debug">
+        <logger name="com.ssafy.meshroom.backend" level="debug">
             <!--     참조할 appender - FILE -->
             <!--                <appender-ref ref="FILE" /> &lt;!&ndash; 7.8/s &ndash;&gt;-->
             <appender-ref ref="FILE-ASYNC" /><!-- 125 ms-->
