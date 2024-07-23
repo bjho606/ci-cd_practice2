@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: dev-log
 
-logging:
+log:
   config:
     path: ./logs
     filename: app-dev
