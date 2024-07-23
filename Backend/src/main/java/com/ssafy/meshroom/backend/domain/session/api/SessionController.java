@@ -42,12 +42,11 @@ public class SessionController {
     }
 
     /*
-    * 메인 세션 및 하위세션 정보 반환
+    * 하위세션 정보 반환
     * */
-     @GetMapping("/{sessionId}")
-     public String test(@PathVariable String sessionId){
-//         log.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
-         return sessionId;
+     @GetMapping("/{sessionId}/{subSessionId}")
+     public ResponseEntity<Response<SessionInfoResponse>> subSessionInfo(@PathVariable String sessionId,@PathVariable String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+         return ResponseEntity.status(HttpStatus.CREATED).body(sessionService.getSubSessionInfo(sessionId, subSessionId));
      }
 
     /*

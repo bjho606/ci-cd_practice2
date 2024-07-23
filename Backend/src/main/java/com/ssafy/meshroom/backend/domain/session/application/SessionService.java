@@ -5,6 +5,7 @@ import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderServi
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.dto.ConnectionCreateResponse;
 import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateResponse;
+import com.ssafy.meshroom.backend.domain.session.dto.SessionInfoResponse;
 import com.ssafy.meshroom.backend.domain.session.dto.SubSessionCreateResponse;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
@@ -28,27 +29,19 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 @Slf4j
 public class SessionService {
-    @Value("${OPENVIDU_URL}")
-    private String OPENVIDU_URL;
 
-    @Value("${OPENVIDU_SECRET}")
-    private String OPENVIDU_SECRET;
-
-    private OpenVidu openvidu;
     private final SessionRepository sessionRepository;
     private final ContentsOrderService contentsOrderService;
     private final UserDetailService userDetailService;
+    private final OpenViduService openViduService;
     private final TokenProvider tokenProvider;
     private final OVTokenService ovTokenService;
 
-    @PostConstruct
-    public void init() {
-        this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
-    }
+
 
     @Transactional
     public Response<SessionCreateResponse> createSession(List<String> contents) throws OpenViduJavaClientException, OpenViduHttpException {
-        Session session = openvidu.createSession();
+        Session session = openViduService.createSession();
 
         com.ssafy.meshroom.backend.domain.session.domain.Session savedSession = sessionRepository.save(
                 com.ssafy.meshroom.backend.domain.session.domain.Session.builder()
@@ -73,13 +66,14 @@ public class SessionService {
 
 
     public Response<SubSessionCreateResponse> createSubSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-        Session session = openvidu.createSession();
+        Session session = openViduService.createSession();
 
         sessionRepository.save(
                 com.ssafy.meshroom.backend.domain.session.domain.Session.builder()
                         .sessionId(session.getSessionId())
                         .url("url")
                         .isMain(false)
+                        .groupName("그룹")
                         .maxUserCount(60L)
                         .maxSubuserCount(10L)
                         .mainSession(sessionId)
@@ -94,9 +88,9 @@ public class SessionService {
     @Transactional
     public Response<ConnectionCreateResponse> createConnection(String userName, String sessionId, HttpServletResponse response) throws OpenViduJavaClientException, OpenViduHttpException{
         // 1. 세션 인원 검사
-        Session session = openvidu.getActiveSession(sessionId);
-        session.fetch();
-        int curCount = session.getActiveConnections().size();
+        Session session = openViduService.getSession(sessionId);
+        long curCount = openViduService.getSessionCount(session);
+
         AtomicReference<UserRole> userRole = new AtomicReference<>(UserRole.PARTICIPANT);
         AtomicReference<com.ssafy.meshroom.backend.domain.session.domain.Session> sessionAtomicReference = new AtomicReference<>();
         sessionRepository.findBySessionId(sessionId).ifPresentOrElse(session1 -> {
@@ -143,5 +137,36 @@ public class SessionService {
         String token = connection.getToken(); // Send this string to the client side
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
                 ,new ConnectionCreateResponse(token));
+    }
+
+    public Response<SessionInfoResponse> getSubSessionInfo(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        AtomicReference<SessionInfoResponse> ret = new AtomicReference<>();
+
+        sessionRepository.findBySessionId(subSessionId).ifPresentOrElse(
+                (session) -> {
+                    // 1. subSession과 session이 부모자식관계인지
+                    log.info(session.get_id());
+                    if(!session.getMainSession().equals(sessionId)) { throw new RuntimeException(); }
+
+                    ret.set(SessionInfoResponse.builder()
+                            .sessionId(subSessionId)
+                            .maxUserCount(session.getMaxSubuserCount())
+                            .groupName(session.getGroupName())
+                            .username(
+                                    ovTokenService.getUsersInSession(session.get_id())
+                            )
+                            .build()
+                    );
+                    // 2. sessionId로 session entity 쿼리
+
+                }
+                ,()->{ throw new RuntimeException(); }
+        );
+        Session session = openViduService.getSession(sessionId);
+        ret.get().setCurrentUserCount(openViduService.getSessionCount(session));
+//        ret.get().setUsername(openViduService.getUsernameInSession(session))
+
+        return new Response<SessionInfoResponse>(true, 2000L, "SUCCESS"
+                ,ret.get());
     }
 }

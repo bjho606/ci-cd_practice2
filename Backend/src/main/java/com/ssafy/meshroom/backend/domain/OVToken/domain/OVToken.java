@@ -18,5 +18,5 @@ public class OVToken {
 
     String userSid;
 
-    String SessionSid;
+    String sessionSid;
 }
