@@ -117,7 +117,7 @@ public class SessionService {
 
         // 3-1. 유저 jwtToken 발행
         String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
-        Cookie cookie = new Cookie("token", jwtToken);
+        Cookie cookie = new Cookie("token", "Bearer "+jwtToken);
         cookie.setHttpOnly(true); // HTTP-Only 속성 설정
 //        cookie.setSecure(true); // HTTPS로만 전송되도록 설정 (필요에 따라)
         cookie.setPath("/"); // 쿠키의 유효 경로 설정
