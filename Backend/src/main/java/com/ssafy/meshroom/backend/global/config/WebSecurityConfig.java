@@ -42,7 +42,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/swagger-ui/**").permitAll()
 //                        .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("/api/v1/sessions/**").permitAll()
+//                        .requestMatchers("/api/v1/sessions/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/token").permitAll()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())              // 그 외의 모든 요청은 인증 필요)
