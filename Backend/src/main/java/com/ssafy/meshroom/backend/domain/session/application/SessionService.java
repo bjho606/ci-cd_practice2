@@ -3,26 +3,23 @@ package com.ssafy.meshroom.backend.domain.session.application;
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
 import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderService;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
-import com.ssafy.meshroom.backend.domain.session.dto.ConnectionCreateResponse;
-import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateResponse;
-import com.ssafy.meshroom.backend.domain.session.dto.SessionInfoResponse;
-import com.ssafy.meshroom.backend.domain.session.dto.SubSessionCreateResponse;
+import com.ssafy.meshroom.backend.domain.session.dto.*;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import io.openvidu.java.client.*;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
@@ -139,16 +136,50 @@ public class SessionService {
                 ,new ConnectionCreateResponse(token));
     }
 
-    public Response<SessionInfoResponse> getSubSessionInfo(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-        AtomicReference<SessionInfoResponse> ret = new AtomicReference<>();
+    public Response<SessionInfoResponse> getSessionInfo(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        AtomicReference<SessionInfoResponse> sessionInfo = new AtomicReference<>();
+        List<SubSessionInfoResponse> subs = new ArrayList<>();
+        sessionRepository.findBySessionId(sessionId).ifPresent(session -> {
+            sessionRepository.findAllByMainSession(sessionId).ifPresent(subSessions -> {
+                subSessions.forEach((subSession)-> {
+                    try {
+                        subs.add(getSubsession(sessionId, subSession.getSessionId()).orElseThrow());
+                    } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            });
+            try {
+                sessionInfo.set(SessionInfoResponse.builder()
+                        .maxUserCount(session.getMaxUserCount())
+                        .currentUserCount(openViduService.getSessionCount(openViduService.getSession(sessionId)))
+                        .url(session.getUrl())
+                        .groups(subs)
+                        .build()
+                );
+            } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return new Response<SessionInfoResponse>(true, 2010L, "SUCCESS",
+                sessionInfo.get());
+    }
+
+    public Response<SubSessionInfoResponse> getSubSessionInfo(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        return new Response<SubSessionInfoResponse>(true, 2000L, "SUCCESS"
+                ,getSubsession(sessionId,subSessionId).orElseThrow());
+    }
+
+    public Optional<SubSessionInfoResponse> getSubsession(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        AtomicReference<SubSessionInfoResponse> ret = new AtomicReference<>();
 
         sessionRepository.findBySessionId(subSessionId).ifPresentOrElse(
                 (session) -> {
                     // 1. subSession과 session이 부모자식관계인지
-                    log.info(session.get_id());
                     if(!session.getMainSession().equals(sessionId)) { throw new RuntimeException(); }
 
-                    ret.set(SessionInfoResponse.builder()
+                    ret.set(SubSessionInfoResponse.builder()
                             .sessionId(subSessionId)
                             .maxUserCount(session.getMaxSubuserCount())
                             .groupName(session.getGroupName())
@@ -165,8 +196,6 @@ public class SessionService {
         Session session = openViduService.getSession(sessionId);
         ret.get().setCurrentUserCount(openViduService.getSessionCount(session));
 //        ret.get().setUsername(openViduService.getUsernameInSession(session))
-
-        return new Response<SessionInfoResponse>(true, 2000L, "SUCCESS"
-                ,ret.get());
+        return Optional.ofNullable(ret.get());
     }
 }

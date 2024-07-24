@@ -9,9 +9,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SessionInfoResponse {
+public class SubSessionInfoResponse {
+    private String sessionId;
+    private String groupName;
     private Long maxUserCount;
     private Long currentUserCount;
-    private String url;
-    private List<SubSessionInfoResponse> groups;
+    private List<String> username;
 }
