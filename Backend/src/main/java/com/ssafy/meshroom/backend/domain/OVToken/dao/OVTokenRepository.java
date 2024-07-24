@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface OVTokenRepository extends MongoRepository<OVToken, String> {
     List<OVToken> findAllBySessionSid(String sessionSid);
+    void deleteAllBySessionSid(String sessionSid);
 }
