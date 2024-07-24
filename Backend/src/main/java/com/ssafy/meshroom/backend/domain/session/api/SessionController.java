@@ -84,24 +84,33 @@ public class SessionController {
     }
 
     @Operation(
-            summary = "하위 세션 정보 조회",
-            description = "지정된 하위 세션에 대한 세부 정보를 반환합니다. 반환되는 정보에는 세션 ID, 그룹 이름, 최대 사용자 수, 현재 사용자 수, 사용자 이름 목록이 포함됩니다.",
-            parameters = {
-                    @Parameter(name = "sessionId", description = "상위 세션의 ID", required = true),
-                    @Parameter(name = "subSessionId", description = "조회할 하위 세션의 ID", required = true)
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 하위 세션 정보를 반환함",
-                            content = @Content(
-                                    schema = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-                    @ApiResponse(responseCode = "404", description = "세션을 찾을 수 없음"),
-                    @ApiResponse(responseCode = "500", description = "서버 오류")
-            }
+            summary = "세션 정보 조회",
+            description = "세션에 대한 세부 정보를 반환합니다. 반환되는 정보에는 세부 세션 목록이 포함됩니다."
+    )
+    @GetMapping("/{sessionId}")
+    public ResponseEntity<Response<SessionInfoResponse>> sessionInfo(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.getSessionInfo(sessionId));
+    }
+
+    @Operation(
+        summary = "하위 세션 정보 조회",
+        description = "지정된 하위 세션에 대한 세부 정보를 반환합니다. 반환되는 정보에는 세션 ID, 그룹 이름, 최대 사용자 수, 현재 사용자 수, 사용자 이름 목록이 포함됩니다.",
+        parameters = {
+                @Parameter(name = "sessionId", description = "상위 세션의 ID", required = true),
+                @Parameter(name = "subSessionId", description = "조회할 하위 세션의 ID", required = true)
+        },
+        responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "성공적으로 하위 세션 정보를 반환함",
+                        content = @Content(
+                                schema = @Schema(implementation = Response.class)
+                        )
+                ),
+                @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                @ApiResponse(responseCode = "404", description = "세션을 찾을 수 없음"),
+                @ApiResponse(responseCode = "500", description = "서버 오류")
+        }
     )
     @GetMapping("/{sessionId}/{subSessionId}")
     public ResponseEntity<Response<SubSessionInfoResponse>> subSessionInfo(
@@ -168,5 +177,71 @@ public class SessionController {
     @DeleteMapping("/{sessionId}")
     public ResponseEntity<Response<?>> removeSession(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(sessionId));
+    }
+
+    @Operation(
+            summary = "세션의 최대 사용자 수 수정",
+            description = "지정된 세션의 최대 사용자 수와 최대 하위 사용자 수를 수정합니다.",
+            parameters = {
+                    @Parameter(name = "sessionId", description = "수정할 세션의 ID", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "세션의 최대 사용자 수와 최대 하위 사용자 수를 수정하기 위한 요청 본문",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = UpdateSessionRequest.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 세션 정보가 수정됨",
+                            content = @Content(
+                                    schema = @Schema(implementation = Response.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                    @ApiResponse(responseCode = "404", description = "세션을 찾을 수 없음"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
+    )
+    @PatchMapping("/{sessionId}")
+    public ResponseEntity<Response<?>> updateSessionUserCounts(
+            @PathVariable String sessionId,
+            @RequestBody UpdateSessionRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSessionUserCounts(sessionId, request));
+    }
+
+    @Operation(
+            summary = "하위 세션 그룹 이름 수정",
+            description = "지정된 하위 세션의 그룹 이름을 수정합니다.",
+            parameters = {
+                    @Parameter(name = "subsessionId", description = "수정할 하위 세션의 ID", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "하위 세션의 그룹 이름을 수정하기 위한 요청 본문",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = UpdateGroupNameRequest.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 하위 세션의 그룹 이름이 수정됨",
+                            content = @Content(
+                                    schema = @Schema(implementation = Response.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                    @ApiResponse(responseCode = "404", description = "하위 세션을 찾을 수 없음"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
+    )
+    @PatchMapping("/{subsessionId}/group-name")
+    public ResponseEntity<Response<?>> updateSubSessionGroupName(
+            @PathVariable String subsessionId,
+            @RequestBody UpdateGroupNameRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId, request));
     }
 }
