@@ -14,6 +14,9 @@ public enum CommonErrorCode implements ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "Invalid parameter included"),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not exists"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
+    DATA_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Data 직렬화 실패"),
+    DATA_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Data 역직렬화 실패"),
+
     ;
 
     private final HttpStatus httpStatus; // HTTP status code associated with the error
