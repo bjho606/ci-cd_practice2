@@ -145,4 +145,28 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(sessionService.createConnection(req.getUserName(), sessionId, response));
     }
+
+    @Operation(
+            summary = "세션 삭제",
+            description = "지정된 세션을 삭제합니다.",
+            parameters = {
+                    @Parameter(name = "sessionId", description = "삭제할 세션의 ID", required = true)
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 세션이 삭제됨",
+                            content = @Content(
+                                    schema = @Schema(implementation = Response.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                    @ApiResponse(responseCode = "404", description = "세션을 찾을 수 없음"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
+    )
+    @DeleteMapping("/{sessionId}")
+    public ResponseEntity<Response<?>> removeSession(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(sessionId));
+    }
 }

@@ -198,4 +198,28 @@ public class SessionService {
 //        ret.get().setUsername(openViduService.getUsernameInSession(session))
         return Optional.ofNullable(ret.get());
     }
+
+    public Response<?> deleteSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        com.ssafy.meshroom.backend.domain.session.domain.Session _session
+                = sessionRepository.findBySessionId(sessionId).orElseThrow();
+
+        if(_session.getIsMain()){
+            ovTokenService.removeSession(_session.get_id());
+            sessionRepository.deleteAllByMainSession(sessionId).orElseThrow()
+                    .forEach((session -> {
+                        try {
+                            openViduService.getSession(session.getSessionId()).close();
+                        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }));
+            sessionRepository.deleteById(_session.get_id());
+        }
+
+        Session session = openViduService.getSession(sessionId);
+        session.close();
+
+        return new Response<>(true, 2000L, "삭제 성공", null);
+    }
+
 }

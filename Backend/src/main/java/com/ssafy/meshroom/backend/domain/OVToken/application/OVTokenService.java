@@ -3,6 +3,7 @@ package com.ssafy.meshroom.backend.domain.OVToken.application;
 import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.OVToken.domain.OVToken;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
+import io.openvidu.java.client.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,9 @@ public class OVTokenService {
             ret.add(userDetailService.loadUserByUsername(userSid).getUsername());
         }
         return ret;
+    }
+
+    public void removeSession(String sessionSid){
+        ovTokenRepository.deleteAllBySessionSid(sessionSid);
     }
 }
