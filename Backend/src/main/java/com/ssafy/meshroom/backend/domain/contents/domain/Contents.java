@@ -19,4 +19,6 @@ public class Contents {
     String description;
 
     String imgUrl;
+
+    Long duration;
 }
