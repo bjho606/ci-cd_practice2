@@ -14,4 +14,12 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic meshTopic() {
+        return TopicBuilder.name("touch-count")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 }

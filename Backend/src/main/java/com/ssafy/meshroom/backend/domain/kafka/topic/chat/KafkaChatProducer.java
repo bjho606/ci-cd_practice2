@@ -1,4 +1,4 @@
-package com.ssafy.meshroom.backend.global.infra.kafka;
+package com.ssafy.meshroom.backend.domain.kafka.topic.chat;
 
 import com.ssafy.meshroom.backend.domain.chat.domain.ChatMessage;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class KafkaProducer {
+public class KafkaChatProducer {
     private static final String TOPIC_CHAT_MESSAGE = "chat_message";
 
     private final KafkaTemplate<String, ChatMessage> kafkaTemplate;

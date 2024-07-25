@@ -1,16 +1,14 @@
-package com.ssafy.meshroom.backend.domain.kafka.admiinClient;
+package com.ssafy.meshroom.backend.domain.kafka.admin.admiinClient;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @SuppressWarnings("DuplicatedCode")
@@ -22,10 +20,15 @@ public class KafkaAdminClient {
 
     private static AdminClient client;
 
+    private final ApplicationContext applicationContext;
+
     public static DescribeTopicsResult describeTopics(String topicName) {
         return client.describeTopics(Collections.singleton(topicName));
     }
 
+    public KafkaAdminClient(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Value("${spring.kafka.bootstrap-servers}")
     public void setBootstrapServer(String bootstrapServer) {
@@ -33,12 +36,14 @@ public class KafkaAdminClient {
     }
 
     @PostConstruct
-    public void KafkaAdminClient() {
+    public void init() {
         if (client == null) {
             Properties properties = new Properties();
             properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
             client = AdminClient.create(properties);
         }
+
+        createAllTopics();
     }
 
     public static void close() {
@@ -49,7 +54,7 @@ public class KafkaAdminClient {
     }
 
     public static CreateTopicsResult createTopics(String topicName) {
-        NewTopic newTopic = TopicBuilder.name(topicName).partitions(1).replicas(1).build();
+        NewTopic newTopic = makeTopic(topicName, 1, 1);
         CreateTopicsResult topicsResult = client.createTopics(Collections.singleton(newTopic));
         topicsResult.all().whenComplete((result, exception) -> {
             if (exception != null) {
@@ -59,6 +64,28 @@ public class KafkaAdminClient {
             }
         });
         return topicsResult;
+    }
+
+    public void createAllTopics() {
+        String[] beanNames = applicationContext.getBeanNamesForType(NewTopic.class);
+        Set<String> existingTopics;
+
+        try {
+            existingTopics = client.listTopics().names().get();
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Error while fetching existing topics", e);
+            return;
+        }
+
+        for (String beanName : beanNames) {
+            NewTopic topic = (NewTopic) applicationContext.getBean(beanName);
+            if (existingTopics.contains(topic.name())) {
+                log.info("Topic {} already exists, skipping creation", topic.name());
+            } else {
+                log.info("Topic {} added newly", topic.name());
+                createTopics(topic.name());
+            }
+        }
     }
 
     public static void deleteTopics(String topicName) {
@@ -86,6 +113,7 @@ public class KafkaAdminClient {
         DeleteTopicsResult deleteTopicsResult = client.deleteTopics(topicNames);
     }
 
-
-
+    public static NewTopic makeTopic(String topicName, int partitionCount, int replicaCount) {
+        return TopicBuilder.name(topicName).partitions(partitionCount).replicas(replicaCount).build();
+    }
 }

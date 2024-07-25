@@ -1,7 +1,7 @@
-package com.ssafy.meshroom.backend.domain.kafka.controller;
+package com.ssafy.meshroom.backend.domain.kafka.admin.controller;
 
 
-import com.ssafy.meshroom.backend.domain.kafka.admiinClient.KafkaAdminClient;
+import com.ssafy.meshroom.backend.domain.kafka.admin.admiinClient.KafkaAdminClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
