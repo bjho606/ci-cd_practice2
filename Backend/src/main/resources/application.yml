@@ -15,11 +15,15 @@ spring:
       _dev: dev, dev-log
       _release: release, release-log
     active: _local
+  web:
+    resources:
+      static-locations: classpath:/static/
 
 server:
   port: 5000
   ssl:
     enabled: false
+
 
 OPENVIDU_URL: http://localhost:4443/
 OPENVIDU_SECRET: MY_SECRET

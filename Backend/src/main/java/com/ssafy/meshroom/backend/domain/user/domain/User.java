@@ -8,32 +8,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
-//
-//import java.util.Collection;
-//import java.util.List;
-//import org.springframework.data.annotation.Id;
-//import org.springframework.data.mongodb.core.mapping.Document;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
 
 @Setter
 @Document("users")
+@Component
 public class User implements UserDetails {
     @Getter
     @Id
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String _id;
     private String username;
     private UserRole role;  // UserRole 추가
 
     // 기본 생성자
-    public User() {}
+    public User() {
+    }
 
     // 모든 필드를 포함한 생성자
     public User(String username, UserRole role) {
