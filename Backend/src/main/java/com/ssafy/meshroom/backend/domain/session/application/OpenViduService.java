@@ -30,6 +30,7 @@ public class OpenViduService {
     public Session getSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         return openvidu.getActiveSession(sessionId);
     }
+
     public long getSessionCount(Session session) throws OpenViduJavaClientException, OpenViduHttpException {
         session.fetch();
         return session.getActiveConnections().size();
@@ -40,5 +41,9 @@ public class OpenViduService {
         return session.getActiveConnections().stream()
                 .map(Connection::getServerData)
                 .collect(Collectors.toList());
+    }
+
+    public void forceDisconnet(Session session, Connection connection) throws OpenViduJavaClientException, OpenViduHttpException {
+        session.forceDisconnect(connection);
     }
 }
