@@ -20,11 +20,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
 
-    /**
-     * 요청 헤더의 Authorization 키의 값 조회
-     * getAccessToken - 가져온 값에서 접두사 제거
-     * 가져온 토큰이 유효한지 확인하고, 유효하면 인증정보 설정
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
@@ -53,6 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return (request.getMethod().equals("POST")&&path.startsWith("/api/v1/sessions"));
+        return (request.getMethod().equals("POST")&&path.startsWith("/api/v1/sessions"))
+                ||(request.getMethod().equals("GET")&&path.startsWith("/api/v1/contents"))
+                ||path.startsWith("/swagger-ui")
+                ||path.startsWith("/api-docs");
     }
 }
