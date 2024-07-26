@@ -28,7 +28,7 @@ public class ChatController {
     // WebSocketConfig에서 설정한 applicationDestinationPrefixes와 @MessageMapping 경로가 병합됨
     // "/publish/chat/message"
     @MessageMapping("/chat/message")
-//    @SendTo("/topic/messages")
+//    @SendTo("/chat/message")
     public void sendMessage(ChatMessage chatMessage) {
         log.info("Message Mapping /chat/message");
         chatService.sendChatMessage(chatMessage);

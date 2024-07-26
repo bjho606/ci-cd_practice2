@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @AllArgsConstructor
 public class KafkaChatProducer {
-    private static final String TOPIC_CHAT_MESSAGE = "chat_message";
+    private static final String TOPIC_CHAT_MESSAGE = "chat-message";
 
     private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
 
