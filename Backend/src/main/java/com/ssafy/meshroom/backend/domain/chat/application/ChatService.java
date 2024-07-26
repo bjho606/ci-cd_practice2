@@ -23,12 +23,10 @@ public class ChatService {
 
     public void sendChatMessage(ChatMessage chatMessage) {
         kafkaChatProducer.sendMessage(chatMessage);
-        template.convertAndSend("/subscribe/chat/session/" + chatMessage.getSessionSid(), chatMessage);
     }
 
     public void join(ChatMessage chatMessage) {
         kafkaChatProducer.sendMessage(chatMessage);
-        template.convertAndSend("/subscribe/chat/session/" + chatMessage.getSessionSid(), chatMessage);
     }
 
     public void leave(ChatMessage chatMessage) throws OpenViduJavaClientException, OpenViduHttpException {
