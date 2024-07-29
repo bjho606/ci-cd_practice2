@@ -50,6 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 //        return true;
         return (request.getMethod().equals("POST")&&path.startsWith("/api/v1/sessions"))
-                ||(request.getMethod().equals("GET")&&path.startsWith("/api/v1/contents"));
+                ||(request.getMethod().equals("GET")&&path.startsWith("/api/v1/contents"))
+                ||(path.startsWith("/swagger-ui"))
+                ||(path.startsWith("/api-docs"))
+                ;
     }
 }
