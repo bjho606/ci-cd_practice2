@@ -14,6 +14,13 @@ import org.springframework.security.config.annotation.web.configurers.RequestCac
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * Spring Security 설정을 위한 설정 클래스.
@@ -50,12 +57,13 @@ public class WebSecurityConfig {
 
         // 모든 기본 필터를 비활성화하고 custom filter만 사용하도록 설정
         http
-            .exceptionHandling(AbstractHttpConfigurer::disable)
-            .headers(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .requestCache(RequestCacheConfigurer::disable)
-            .securityContext(AbstractHttpConfigurer::disable)
-            .servletApi(AbstractHttpConfigurer::disable);
+                .exceptionHandling(AbstractHttpConfigurer::disable)
+                .headers(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .requestCache(RequestCacheConfigurer::disable)
+                .securityContext(AbstractHttpConfigurer::disable)
+                .servletApi(AbstractHttpConfigurer::disable)
+                .cors(withDefaults()); // CORS 설정 추가
 
         return http.build();
     }
@@ -71,5 +79,26 @@ public class WebSecurityConfig {
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    /**
+     * CORS 필터를 구성합니다.
+     *
+     * @return 구성된 CorsFilter
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Custom-Header"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
     }
 }
