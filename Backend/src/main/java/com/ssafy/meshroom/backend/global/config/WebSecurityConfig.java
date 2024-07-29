@@ -53,7 +53,8 @@ public class WebSecurityConfig {
 //                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/token").permitAll()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())              // 그 외의 모든 요청은 인증 필요)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                        .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass());
 
         // 모든 기본 필터를 비활성화하고 custom filter만 사용하도록 설정
         http
