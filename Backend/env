@@ -1,6 +1,0 @@
-CURRENT_ENV=local
-MONGO_DB_URI=mongodb://meshroom:meshmeshroomroom@i11a401.p.ssafy.io:27017/meshroom-dev?directConnection=true
-KAFKA_BOOTSTRAP_SERVER=localhost:9092
-JWT_SECRET_KEY=meshmeshroomroom
-OPENVIDU_URL=https://i11a401.p.ssafy.io
-OPENVIDU_SECRET=meshmeshroomroom

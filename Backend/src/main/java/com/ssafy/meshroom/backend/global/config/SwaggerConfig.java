@@ -2,6 +2,7 @@ package com.ssafy.meshroom.backend.global.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -11,8 +12,11 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@OpenAPIDefinition(
+@OpenAPIDefinition(servers = {
+        @Server(url = "/", description = "Default Server URL")
+},
         info = @Info(title = "MESH-ROOM API 명세서",
+
                 description = "MESH-ROOM API 명세서",
                 version = "v1"))
 @RequiredArgsConstructor
