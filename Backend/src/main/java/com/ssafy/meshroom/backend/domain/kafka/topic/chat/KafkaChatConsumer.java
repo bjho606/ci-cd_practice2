@@ -17,14 +17,6 @@ public class KafkaChatConsumer {
     @KafkaListener(topics = "chat-message", groupId = "mesh-chat")
     public void listen(ChatMessage chatMessage) {
 
-        if (chatMessage.getType() == MessageType.ALL) {
-            log.info("<<<<<<<< kafka 전체 채팅 : " +  chatMessage);
-        } else if (chatMessage.getType() == MessageType.GROUP) {
-            log.info("<<<<<<<< kafka 그룹 채팅 : " +  chatMessage);
-        } else {
-            throw new RuntimeException("Unknown MessageType: " + chatMessage.getType());
-        }
-
         // 클라이언트로 메시지 전달
         messagingTemplate.convertAndSend("/subscribe/chat/session/" + chatMessage.getSessionSid(), chatMessage);
     }
