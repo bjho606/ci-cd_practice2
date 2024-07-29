@@ -9,12 +9,13 @@ spring:
       - classpath:/yaml/logging/application-local-log.yml
       - classpath:/yaml/logging/application-dev-log.yml
       - classpath:/yaml/logging/application-release-log.yml
+      - file:.env[.properties]
   profiles:
     group:
       _local: local, local-log
       _dev: dev, dev-log
       _release: release, release-log
-    active: _local
+    active: _${CURRENT_ENV}
   web:
     resources:
       static-locations: classpath:/static/
@@ -23,7 +24,3 @@ server:
   port: 5000
   ssl:
     enabled: false
-
-
-OPENVIDU_URL: http://localhost:4443/
-OPENVIDU_SECRET: MY_SECRET

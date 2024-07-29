@@ -1,26 +1,24 @@
 package com.ssafy.meshroom.backend.domain.session.application;
 
+import com.ssafy.meshroom.backend.global.common.properties.OpenViduProperties;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class OpenViduService {
-    @Value("${OPENVIDU_URL}")
-    private String OPENVIDU_URL;
-
-    @Value("${OPENVIDU_SECRET}")
-    private String OPENVIDU_SECRET;
-
+    private final OpenViduProperties openViduProperties;
     private OpenVidu openvidu;
 
     @PostConstruct
     public void init() {
-        this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
+        this.openvidu = new OpenVidu(openViduProperties.getUrl(), openViduProperties.getSecret());
     }
 
     public Session createSession() throws OpenViduJavaClientException, OpenViduHttpException {
