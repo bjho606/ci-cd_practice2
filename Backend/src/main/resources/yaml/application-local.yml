@@ -4,10 +4,9 @@ spring:
       on-profile: local
   data:
     mongodb:
-      uri: mongodb://localhost:27017/openvidu_test
+      uri: ${MONGO_DB_URI}
   kafka:
-#    bootstrap-servers: 210.94.91.123:9092
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -23,12 +22,18 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
     deserialization:
       ADJUST_DATES_TO_CONTEXT_TIME_ZONE: false
+
 log:
   config:
     mode: local
+
 jwt:
-  issuer: kkh
-  secret_key: test_security
+  issuer: meshroom
+  secret_key: ${JWT_SECRET_KEY}
+
+openvidu:
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
 
 springdoc:
   version: '@project.version@'
