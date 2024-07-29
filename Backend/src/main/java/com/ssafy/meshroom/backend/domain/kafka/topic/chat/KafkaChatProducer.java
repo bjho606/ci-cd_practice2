@@ -1,6 +1,7 @@
 package com.ssafy.meshroom.backend.domain.kafka.topic.chat;
 
 import com.ssafy.meshroom.backend.domain.chat.domain.ChatMessage;
+import com.ssafy.meshroom.backend.domain.chat.dto.ChatMessageSubscribe;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,11 +13,11 @@ import org.springframework.stereotype.Service;
 public class KafkaChatProducer {
     private static final String TOPIC_CHAT_MESSAGE = "chat-message";
 
-    private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
+    private final KafkaTemplate<String, ChatMessageSubscribe> kafkaTemplate;
 
-    public void sendMessage(ChatMessage chatMessage) {
+    public void sendMessage(ChatMessageSubscribe chatMessageSubscribe) {
 
-        log.info(">>>>>>>> kafka send message : " +  chatMessage);
-        kafkaTemplate.send(TOPIC_CHAT_MESSAGE, chatMessage);
+        log.info(">>>>>>>> kafka send message : " +  chatMessageSubscribe);
+        kafkaTemplate.send(TOPIC_CHAT_MESSAGE, chatMessageSubscribe);
     }
 }

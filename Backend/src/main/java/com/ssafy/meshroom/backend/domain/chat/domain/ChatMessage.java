@@ -26,7 +26,7 @@ public class ChatMessage {
     private String userSid;
     private String senderName;
 
-    String sessionSid;
+    private String sessionSid;
 
     private String content;
 
