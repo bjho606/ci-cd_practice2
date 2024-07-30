@@ -1,5 +1,6 @@
 package com.ssafy.meshroom.backend.global.auth.jwt;
 
+import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -23,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
-        String token = null;
+        String token = CookieUtil.getCookie(request,"token").orElseThrow().getValue();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -33,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
+        log.info(token);
         if (token == null || !tokenProvider.validToken(token)) {
             throw new RuntimeException("Invalid token");
         }
