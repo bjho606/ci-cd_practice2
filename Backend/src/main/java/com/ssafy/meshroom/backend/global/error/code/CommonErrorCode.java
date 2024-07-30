@@ -17,6 +17,12 @@ public enum CommonErrorCode implements ErrorCode {
     DATA_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Data 직렬화 실패"),
     DATA_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Data 역직렬화 실패"),
 
+    /*
+    * Session 관련 오류
+    * */
+    FULL_CAPACITY_USERS(HttpStatus.SERVICE_UNAVAILABLE, "제한 인원 초과"),
+    SESSION_NOT_EXIST(HttpStatus.NOT_FOUND, "존재하지 않는 세션"),
+    OPENVIDU_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "openvidu 오류"),
     ;
 
     private final HttpStatus httpStatus; // HTTP status code associated with the error
