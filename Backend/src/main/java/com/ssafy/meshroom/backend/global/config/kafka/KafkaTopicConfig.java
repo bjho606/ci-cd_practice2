@@ -17,7 +17,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic meshTopic() {
-        return TopicBuilder.name("touch-count")
+        return TopicBuilder.name("game-touchmesh")
                 .partitions(1)
                 .replicas(1)
                 .build();
