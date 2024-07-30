@@ -26,10 +26,23 @@ public class SwaggerConfig {
     public GroupedOpenApi ssafyApi() {
         // "/**" 경로에 매칭되는 API를 그룹화하여 문서화한다.
         String[] paths = {"/api/v1/**", "/**"};
-
         return GroupedOpenApi.builder()
                 .group("MESH-ROOM API v1")  // 그룹 이름을 설정한다.
                 .pathsToMatch(paths)     // 그룹에 속하는 경로 패턴을 지정한다.
                 .build();
+    }
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        SecurityScheme auth = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.COOKIE)
+                .name("token");
+
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("basicAuth");
+
+        return new OpenAPI()
+                .components(new Components().addSecuritySchemes("basicAuth", auth))
+                .addSecurityItem(securityRequirement);
     }
 }

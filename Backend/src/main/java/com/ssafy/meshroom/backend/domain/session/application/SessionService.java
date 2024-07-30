@@ -8,6 +8,7 @@ import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
+import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import io.openvidu.java.client.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -116,12 +117,7 @@ public class SessionService {
 
         // 3-1. 유저 jwtToken 발행
         String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
-        Cookie cookie = new Cookie("token", jwtToken);
-        cookie.setHttpOnly(true); // HTTP-Only 속성 설정
-//        cookie.setSecure(true); // HTTPS로만 전송되도록 설정 (필요에 따라)
-        cookie.setPath("/"); // 쿠키의 유효 경로 설정
-        cookie.setMaxAge(60 * 60 * 24); // 쿠키의 유효 기간 설정 (초 단위, 여기서는 1일)
-        response.addCookie(cookie);
+        CookieUtil.addCookie(response, "token", jwtToken);
 
         // 3-2. session 접속 토큰 발행
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
