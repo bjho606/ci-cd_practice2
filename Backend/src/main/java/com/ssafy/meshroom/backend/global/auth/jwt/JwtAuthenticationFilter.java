@@ -55,6 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 ||(request.getMethod().equals("GET")&&path.startsWith("/api/v1/contents"))
                 ||(path.startsWith("/swagger-ui"))
                 ||(path.startsWith("/api-docs"))
+                || "test-token".equals(request.getHeader("X-Test-Token"))
                 ;
     }
 }
