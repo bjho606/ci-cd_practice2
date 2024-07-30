@@ -8,6 +8,9 @@ import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
+import com.ssafy.meshroom.backend.global.error.exception.FullCapacityLimitException;
+import com.ssafy.meshroom.backend.global.error.exception.OpenViduException;
+import com.ssafy.meshroom.backend.global.error.exception.SessionNotExistException;
 import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import io.openvidu.java.client.*;
 import jakarta.servlet.http.Cookie;
@@ -63,6 +66,7 @@ public class SessionService {
 
     @Transactional
     public Response<SubSessionCreateResponse> createSubSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         Session session = openViduService.createSession();
 
         sessionRepository.save(
@@ -85,7 +89,7 @@ public class SessionService {
     @Transactional
     public Response<ConnectionCreateResponse> createConnection(String userName, String sessionId, HttpServletResponse response) throws OpenViduJavaClientException, OpenViduHttpException {
         // 1. 세션 인원 검사
-        Session session = openViduService.getSession(sessionId);
+        Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         long curCount = openViduService.getSessionCount(session);
 
         AtomicReference<UserRole> userRole = new AtomicReference<>(UserRole.PARTICIPANT);
@@ -94,14 +98,14 @@ public class SessionService {
             sessionAtomicReference.set(session1);
             if (session1.getIsMain()) {
                 if (curCount >= session1.getMaxUserCount()) {
-                    throw new RuntimeException("꽉참");
+                    throw new FullCapacityLimitException();
                 }
                 if (curCount == 0) {
                     userRole.set(UserRole.FACILITATOR);
                 }
             } else {
                 if (curCount >= session1.getMaxSubuserCount()) {
-                    throw new RuntimeException("꽉참");
+                    throw new FullCapacityLimitException();
                 }
                 if (curCount == 0) {
                     userRole.set(UserRole.TEAM_LEADER);
@@ -133,6 +137,7 @@ public class SessionService {
 
     @Transactional
     public Response<SessionInfoResponse> getSessionInfo(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         AtomicReference<SessionInfoResponse> sessionInfo = new AtomicReference<>();
         List<SubSessionInfoResponse> subs = new ArrayList<>();
         sessionRepository.findBySessionId(sessionId).ifPresent(session -> {
@@ -141,7 +146,7 @@ public class SessionService {
                     try {
                         subs.add(getSubsession(sessionId, subSession.getSessionId()).orElseThrow());
                     } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-                        throw new RuntimeException(e);
+                        throw new OpenViduException();
                     }
                 });
             });
@@ -154,7 +159,7 @@ public class SessionService {
                         .build()
                 );
             } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-                throw new RuntimeException(e);
+                throw new OpenViduException();
             }
         });
 
@@ -174,7 +179,7 @@ public class SessionService {
                 (session) -> {
                     // 1. subSession과 session이 부모자식관계인지
                     if (!session.getMainSession().equals(sessionId)) {
-                        throw new RuntimeException();
+                        throw new RuntimeException(sessionId+"의 하위세션이 아닙니다.");
                     }
 
                     ret.set(SubSessionInfoResponse.builder()
@@ -200,7 +205,7 @@ public class SessionService {
     @Transactional
     public Response<?> deleteSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         com.ssafy.meshroom.backend.domain.session.domain.Session _session
-                = sessionRepository.findBySessionId(sessionId).orElseThrow();
+                = sessionRepository.findBySessionId(sessionId).orElseThrow(SessionNotExistException::new);
 
         if (_session.getIsMain()) {
             ovTokenService.removeSession(_session.get_id());
@@ -209,13 +214,13 @@ public class SessionService {
                         try {
                             openViduService.getSession(session.getSessionId()).close();
                         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-                            throw new RuntimeException(e);
+                            throw new OpenViduException();
                         }
                     }));
             sessionRepository.deleteById(_session.get_id());
         }
 
-        Session session = openViduService.getSession(sessionId);
+        Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         session.close();
 
         return new Response<>(true, 2000L, "삭제 성공", null);
@@ -224,7 +229,7 @@ public class SessionService {
     @Transactional
     public Response<?> updateSessionUserCounts(String sessionId, UpdateSessionRequest request) {
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new RuntimeException("세션을 찾을 수 없습니다"));
+                .orElseThrow(SessionNotExistException::new);
 
         session.setMaxUserCount(request.getMaxUserCount());
         session.setMaxSubuserCount(request.getMaxSubuserCount());
@@ -236,7 +241,7 @@ public class SessionService {
     @Transactional
     public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) {
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subsessionId)
-                .orElseThrow(() -> new RuntimeException("하위 세션을 찾을 수 없습니다"));
+                .orElseThrow(SessionNotExistException::new);
 
         session.setGroupName(request.getGroupName());
         sessionRepository.save(session);

@@ -3,7 +3,10 @@ package com.ssafy.meshroom.backend.global.error;
 import com.ssafy.meshroom.backend.global.error.code.CommonErrorCode;
 import com.ssafy.meshroom.backend.global.error.code.ErrorCode;
 import com.ssafy.meshroom.backend.global.error.dto.ErrorResponse;
+import com.ssafy.meshroom.backend.global.error.exception.FullCapacityLimitException;
+import com.ssafy.meshroom.backend.global.error.exception.OpenViduException;
 import com.ssafy.meshroom.backend.global.error.exception.RestApiException;
+import com.ssafy.meshroom.backend.global.error.exception.SessionNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +28,23 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(FullCapacityLimitException.class)
+    public ResponseEntity<Object> handleFullCapacityLimitExceptionException(FullCapacityLimitException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(OpenViduException.class)
+    public ResponseEntity<Object> handleOpenViduExceptionException(OpenViduException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(SessionNotExistException.class)
+    public ResponseEntity<Object> handleSessionNotExistExceptionException(SessionNotExistException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
     /**
      * Handles custom exceptions of type RestApiException.
      *
