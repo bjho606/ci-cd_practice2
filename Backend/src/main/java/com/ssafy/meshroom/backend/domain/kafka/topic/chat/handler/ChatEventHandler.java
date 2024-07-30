@@ -1,21 +1,16 @@
-package com.ssafy.meshroom.backend.domain.chat.api;
+package com.ssafy.meshroom.backend.domain.kafka.topic.chat.handler;
 
-import com.ssafy.meshroom.backend.domain.chat.application.ChatService;
-import com.ssafy.meshroom.backend.domain.chat.domain.ChatMessage;
-import com.ssafy.meshroom.backend.domain.chat.dto.ChatMessagePublish;
+import com.ssafy.meshroom.backend.domain.kafka.topic.chat.service.ChatService;
+import com.ssafy.meshroom.backend.domain.kafka.topic.chat.dto.ChatMessagePublish;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
-public class ChatController {
+public class ChatEventHandler {
 
     private final ChatService chatService;
 
@@ -33,13 +28,6 @@ public class ChatController {
 //    @SendTo("/chat/message")
     public void sendMessage(ChatMessagePublish chatMessagePublish) {
         log.info("Message Mapping /chat/message");
-
-        chatService.sendChatMessage(chatMessagePublish);
-    }
-
-    @RequestMapping(value = "/chat/message", produces = "application/json", method = {RequestMethod.POST})
-    public void messagePost(@RequestBody ChatMessagePublish chatMessagePublish) {
-        log.info("Request Mapping /chat/message");
 
         chatService.sendChatMessage(chatMessagePublish);
     }
