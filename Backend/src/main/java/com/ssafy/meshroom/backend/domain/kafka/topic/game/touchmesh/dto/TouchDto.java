@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class TouchDto {
     //  세션id와 +/- 정보
-    private String sessionSid;
+    private String sessionId;
     private enum type {INCREASE, DECREASE};
 }

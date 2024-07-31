@@ -22,47 +22,43 @@ public class ChatService {
     private final KafkaChatProducer kafkaChatProducer;
     private final UserRepository userRepository;
 
-    public void sendChatMessage(ChatMessagePublish chatMessagePublish) {
-        // FIXME : 테스트 필요
-        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(chatMessagePublish);
-
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String username;
-//        if (principal instanceof UserDetails) {
-//            username = ((UserDetails)principal).getUsername();
-//        } else {
-//            username = principal.toString();
-//        }
-//        System.out.println(username);
+    public void sendChatMessage(String userSid, ChatMessagePublish chatMessagePublish) {
+        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(userSid, chatMessagePublish);
 
         kafkaChatProducer.sendMessage(chatMessageSubscribe);
     }
 
-    public void join(ChatMessagePublish chatMessagePublish) {
-        // FIXME : 테스트 필요
-        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(chatMessagePublish);
+    public void join(String userSid, ChatMessagePublish chatMessagePublish) {
+        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(userSid, chatMessagePublish);
 
         chatMessageSubscribe.setContent(chatMessageSubscribe.getUserName() + " 님이 입장하셨습니다.");
 
         kafkaChatProducer.sendMessage(chatMessageSubscribe);
     }
 
-    public void leave(ChatMessagePublish chatMessagePublish) throws OpenViduJavaClientException, OpenViduHttpException {
-        // FIXME : 테스트 필요
-        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(chatMessagePublish);
+    // TODO: 퇴장 처리 로직 추가해야 합니다.
+    public void leave(String userSid, ChatMessagePublish chatMessagePublish) {
+        ChatMessageSubscribe chatMessageSubscribe = processChatMessage(userSid, chatMessagePublish);
 
         chatMessageSubscribe.setContent(chatMessageSubscribe.getUserName() + " 님이 퇴장하셨습니다.");
 
         kafkaChatProducer.sendMessage(chatMessageSubscribe);
-        sessionService.removeUserFromSession(chatMessageSubscribe.getSessionSid(), user.get_id());
+        try {
+            sessionService.removeUserFromSession(chatMessageSubscribe.getSessionId(), user.get_id());
+        } catch (OpenViduJavaClientException e) {
+            throw new RuntimeException(e);
+        } catch (OpenViduHttpException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public ChatMessageSubscribe processChatMessage(ChatMessagePublish chatMessagePublish) {
-        String userSid = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    public ChatMessageSubscribe processChatMessage(String userSid, ChatMessagePublish chatMessagePublish) {
         String userName = userRepository.findById(userSid)
                 .orElseThrow(() -> new RuntimeException("유저 없음"))
                 .getUsername();
 
-        return ChatMessageSubscribe.from(chatMessagePublish, userName);
+        ChatMessageSubscribe chatMessageSubscribe = ChatMessageSubscribe.from(chatMessagePublish, userName);
+        System.out.println(chatMessageSubscribe);
+        return chatMessageSubscribe;
     }
 }

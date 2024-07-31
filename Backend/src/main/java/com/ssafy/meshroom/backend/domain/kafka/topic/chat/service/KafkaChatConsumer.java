@@ -17,6 +17,6 @@ public class KafkaChatConsumer {
     public void listen(ChatMessageSubscribe chatMessage) {
 
         // 클라이언트로 메시지 전달
-        messagingTemplate.convertAndSend("/subscribe/chat/session/" + chatMessage.getSessionSid(), chatMessage);
+        messagingTemplate.convertAndSend("/subscribe/chat/session/" + chatMessage.getSessionId(), chatMessage);
     }
 }

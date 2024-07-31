@@ -33,3 +33,12 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### openvidu 실행
+#### 관리자 모드로 파워셀 실행
+`docker run -p 4443:4443 --rm -e OPENVIDU_SECRET=MY_SECRET openvidu/openvidu-dev:2.30.0`  
+#### 터미널 분할
+##### 이동
+`C:\projects\S11P12A401\Frontend\lolmushroom\src\plugins`
+##### 실행
+`node index.js`
