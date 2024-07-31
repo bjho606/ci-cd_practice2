@@ -13,15 +13,15 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ChatMessageSubscribe {
     private String userName;
-    private String sessionSid;
+    private String sessionId;
     private String content;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant timestamp;
 //    private Date timestamp = new Date(System.currentTimeMillis());
 
-    public ChatMessageSubscribe(String sessionSid, String content, Instant timestamp) {
-        this.sessionSid = sessionSid;
+    public ChatMessageSubscribe(String sessionId, String content, Instant timestamp) {
+        this.sessionId = sessionId;
         this.content = content;
         this.timestamp = timestamp;
     }
@@ -29,7 +29,7 @@ public class ChatMessageSubscribe {
     public static ChatMessageSubscribe from (ChatMessagePublish chatMessagePublish, String userName) {
         return new ChatMessageSubscribe(
             userName,
-            chatMessagePublish.getSessionSid(),
+            chatMessagePublish.getSessionId(),
             chatMessagePublish.getContent(),
             chatMessagePublish.getTimestamp()
         );

@@ -13,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ChatMessagePublish {
 
-    private String sessionSid;
+    private String sessionId;
     private String content;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
