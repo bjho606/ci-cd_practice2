@@ -73,7 +73,7 @@ const handleRoomClick = async (index) => {
     await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
     router.push({
       name: 'roomwaiting',
-      params: { sessionId: sessionStore.sessionId, num: room.sessionId }
+      params: { sessionId: sessionStore.sessionId, subSessionId: room.sessionId }
     })
     sessionStore.setSubSessionId(room.sessionId)
     // roomStore.updateRoomOccupants(index)

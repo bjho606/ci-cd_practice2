@@ -1,35 +1,48 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/User'
-import GlobalHeader from '@/components/common/GlobalHeader.vue'
 import MakeSessionView from '@/views/MakeSessionView.vue'
 import RoomWatching from '@/components/room/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
-import SessionCuration from '@/components/setting/SessionCuration.vue'
 import ManagerWating from '@/components/room/ManagerWating.vue'
 import PlayerChoose from '@/components/room/PlayerChoose.vue'
 import RoomWaiting from '@/components/room/RoomWaiting.vue'
-import CustomRoom from '@/components/room/CustomRoom.vue'
-import MushroomMyGroup from '@/components/contents/MushroomMyGroup.vue'
-import MushroomGrow from '@/components/contents/Mushroom.vue'
+import ManagerView from '@/views/ManagerView.vue'
+import PlayerView from '@/views/PlayerView.vue'
+import GroupSessionView from '@/views/GroupSessionView.vue'
+import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 
 const routes = [
+  // Home Route -> Session을 만드는 사람은 Manager가 된다.
   { path: '/', name: 'home', component: MakeSessionView },
-  { path: '/:sessionId', name: 'mainSession', component: PlayerChoose },
-  //관리자 라우트
 
-  { path: '/:sessionId/multiroom', name: 'multiroom', component: MultiRoom },
-  { path: '/:sessionId/roomwatching', name: 'roomwatching', component: RoomWatching },
-  { path: '/:sessionId/managerwating', name: 'managerwating', component: ManagerWating },
+  {
+    path: '/admin/:sessionId',
+    component: ManagerView,
+    children: [
+      { path: 'multiroom', name: 'multiroom', component: MultiRoom },
+      { path: 'roomwatching', name: 'roomwatching', component: RoomWatching },
+      { path: 'managerwating', name: 'managerwating', component: ManagerWating }
+    ]
+  },
 
-  // 사용자 라우트
-
-  // 대기 화면
-  { path: '/:sessionId/:num/roomwaiting', name: 'roomwaiting', component: RoomWaiting },
-  // 사용자 고르는 화면
-  { path: '/:sessionId/playerchoose', name: 'playerChoose', component: PlayerChoose },
-
-  { path: '/MushroomMyGroup', name: 'MushroomMyGroup', component: MushroomMyGroup },
-  { path: '/MushroomGrow', name: 'MushroomGrow', component: MushroomGrow }
+  {
+    path: '/:sessionId',
+    component: PlayerView,
+    children: [
+      { path: '', name: 'mainSession', component: PlayerChoose },
+      { path: ':subSessionId/roomwaiting', name: 'roomwaiting', component: RoomWaiting },
+      {
+        path: ':subSessionId/GroupSessionView',
+        name: 'GroupSessionView',
+        component: GroupSessionView
+      },
+      {
+        path: ':subSessionId/GroupFightSessionView',
+        name: 'GroupFightSessionView',
+        component: GroupFightSessionView
+      },
+      { path: 'playerchoose', name: 'playerChoose', component: PlayerChoose }
+    ]
+  }
 ]
 
 const router = createRouter({

@@ -15,7 +15,7 @@ const sendMessage = () => {
     type: 'ALL',
     userSid: 1,
     senderName: 'User1',
-    sessionSid: sessionStore.sessionId,
+    sessionSid: sessionStore.subSessionId,
     content: text.value,
     timestamp: new Date().toISOString()
   }
@@ -29,7 +29,7 @@ const onMessageReceived = (message) => {
 }
 
 const connectToWebSocket = () => {
-  webSocketAPI.connect(sessionStore.sessionId, onMessageReceived)
+  webSocketAPI.connect(sessionStore.subSessionId, onMessageReceived)
 }
 
 onMounted(() => {
