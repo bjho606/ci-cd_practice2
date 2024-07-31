@@ -1,32 +1,21 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
 import './assets/fonts.css'
-import AudioPlayer from './components/common/AudioPlayer.vue'
+import { ref } from 'vue'
 import GlobalHeader from '@/components/common/GlobalHeader.vue'
 import GlobalFooter from '@/components/common/GlobalFooter.vue'
-import MakeSessionView from '@/views/MakeSessionView.vue'
-import GroupSessionView from '@/views/GroupSessionView.vue'
-import GroupFightSessionView from './views/GroupFightSessionView.vue'
-import CustomRoom from '@/components/room/CustomRoom.vue'
-import MultiRoom from '@/components/room/MultiRoom.vue'
-import RoomWatching from '@/components/room/RoomWatching.vue'
 </script>
 
 <template>
   <v-app id="v-app">
     <!-- Navigation Drawer는 그룹 컨텐츠 / 그룹 대항전 컨텐츠 여부에 따라 달라져야 함-->
-    <v-navigation-drawer :width="10" permanent></v-navigation-drawer>
+    <v-navigation-drawer :width="10" permanent> </v-navigation-drawer>
     <v-navigation-drawer :width="10" location="right" permanent></v-navigation-drawer>
     <GlobalHeader />
     <v-main class="d-flex align-center justify-center background">
       <v-container fluid class="container">
-        <!-- <GroupSessionView /> -->
-        <!-- <MakeSessionView /> -->
-        <!-- <GroupFightSessionView /> -->
-        <!-- <AudioPlayer /> -->
         <RouterView></RouterView>
       </v-container>
-      <!-- <ChatScreen class="chat"/> -->
       <div class="mushroomGreen mushroom-1"></div>
       <div class="mushroomOrange mushroom-2"></div>
       <div class="mushroomRed mushroom-3"></div>
@@ -126,10 +115,4 @@ import RoomWatching from '@/components/room/RoomWatching.vue'
     left: 20%;
   }
 }
-
-/* .chat {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-} */
 </style>

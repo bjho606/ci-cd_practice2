@@ -1,6 +1,4 @@
-<script setup>
-import ChatScreen from '../common/ChatScreen.vue'
-</script>
+<script setup></script>
 
 <template>
   <div class="main">
@@ -15,7 +13,6 @@ import ChatScreen from '../common/ChatScreen.vue'
         <v-progress-linear indeterminate color="white" :height="15"></v-progress-linear>
       </v-container>
     </v-container>
-    <ChatScreen />
   </div>
 </template>
 
