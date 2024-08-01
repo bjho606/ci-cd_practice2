@@ -52,7 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         return ("test-token".equals(request.getHeader("X-Test-Token")))
-                || (request.getMethod().equals("POST") && path.startsWith(("/api/v1/sessions")))
+                || !(request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
+//                || path.startsWith(("/swagger-ui"))
+//                || path.startsWith(("/api-docs"))
                 ;
     }
 }

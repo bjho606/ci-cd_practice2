@@ -52,24 +52,25 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
+                .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass())
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/swagger-ui/**").permitAll()
 //                        .requestMatchers("/api-docs/**").permitAll()
 //                        .requestMatchers("**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions").anonymous()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions/**").anonymous()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**/group-name").hasAuthority(UserRole.TEAM_LEADER.getAuthority())
                         .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**").hasAuthority(UserRole.FACILITATOR.getAuthority())
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())              // 그 외의 모든 요청은 인증 필요)
+                        .anyRequest().permitAll())              // 그 외의 모든 요청은 인증 필요)
                 .exceptionHandling(e-> {
                             e.accessDeniedHandler(securityDeniedHandler);
                             e.authenticationEntryPoint(securityAuthenticationEntryPoint);
-                    }
+                        }
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
-                .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass());
+        ;
 
         // 모든 기본 필터를 비활성화하고 custom filter만 사용하도록 설정
         http
@@ -82,19 +83,6 @@ public class WebSecurityConfig {
                 .cors(withDefaults()); // CORS 설정 추가
 
         return http.build();
-    }
-
-    /**
-     * AuthenticationManager를 제공합니다.
-     * 이 메서드는 AuthenticationManager를 구성하고, 사용자 정의 인증 메커니즘을 사용할 수 있도록 합니다.
-     *
-     * @param authenticationConfiguration 인증 설정
-     * @return 구성된 AuthenticationManager
-     * @throws Exception 인증 매니저 구성 중 예외 발생 시
-     */
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
