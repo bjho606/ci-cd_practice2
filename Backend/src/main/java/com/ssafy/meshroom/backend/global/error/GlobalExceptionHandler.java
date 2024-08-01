@@ -3,14 +3,12 @@ package com.ssafy.meshroom.backend.global.error;
 import com.ssafy.meshroom.backend.global.error.code.CommonErrorCode;
 import com.ssafy.meshroom.backend.global.error.code.ErrorCode;
 import com.ssafy.meshroom.backend.global.error.dto.ErrorResponse;
-import com.ssafy.meshroom.backend.global.error.exception.FullCapacityLimitException;
-import com.ssafy.meshroom.backend.global.error.exception.OpenViduException;
-import com.ssafy.meshroom.backend.global.error.exception.RestApiException;
-import com.ssafy.meshroom.backend.global.error.exception.SessionNotExistException;
+import com.ssafy.meshroom.backend.global.error.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +25,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(SecurityAuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(SecurityAuthenticationException ex) {
+        return handleExceptionInternal(ex.getErrorCode());
+    }
 
     @ExceptionHandler(FullCapacityLimitException.class)
     public ResponseEntity<Object> handleFullCapacityLimitExceptionException(FullCapacityLimitException e) {

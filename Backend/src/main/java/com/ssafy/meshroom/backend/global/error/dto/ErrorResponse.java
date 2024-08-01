@@ -1,6 +1,7 @@
 package com.ssafy.meshroom.backend.global.error.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 @Getter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
 
     private final String code; // Error code
