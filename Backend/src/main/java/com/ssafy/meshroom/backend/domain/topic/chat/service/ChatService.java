@@ -1,7 +1,7 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.chat.service;
+package com.ssafy.meshroom.backend.domain.topic.chat.service;
 
-import com.ssafy.meshroom.backend.domain.kafka.topic.chat.dto.ChatMessagePublish;
-import com.ssafy.meshroom.backend.domain.kafka.topic.chat.dto.ChatMessageSubscribe;
+import com.ssafy.meshroom.backend.domain.topic.chat.dto.ChatMessagePublish;
+import com.ssafy.meshroom.backend.domain.topic.chat.dto.ChatMessageSubscribe;
 import com.ssafy.meshroom.backend.domain.session.application.SessionService;
 import com.ssafy.meshroom.backend.domain.user.dao.UserRepository;
 import com.ssafy.meshroom.backend.domain.user.domain.User;

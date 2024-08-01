@@ -1,4 +1,4 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.dto;
+package com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto;
 
 import lombok.Getter;
 import lombok.Setter;

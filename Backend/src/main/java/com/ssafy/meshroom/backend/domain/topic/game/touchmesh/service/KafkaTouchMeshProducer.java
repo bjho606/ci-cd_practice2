@@ -1,6 +1,6 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.service;
+package com.ssafy.meshroom.backend.domain.topic.game.touchmesh.service;
 
-import com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.dto.TouchDto;
+import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

@@ -1,21 +1,20 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.game.handler;
+package com.ssafy.meshroom.backend.domain.topic.game.touchmesh.handler;
 
-import com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.dto.TouchDto;
-import com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.service.KafkaTouchMeshProducer;
+import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
+import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.service.KafkaTouchMeshProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class GameEventHandler {
+public class TouchMeshEventHandler {
 
     @Autowired
     private KafkaTouchMeshProducer kafkaTouchMeshProducer;
 
     @MessageMapping("/game/touch")
-    public void handleGameEvent(TouchDto touchEvent) {
+    public void handleTouchEvent(TouchDto touchEvent) {
         kafkaTouchMeshProducer.sendEvent(touchEvent);
     }
 
-    // TODO: 게임 더 추가
 }
