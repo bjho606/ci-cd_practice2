@@ -27,14 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         String token = CookieUtil.getCookie(request,"token").orElseThrow(()->new SecurityAuthenticationException("Invalid token")).getValue();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("token".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
         log.info(token);
         if (token == null || !tokenProvider.validToken(token)) {
             throw new RuntimeException("Invalid token");
@@ -52,7 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         return ("test-token".equals(request.getHeader("X-Test-Token")))
-                || !(request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
+                // 아래 조건을 만족하면 필터링을 해야만 함!
+                || !(
+                        (request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
+                        || CookieUtil.getCookie(request,"token").isPresent()
+                    )
+
 //                || path.startsWith(("/swagger-ui"))
 //                || path.startsWith(("/api-docs"))
                 ;
