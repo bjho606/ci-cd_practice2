@@ -1,5 +1,6 @@
 package com.ssafy.meshroom.backend.global.auth.jwt;
 
+import com.ssafy.meshroom.backend.global.error.exception.SecurityAuthenticationException;
 import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
-        String token = CookieUtil.getCookie(request,"token").orElseThrow().getValue();
+        String token = CookieUtil.getCookie(request,"token").orElseThrow(()->new SecurityAuthenticationException("Invalid token")).getValue();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -50,12 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-//        return true;
-        return (request.getMethod().equals("POST")&&path.startsWith("/api/v1/sessions"))
-                ||(request.getMethod().equals("GET")&&path.startsWith("/api/v1/contents"))
-                ||(path.startsWith("/swagger-ui"))
-                ||(path.startsWith("/api-docs"))
-                || "test-token".equals(request.getHeader("X-Test-Token"))
+        return ("test-token".equals(request.getHeader("X-Test-Token")))
+                || (request.getMethod().equals("POST") && path.startsWith(("/api/v1/sessions")))
                 ;
     }
 }

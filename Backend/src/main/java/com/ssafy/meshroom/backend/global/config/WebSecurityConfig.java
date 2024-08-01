@@ -1,5 +1,9 @@
 package com.ssafy.meshroom.backend.global.config;
 
+import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
+import com.ssafy.meshroom.backend.global.auth.error.AuthFailHandlerFilter;
+import com.ssafy.meshroom.backend.global.auth.error.SecurityAuthenticationEntryPoint;
+import com.ssafy.meshroom.backend.global.auth.error.SecurityDeniedHandler;
 import com.ssafy.meshroom.backend.global.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +35,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final SecurityAuthenticationEntryPoint securityAuthenticationEntryPoint;
+    private final SecurityDeniedHandler securityDeniedHandler;
+    private final AuthFailHandlerFilter authFailHandlerFilter;
 
     /**
      * Spring Security의 필터 체인을 구성합니다.
@@ -47,14 +53,23 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("**").permitAll()
-//                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/token").permitAll()
+//                        .requestMatchers("/swagger-ui/**").permitAll()
+//                        .requestMatchers("/api-docs/**").permitAll()
+//                        .requestMatchers("**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions").anonymous()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions/**").anonymous()
+                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**/group-name").hasAuthority(UserRole.TEAM_LEADER.getAuthority())
+                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**").hasAuthority(UserRole.FACILITATOR.getAuthority())
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())              // 그 외의 모든 요청은 인증 필요)
+                .exceptionHandling(e-> {
+                            e.accessDeniedHandler(securityDeniedHandler);
+                            e.authenticationEntryPoint(securityAuthenticationEntryPoint);
+                    }
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass());
+                .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
+                .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass());
 
         // 모든 기본 필터를 비활성화하고 custom filter만 사용하도록 설정
         http

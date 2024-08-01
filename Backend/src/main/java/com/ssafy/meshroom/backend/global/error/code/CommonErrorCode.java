@@ -23,6 +23,8 @@ public enum CommonErrorCode implements ErrorCode {
     FULL_CAPACITY_USERS(HttpStatus.SERVICE_UNAVAILABLE, "제한 인원 초과"),
     SESSION_NOT_EXIST(HttpStatus.NOT_FOUND, "존재하지 않는 세션"),
     OPENVIDU_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "openvidu 오류"),
+
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.")
     ;
 
     private final HttpStatus httpStatus; // HTTP status code associated with the error
