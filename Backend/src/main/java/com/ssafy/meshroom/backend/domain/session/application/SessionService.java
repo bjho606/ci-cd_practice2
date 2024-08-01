@@ -14,9 +14,12 @@ import com.ssafy.meshroom.backend.global.error.exception.SessionNotExistExceptio
 import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import io.openvidu.java.client.*;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,10 +95,12 @@ public class SessionService {
         Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         long curCount = openViduService.getSessionCount(session);
 
+        AtomicReference<Boolean> isMain = new AtomicReference<>();
         AtomicReference<UserRole> userRole = new AtomicReference<>(UserRole.PARTICIPANT);
         AtomicReference<com.ssafy.meshroom.backend.domain.session.domain.Session> sessionAtomicReference = new AtomicReference<>();
         sessionRepository.findBySessionId(sessionId).ifPresentOrElse(session1 -> {
             sessionAtomicReference.set(session1);
+            isMain.set(session1.getIsMain());
             if (session1.getIsMain()) {
                 if (curCount >= session1.getMaxUserCount()) {
                     throw new FullCapacityLimitException();
@@ -115,13 +120,20 @@ public class SessionService {
             throw new RuntimeException("없는 세션");
         });
 
+        String userId = "";
         // 2. user 컬렉션과 token 컬렉션에 관계 추가
-        String userId = userDetailService.saveUser(userName, userRole.get());
+        if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken){
+            userId = userDetailService.saveUser(userName, userRole.get());
+        }else{
+            userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        }
         ovTokenService.save(sessionAtomicReference.get().get_id(), userId);
 
-        // 3-1. 유저 jwtToken 발행
-        String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
-        CookieUtil.addCookie(response, "token", jwtToken);
+        if(isMain.get()){
+            // 3-1. 유저 jwtToken 발행
+            String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
+            CookieUtil.addCookie(response, "token", jwtToken);
+        }
 
         // 3-2. session 접속 토큰 발행
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
