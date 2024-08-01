@@ -1,7 +1,7 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.chat.handler;
+package com.ssafy.meshroom.backend.domain.topic.chat.handler;
 
-import com.ssafy.meshroom.backend.domain.kafka.topic.chat.service.ChatService;
-import com.ssafy.meshroom.backend.domain.kafka.topic.chat.dto.ChatMessagePublish;
+import com.ssafy.meshroom.backend.domain.topic.chat.service.ChatService;
+import com.ssafy.meshroom.backend.domain.topic.chat.dto.ChatMessagePublish;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;

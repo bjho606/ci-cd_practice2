@@ -1,4 +1,4 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.chat.dto;
+package com.ssafy.meshroom.backend.domain.topic.chat.dto;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;

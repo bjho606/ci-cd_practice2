@@ -1,6 +1,6 @@
-package com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.service;
+package com.ssafy.meshroom.backend.domain.topic.game.touchmesh.service;
 
-import com.ssafy.meshroom.backend.domain.kafka.topic.game.touchmesh.dto.TouchDto;
+import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
