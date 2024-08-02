@@ -2,6 +2,8 @@ package com.ssafy.meshroom.backend.domain.OVToken.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.OVToken.domain.OVToken;
+import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
+import com.ssafy.meshroom.backend.domain.session.domain.Session;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.List;
 public class OVTokenService {
     private final OVTokenRepository ovTokenRepository;
     private final UserDetailService userDetailService;
+    private final SessionRepository sessionRepository;
 
     public void save(String sessionSid, String userSid) {
         ovTokenRepository.save(OVToken.builder()
@@ -39,5 +42,16 @@ public class OVTokenService {
 
     public void removeUserFromSession(String sessionSid, String userSid) {
         ovTokenRepository.deleteBySessionSidAndUserSid(sessionSid, userSid);
+    }
+
+    public Session getMainSessionFromUserId(String userSid){
+        List<OVToken> ovTokens = ovTokenRepository.findAllByUserSid(userSid);
+
+        for(OVToken ovToken: ovTokens){
+            Session s = sessionRepository.findById(ovToken.getSessionSid()).orElseThrow();
+            if(s.getIsMain()){ return s; }
+        }
+
+        return null;
     }
 }
