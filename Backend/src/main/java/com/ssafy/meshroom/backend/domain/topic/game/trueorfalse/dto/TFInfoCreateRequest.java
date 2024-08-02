@@ -1,19 +1,18 @@
 package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+@ToString
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TFInfoCreateRequest {
-    String ovToken;
+    private String ovToken;
 
-    ArrayList<String> truths;
-    String false1;
+    private ArrayList<String> truths;
+    private String false1;
 }
