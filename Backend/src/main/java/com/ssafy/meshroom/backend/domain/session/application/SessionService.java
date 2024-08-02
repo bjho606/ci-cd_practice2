@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 @Slf4j
 public class SessionService {
-
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final SessionRepository sessionRepository;
     private final ContentsOrderService contentsOrderService;
     private final UserDetailService userDetailService;
@@ -83,6 +84,8 @@ public class SessionService {
                         .mainSession(sessionId)
                         .build()
         );
+
+        simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
 
         return new Response<SubSessionCreateResponse>(true, 2010L, "SUCCESS",
                 new SubSessionCreateResponse(session.getSessionId())
@@ -143,6 +146,12 @@ public class SessionService {
                 .build();
         Connection connection = session.createConnection(connectionProperties);
         String token = connection.getToken(); // Send this string to the client side
+        if(isMain.get()){
+            simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
+        }else{
+            String mainSessionId = sessionAtomicReference.get().getMainSession();
+            simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + mainSessionId, getSessionInfo(mainSessionId).getResult());
+        }
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
                 , new ConnectionCreateResponse(token));
     }
@@ -239,7 +248,7 @@ public class SessionService {
     }
 
     @Transactional
-    public Response<?> updateSessionUserCounts(String sessionId, UpdateSessionRequest request) {
+    public Response<?> updateSessionUserCounts(String sessionId, UpdateSessionRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(sessionId)
                 .orElseThrow(SessionNotExistException::new);
 
@@ -247,17 +256,19 @@ public class SessionService {
         session.setMaxSubuserCount(request.getMaxSubuserCount());
         sessionRepository.save(session);
 
+        simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
         return new Response<>(true, 2000L, "세션 정보가 성공적으로 수정되었습니다.", null);
     }
 
     @Transactional
-    public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) {
+    public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subsessionId)
                 .orElseThrow(SessionNotExistException::new);
 
         session.setGroupName(request.getGroupName());
         sessionRepository.save(session);
 
+        simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
         return new Response<>(true, 2000L, "하위 세션의 그룹 이름이 성공적으로 수정되었습니다.", null);
     }
 

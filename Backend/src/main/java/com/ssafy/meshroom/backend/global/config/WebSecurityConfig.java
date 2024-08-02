@@ -56,14 +56,11 @@ public class WebSecurityConfig {
                 .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
                 .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass())
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/swagger-ui/**").permitAll()
-//                        .requestMatchers("/api-docs/**").permitAll()
-//                        .requestMatchers("**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/sessions/**").permitAll()
-                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**/group-name").hasAuthority(UserRole.TEAM_LEADER.getAuthority())
-                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/**").hasAuthority(UserRole.FACILITATOR.getAuthority())
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/*/group-name").hasAnyAuthority(
+                                UserRole.TEAM_LEADER.getAuthority()
+                                ,UserRole.FACILITATOR.getAuthority()
+                        )
+                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/{sessionId}").hasAuthority(UserRole.FACILITATOR.getAuthority())
                         .anyRequest().permitAll())              // 그 외의 모든 요청은 인증 필요)
                 .exceptionHandling(e-> {
                             e.accessDeniedHandler(securityDeniedHandler);
