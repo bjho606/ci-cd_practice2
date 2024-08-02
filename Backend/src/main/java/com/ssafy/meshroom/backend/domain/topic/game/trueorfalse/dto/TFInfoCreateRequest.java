@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TFInfoCreateRequest {
     String ovToken;
 
-    String truth1;
-    String truth2;
-    String truth3;
-    String truth4;
+    ArrayList<String> truths;
     String false1;
 }

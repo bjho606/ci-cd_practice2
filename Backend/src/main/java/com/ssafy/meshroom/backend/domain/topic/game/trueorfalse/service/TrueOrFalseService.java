@@ -19,15 +19,23 @@ public class TrueOrFalseService {
     private final TrueOrFalseRepository trueOrFalseRepository;
 
     public Response<TFInfoCreateResponse> createTFInfo(String sessionId, TFInfoCreateRequest tfInfoCreateRequest) {
-        trueOrFalseRepository.save(TFInfo.builder()
-                        .ovToken(tfInfoCreateRequest.getOvToken())
-                        .sessionId(sessionId)
-                        .truth1(tfInfoCreateRequest.getTruth1())
-                        .truth2(tfInfoCreateRequest.getTruth2())
-                        .truth3(tfInfoCreateRequest.getTruth3())
-                        .truth4(tfInfoCreateRequest.getTruth4())
-                        .false1(tfInfoCreateRequest.getFalse1())
-                .build());
+        TFInfo newTFInfo = TFInfo.builder()
+                            .ovToken(tfInfoCreateRequest.getOvToken())
+                            .sessionId(sessionId)
+                            .truths(tfInfoCreateRequest.getTruths())
+                            .false1(tfInfoCreateRequest.getFalse1())
+                        .build();
+
+        if (trueOrFalseRepository.existsByOvTokenAndSessionId(tfInfoCreateRequest.getOvToken(), sessionId)) {
+            System.out.println("exists");
+            TFInfo foundTFInfo = trueOrFalseRepository.findByOvTokenAndSessionId(tfInfoCreateRequest.getOvToken(), sessionId)
+                            .orElseThrow(() -> new RuntimeException("정보가 존재하지 않음"));
+            foundTFInfo.setTruths(tfInfoCreateRequest.getTruths());
+            foundTFInfo.setFalse1(tfInfoCreateRequest.getFalse1());
+            trueOrFalseRepository.save(foundTFInfo);
+        } else {
+            trueOrFalseRepository.save(newTFInfo);
+        }
 
         return new Response<TFInfoCreateResponse>(true, 2010L, "SUCCESS",
                 TFInfoCreateResponse.builder()
@@ -39,7 +47,7 @@ public class TrueOrFalseService {
     public Response<TFInfoResponse> getTFInfo(String sessionId, TFInfoRequest tfInfoRequest) {
         TFInfo foundTFInfo = trueOrFalseRepository.findByOvTokenAndSessionId(tfInfoRequest.getOvToken(), sessionId)
                 .orElseThrow(()-> new RuntimeException("진실 혹은 거짓 작성 내용이 없습니다."));
-
+        System.out.println(foundTFInfo.toString());
         return new Response<TFInfoResponse>(true, 2000L, "SUCCESS",
                 TFInfoResponse.from(foundTFInfo)
         );

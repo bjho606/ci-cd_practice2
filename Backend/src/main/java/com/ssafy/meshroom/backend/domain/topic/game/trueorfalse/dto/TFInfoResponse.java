@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -13,20 +15,14 @@ import lombok.NoArgsConstructor;
 public class TFInfoResponse {
     String ovToken;
     String sessionId;
-    String truth1;
-    String truth2;
-    String truth3;
-    String truth4;
+    ArrayList<String> truths;
     String false1;
 
     public static TFInfoResponse from (TFInfo tfInfo) {
         return new TFInfoResponse(
                 tfInfo.getOvToken(),
                 tfInfo.getSessionId(),
-                tfInfo.getTruth1(),
-                tfInfo.getTruth2(),
-                tfInfo.getTruth3(),
-                tfInfo.getTruth4(),
+                tfInfo.getTruths(),
                 tfInfo.getFalse1()
         );
     }
