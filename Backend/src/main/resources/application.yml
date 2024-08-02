@@ -10,6 +10,7 @@ spring:
       - classpath:/yaml/logging/application-dev-log.yml
       - classpath:/yaml/logging/application-release-log.yml
       - file:.env[.properties]
+
   profiles:
     group:
       _local: local, local-log
