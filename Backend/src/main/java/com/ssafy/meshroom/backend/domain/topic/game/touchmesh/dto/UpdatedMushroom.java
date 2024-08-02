@@ -5,13 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TouchDto {
-    //  세션id와 +/- 정보
+public class UpdatedMushroom {
     private String mainSessionId;
     private String sessionId;
-    private TouchType type;
-
-    public enum TouchType {
-        INCREASE, DECREASE;
-    }
+    private int size;
 }
