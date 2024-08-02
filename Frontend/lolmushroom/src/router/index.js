@@ -10,6 +10,8 @@ import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 import MushroomContent from '@/components/contents/MushroomContent.vue'
+import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
+import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
 
 const routes = [
   // Home Route -> Session을 만드는 사람은 Manager가 된다.
@@ -33,8 +35,11 @@ const routes = [
       { path: ':subSessionId/roomwaiting', name: 'roomwaiting', component: RoomWaiting },
       {
         path: ':subSessionId/GroupSessionView',
-        name: 'GroupSessionView',
-        component: GroupSessionView
+        component: GroupSessionView,
+          children: [
+            { path: 'TOF', name: 'TOF', component: TOFInputsComponent },
+            { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent }
+          ]
       },
       {
         path: ':subSessionId/GroupFightSessionView',

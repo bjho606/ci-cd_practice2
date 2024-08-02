@@ -53,9 +53,9 @@ const NotNullRules = (value) => {
 // TOF 제출하기 버튼을 눌렀을 때 동작
 const tofAnswerSubmit = (a1, a2, a3, a4) => {
   addTOFAnswers(a1, a2, a3, a4)
-  isSubmitAnswer.value = !isSubmitAnswer.value
+  // isSubmitAnswer.value = !isSubmitAnswer.value
   // 이거는 이제 그룹의 모든 구성원이 완료하면 실행하는 코드
-  router.push({ name: 'tofmain' })
+  router.push({ name: 'TOFContent' });
 }
 
 // store에 TOF 진술을 추가하는 코드
@@ -71,7 +71,7 @@ const addTOFAnswers = (a1, a2, a3, a4) => {
 
 // 모든 사람이 준비되었을 때 TOF main으로 이동하는 함수
 const readyAllGuys = () => {
-  router.push('tof/main')
+  router.push('TOFContent')
 }
 </script>
 
