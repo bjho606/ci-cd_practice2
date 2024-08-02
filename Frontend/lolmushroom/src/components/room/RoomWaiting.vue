@@ -1,4 +1,31 @@
-<script setup></script>
+<script setup>
+import { onMounted } from 'vue'
+import { useChatStore } from '@/stores/chatStore'
+import { useSessionStore } from '@/stores/session'
+import { useRouter } from 'vue-router'
+import webSocketAPI from '@/api/webSocket'
+
+const chatStore = useChatStore()
+const sessionStore = useSessionStore()
+const router = useRouter()
+
+/**
+ * * 1. Player가 Sub Session Message에 대한 메시지를 구독한다.
+ * ! webSocketAPI.connect()의 CallBack에 들어갈 함수 ( Pinia의 MainSessionMessage에 저장 )
+ */
+const onSubSessionMessageReceived = (message) => {
+  chatStore.addSubSessionMessage(message)
+}
+
+/**
+ * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
+ * TODO 2. 진행자의 Signal을 await하고 있다가, 다음 Component로 이동할 수 있어야 한다.
+ */
+
+onMounted(() => {
+  webSocketAPI.connect(sessionStore.subSessionId, onSubSessionMessageReceived)
+})
+</script>
 
 <template>
   <div class="main">

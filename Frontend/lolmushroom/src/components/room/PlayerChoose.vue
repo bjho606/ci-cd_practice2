@@ -4,23 +4,28 @@ import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
 import { useUserStore } from '@/stores/User'
 import { useSessionStore } from '@/stores/session'
-import { useRoute, useRouter } from 'vue-router'
-import NicknameModal from '@/components/common/NicknameModal.vue'
+import { useRouter } from 'vue-router'
 import RoomNameInput from '@/components/room/RoomNameInput.vue'
 import sessionAPI from '@/api/session'
 
 const router = useRouter()
-const route = useRoute()
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const sessionStore = useSessionStore()
 const { rooms } = storeToRefs(roomStore)
-
-const showNicknameModal = ref(false)
 const showRoomNameInput = ref(false)
 const activeButtonIndex = ref(0)
 
-// Create session connection
+/**
+ * IMP 1. SubSession에 대한 Connection을 생성한다.
+ * REQ
+ * @param sessionId
+ * @param userName
+ *
+ * RES openvide_token, user_token
+ * ! Connection Token은 OpenVidu에서 주는 Token
+ * ! Server와 인증에 사용되는 User JWT Token은 Cookie에 저장됨
+ */
 const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
@@ -33,13 +38,22 @@ const getSessionConnection = async (sessionId, userName) => {
   }
 }
 
-// Get session information
+/**
+ * IMP 2. Main Session에 대한 정보를 받아낸다.
+ * * 2.1 Main Session에 대한 정보를 바탕으로, 현재 활성화된 Group을 갱신한다.
+ * REQ
+ * @param sessionId
+ *
+ * RES url, groups, max_user_count, current_user_count
+ * * groups : Group List => subSessionId, groupName, maxUserCount, currentUserCount, userName_Array
+ * ! MeshRoom 진행에 대한 Socket 연걸이 가능해지면 Deprecated될 동작 방식
+ */
 const getSessionInfo = async (sessionId) => {
   try {
     const response = await sessionAPI.getSessionInfo(sessionId)
     if (response.data.isSuccess) {
-      console.log('현재 Session의 정보를 가져왔습니다:) 현재 Session 상태는 다음과 같습니다:)')
       const groups = response.data.result.groups
+      console.log('현재 Session의 정보를 가져왔습니다:) 현재 Session 상태는 다음과 같습니다:)')
       console.log(response.data.result)
       roomStore.setRooms(groups)
     }
@@ -48,7 +62,16 @@ const getSessionInfo = async (sessionId) => {
   }
 }
 
-// Create sub-session
+/**
+ * IMP 3. SubSession을 '생성'한다 -> '생성'과 '입장'은 구분되어 있음.
+ * REQ
+ * @param sessionId
+ *
+ * RES sessionId(하위 세션 ID)
+ * * sessionId : 하위 세션 ID를 Result로 가져오지만, '입장'하는 것이 아니므로 쓸 일이 없다.
+ * IMP CreateSubSessionHandler()를 통해 Sub Session을 만들어내면, Main Session의 정보가 Server에서 갱신된다.
+ * IMP 이러한 특성을 이용해, 2번 getSessionInfo()를 통해 Main Session의 활성화 상태를 갱신한다.
+ */
 const createSubSessionHandler = async (sessionId) => {
   try {
     const response = await sessionAPI.createSubSession(sessionId)
@@ -61,7 +84,15 @@ const createSubSessionHandler = async (sessionId) => {
   }
 }
 
-// Room click handler
+/**
+ * * 4. Room을 클릭한다 => 2가지의 User Flow로 분기된다.
+ * @param index
+ * IMP 4.1 Room이 비활성 상태인 경우 -> 1번 createSubSessionHandler를 통해, 새로운 Sub Session을 생성한다.
+ * IMP 4.2 Room이 활성 상태인 경우 -> 해당 Sub Session으로 들어가는 Routing을 해주고, 동시에 Sub Session과 Connection을 만들어준다.
+ * * 이때, 'subSessionId : room.sessionId'을 통해 Sub Session Routing을 시켜주고 있음
+ * * Room 배열에 이미 subSessionId가 붙어 있기 때문에, 가능한 Process
+ *
+ */
 const handleRoomClick = async (index) => {
   const room = rooms.value[index]
   if (!room.buttonClicked) {
@@ -71,34 +102,24 @@ const handleRoomClick = async (index) => {
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
     await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
+    sessionStore.setSubSessionId(room.sessionId)
     router.push({
       name: 'roomwaiting',
       params: { sessionId: sessionStore.sessionId, subSessionId: room.sessionId }
     })
-    sessionStore.setSubSessionId(room.sessionId)
     // roomStore.updateRoomOccupants(index)
   }
 }
 
-// User flow handler
-const userFlowHandler = async () => {
-  const sessionId = route.params.sessionId
-  sessionStore.setSessionId(sessionId)
-  console.log(
-    `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
-  )
-  await getSessionConnection(sessionId, { userName: userStore.userNickname })
-  await getSessionInfo(sessionId)
-}
+/**
+ * TODO -> 주기적으로 getSessionInfo()를 통해, Room에 대한 정보를 가져와야 한다.
+ * ! IF -> MeshRoom Flow에 대한 Socket 연결이 진행되면 Deprecated될 동작
+ */
 
-// Component mount handler
 onMounted(async () => {
-  if (userStore.userNickname === '닉네임을 설정해주세요') {
-    // showNicknameModal.value = true
-    await userFlowHandler()
-  } else {
-    await userFlowHandler()
-  }
+  setInterval(async () => {
+    await getSessionInfo(sessionStore.sessionId)
+  }, 5000) // 5000 milliseconds = 5 seconds
 })
 </script>
 
@@ -144,12 +165,6 @@ onMounted(async () => {
         </template>
       </v-col>
     </v-row>
-    <!-- Nickname Modal -->
-    <NicknameModal
-      :show="showNicknameModal"
-      @update:show="showNicknameModal = $event"
-      @nickname-saved="userFlowHandler"
-    />
     <!-- Room Name Input Dialog -->
     <v-dialog v-model="showRoomNameInput" max-width="1000px">
       <RoomNameInput />

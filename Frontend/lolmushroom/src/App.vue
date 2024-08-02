@@ -13,7 +13,7 @@ import GlobalFooter from '@/components/common/GlobalFooter.vue'
     <v-navigation-drawer :width="10" location="right" permanent></v-navigation-drawer>
     <GlobalHeader />
     <v-main class="d-flex align-center justify-center background">
-      <v-container fluid class="container">
+      <v-container class="container">
         <RouterView></RouterView>
       </v-container>
       <div class="mushroomGreen mushroom-1"></div>
@@ -39,7 +39,7 @@ import GlobalFooter from '@/components/common/GlobalFooter.vue'
   max-width: calc(100% - 20vw); /* => 그룹 세션 / 그룹 대항전 여부에 따라 달라져야함 */
   height: 100%; /* Ensure the container takes full height */
   position: relative;
-  z-index: 2;
+  overflow: visible;
 }
 .mushroomGreen {
   width: 50px;
