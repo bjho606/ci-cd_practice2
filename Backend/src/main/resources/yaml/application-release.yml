@@ -50,3 +50,7 @@ springdoc:
     doc-expansion: none
   paths-to-match:
     - /api/**
+
+server:
+  servlet:
+    context-path: /server
