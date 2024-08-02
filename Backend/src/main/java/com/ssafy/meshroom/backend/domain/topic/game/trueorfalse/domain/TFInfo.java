@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -19,9 +21,6 @@ public class TFInfo {
 
     String ovToken;
     String sessionId;
-    String truth1;
-    String truth2;
-    String truth3;
-    String truth4;
+    ArrayList<String> truths;
     String false1;
 }

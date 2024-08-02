@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface TrueOrFalseRepository extends MongoRepository<TFInfo, String> {
+    boolean existsByOvTokenAndSessionId(String ovToken, String sessionId);
     Optional<TFInfo> findByOvTokenAndSessionId(String ovToken, String sessionId);
 }

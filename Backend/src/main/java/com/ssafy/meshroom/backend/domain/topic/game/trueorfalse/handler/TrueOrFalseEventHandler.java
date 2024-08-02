@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -41,18 +42,18 @@ public class TrueOrFalseEventHandler {
                 .body(trueOrFalseService.getTFInfo(sessionId, tfInfoRequest));
     }
 
-    @MessageMapping("/game/tf/question")
-    @SendTo("/subscribe/game/tf/question")
-    public Boolean handleSubmitTF(Boolean isDone) {
-        log.info("submit signal recieved : " + isDone);
+    @MessageMapping("/game/tf/question/{sessionId}")
+    @SendTo("/subscribe/game/tf/question/{sessionId}")
+    public Boolean handleSubmitTF(@DestinationVariable String sessionId, Boolean isDone) {
+        log.info("submit signal recieved : " + sessionId + " - " + isDone);
 //        messagingTemplate.convertAndSend("/subscribe/game/tf/question", isDone);
         return isDone;
     }
 
-    @MessageMapping("/game/tf/answer")
-    @SendTo("/subscribe/game/tf/answer")
-    public int handleAnswerTF(int chosen) {
-        log.info("choose number signal recieved : " + chosen);
+    @MessageMapping("/game/tf/answer/{sessionId}")
+    @SendTo("/subscribe/game/tf/answer/{sessionId}")
+    public int handleAnswerTF(@DestinationVariable String sessionId, int chosen) {
+        log.info("choose number signal recieved : " + sessionId + " - " + chosen);
         return chosen;
     }
 
