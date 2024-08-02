@@ -104,6 +104,8 @@ const clickPosition = ref({ x: 0, y: 0 })
   <v-container fluid class="main-container">
     <!-- Left Container -->
     <v-container class="left-container">
+      <h2>My Group</h2>
+      <!-- Fixed Title for Left Container -->
       <div class="current-group-info">
         <div>Current Group: {{ currentGroup }}</div>
         <div>Size: {{ currentMushroomSize }}vw</div>
@@ -130,6 +132,8 @@ const clickPosition = ref({ x: 0, y: 0 })
 
     <!-- Right Container -->
     <v-container class="right-container">
+      <h2>Other Groups</h2>
+      <!-- Fixed Title for Right Container -->
       <div class="grid-container">
         <div
           v-for="group in groups"
@@ -156,8 +160,9 @@ const clickPosition = ref({ x: 0, y: 0 })
 
 <style scoped>
 .main-container {
+  position: absolute;
   display: flex;
-  height: 100vh;
+  height: 90vh;
 }
 
 .left-container,

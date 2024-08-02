@@ -1,44 +1,61 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
+import { useChatStore } from '@/stores/chatStore'
 import avatarImg from '@/assets/origbig.png'
 import webSocketAPI from '@/api/webSocket'
 
 const menu = ref(false)
+const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const text = ref('')
-const myMessages = ref([])
+
+/**
+ * * 1. 사용자에게 보이는 채팅의 내용은 currentMode에 따라 다르다.
+ * IMP 1.1 'All' Mode : mainSessionMessages
+ * IMP 1.2 'Group' Mode : subSessionMessages
+ */
+const isMainMode = computed(() => chatStore.currentMode === 'All')
+const currentMessages = computed(() => {
+  return isMainMode.value ? chatStore.mainSessionMessages : chatStore.subSessionMessages
+})
+const currentTitle = computed(() =>
+  isMainMode.value ? '전체 그룹의 재잘재잘' : '우리 그룹의 재잘재잘'
+)
+const currentSubtitle = computed(() => (isMainMode.value ? '60명' : '10명'))
+
+/**
+ * * 2. CurrentMode를 Toggle한다.
+ * IMP 'All' <-> 'Group'
+ */
+
+const toggleMode = () => {
+  if (chatStore.currentMode === 'All') {
+    chatStore.setCurrentMode('Group')
+    console.log(isMainMode.value)
+  } else {
+    chatStore.setCurrentMode('All')
+    console.log(isMainMode.value)
+  }
+}
+
+/**
+ * * 3. Message를 WebSocket을 통해 Send한다.
+ * IMP 'All' Mode -> 'sessionStore.sessionId'로 설정하고 Send
+ * IMP 'Group' Mode -> 'sessionStore.subSessionId'로 설정하고 Send
+ */
 
 const sendMessage = () => {
   if (text.value.trim() === '') return
+  const sessionId = isMainMode.value ? sessionStore.sessionId : sessionStore.subSessionId
   const chatMessage = {
-    type: 'ALL',
-    userSid: 1,
-    senderName: 'User1',
-    sessionSid: sessionStore.subSessionId,
+    sessionId: sessionId,
     content: text.value,
     timestamp: new Date().toISOString()
   }
   webSocketAPI.sendMessage('/publish/chat/message', chatMessage)
   text.value = ''
 }
-
-const onMessageReceived = (message) => {
-  console.log('onMessageReceived:', message) // 추가된 로그
-  myMessages.value.push(message)
-}
-
-const connectToWebSocket = () => {
-  webSocketAPI.connect(sessionStore.subSessionId, onMessageReceived)
-}
-
-onMounted(() => {
-  connectToWebSocket()
-})
-
-onBeforeUnmount(() => {
-  webSocketAPI.disconnect()
-})
 </script>
 
 <template>
@@ -50,14 +67,19 @@ onBeforeUnmount(() => {
         </v-badge>
       </template>
 
-      <v-card min-width="300" min-height="300">
+      <v-card min-width="300" min-height="300" max-height="500" overflow-y: auto>
         <v-list>
           <v-list-item
             prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-            subtitle="이규석, 김경호, 김윤홍, 송인범, 변재호, 오화랑"
-            title="1번 그룹의 재잘재잘"
+            :subtitle="currentSubtitle"
+            :title="currentTitle"
           >
             <template v-slot:append>
+              <v-btn class="toggle-button" @click="toggleMode" icon>
+                <div class="toggle-circle" :class="{ 'active-circle': isMainMode }"></div>
+                <span class="toggle-text left" :class="{ visible: isMainMode }">모두</span>
+                <span class="toggle-text" :class="{ visible: !isMainMode }">우리</span>
+              </v-btn>
               <v-btn
                 style="color: red"
                 icon="mdi-minus-box"
@@ -70,8 +92,8 @@ onBeforeUnmount(() => {
 
         <v-divider></v-divider>
 
-        <v-list>
-          <v-list-item v-for="(message, index) in myMessages" :key="index">
+        <v-list max-height="300px" overflow-y: auto>
+          <v-list-item v-for="(message, index) in currentMessages" :key="index">
             <v-banner :avatar="avatarImg" color="black" :text="message.content" :stacked="false">
               <template v-slot:actions>
                 <v-btn>추후 구현 必</v-btn>
@@ -98,5 +120,56 @@ onBeforeUnmount(() => {
 .icon-size {
   width: 50px;
   height: 50px;
+}
+
+.toggle-button {
+  background-color: #2a3b59;
+  border-radius: 20px;
+  width: 90px;
+  height: 30px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  transition: background-color 0.3s;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.toggle-circle {
+  width: 25px;
+  height: 25px;
+  background-color: #52d1ff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  transition: transform 0.3s;
+}
+
+.active-circle {
+  transform: translate(56px, -50%);
+}
+
+.toggle-text {
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+.toggle-text.left {
+  left: 10%;
+}
+
+.toggle-text.visible {
+  opacity: 1;
+  visibility: visible;
 }
 </style>

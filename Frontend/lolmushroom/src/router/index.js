@@ -9,6 +9,7 @@ import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
+import MushroomContent from '@/components/contents/MushroomContent.vue'
 
 const routes = [
   // Home Route -> Session을 만드는 사람은 Manager가 된다.
@@ -38,7 +39,8 @@ const routes = [
       {
         path: ':subSessionId/GroupFightSessionView',
         name: 'GroupFightSessionView',
-        component: GroupFightSessionView
+        component: GroupFightSessionView,
+        children: [{ path: 'MushroomContent', name: 'MushroomContent', component: MushroomContent }]
       },
       { path: 'playerchoose', name: 'playerChoose', component: PlayerChoose }
     ]
