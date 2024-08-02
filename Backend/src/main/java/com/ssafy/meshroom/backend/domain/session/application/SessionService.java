@@ -13,8 +13,6 @@ import com.ssafy.meshroom.backend.global.error.exception.OpenViduException;
 import com.ssafy.meshroom.backend.global.error.exception.SessionNotExistException;
 import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import io.openvidu.java.client.*;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,14 +123,14 @@ public class SessionService {
 
         String userId = "";
         // 2. user 컬렉션과 token 컬렉션에 관계 추가
-        if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken){
+        if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
             userId = userDetailService.saveUser(userName, userRole.get());
-        }else{
+        } else {
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
         }
         ovTokenService.save(sessionAtomicReference.get().get_id(), userId);
 
-        if(isMain.get()){
+        if (isMain.get()) {
             // 3-1. 유저 jwtToken 발행
             String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
             CookieUtil.addCookie(response, "token", jwtToken);
@@ -200,7 +198,7 @@ public class SessionService {
                 (session) -> {
                     // 1. subSession과 session이 부모자식관계인지
                     if (!session.getMainSession().equals(sessionId)) {
-                        throw new RuntimeException(sessionId+"의 하위세션이 아닙니다.");
+                        throw new RuntimeException(sessionId + "의 하위세션이 아닙니다.");
                     }
 
                     ret.set(SubSessionInfoResponse.builder()
@@ -291,3 +289,4 @@ public class SessionService {
 
 
 }
+

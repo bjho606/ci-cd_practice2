@@ -1,9 +1,7 @@
 package com.ssafy.meshroom.backend.global.config.websocket;
 
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
-import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -17,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -26,7 +23,6 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketInterceptor implements ChannelInterceptor {
     private final TokenProvider jwtProvider;
-
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -38,6 +34,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             accessor.setUser(authentication);
         }
+
         return message;
     }
 
