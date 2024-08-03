@@ -97,7 +97,10 @@ const userFlowHandler = async () => {
   )
   await getSessionConnection(sessionId, { userName: userStore.userNickname })
   await getSessionInfo(sessionId)
-  webSocketAPI.connect(sessionStore.sessionId, onMainSessionMessageReceived)
+  webSocketAPI.connect({
+    sessionId: sessionStore.sessionId,
+    onMessageReceived: onMainSessionMessageReceived
+  })
 }
 
 /**
@@ -111,7 +114,10 @@ onMounted(async () => {
     // showNicknameModal.value = true
     await userFlowHandler()
   } else {
-    webSocketAPI.connect(sessionStore.sessionId, onMainSessionMessageReceived)
+    webSocketAPI.connect({
+      sessionId: sessionStore.sessionId,
+      onMessageReceived: onMainSessionMessageReceived
+    })
   }
 })
 </script>
@@ -139,7 +145,7 @@ onMounted(async () => {
   display: flex; /* Use Flexbox for layout */
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
-  background-color: rgba(224, 224, 224, 0.6); /* 원하는 배경색으로 변경 */
+  background-color: rgba(224, 224, 224, 0.6);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
   position: absolute; /* Position absolutely within parent */
   overflow: hidden;
