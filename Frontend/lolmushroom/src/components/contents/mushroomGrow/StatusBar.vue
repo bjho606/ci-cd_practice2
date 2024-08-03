@@ -1,6 +1,7 @@
+<!-- eslint-disable no-unused-vars -->
 <template>
   <v-sheet class="status-bar" elevation="2">
-    <v-row align="center" justify="space-between">
+    <v-row justify="space-between">
       <v-col cols="auto">
         <v-icon>mdi-information</v-icon>
         <span>{{ title }}</span>

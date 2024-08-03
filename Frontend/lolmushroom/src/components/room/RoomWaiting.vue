@@ -23,7 +23,10 @@ const onSubSessionMessageReceived = (message) => {
  */
 
 onMounted(() => {
-  webSocketAPI.connect(sessionStore.subSessionId, onSubSessionMessageReceived)
+  webSocketAPI.connect({
+    sessionId: sessionStore.subSessionId,
+    onMessageReceived: onSubSessionMessageReceived
+  })
 })
 </script>
 

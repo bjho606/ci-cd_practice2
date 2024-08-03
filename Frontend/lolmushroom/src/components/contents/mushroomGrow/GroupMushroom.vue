@@ -1,11 +1,3 @@
-<template>
-  <v-card class="group-mushroom-card" @click="handleClick">
-    <v-img :src="mushroomImage" aspect-ratio="1" class="mushroom-image" />
-    <v-card-title class="text-center">{{ group.name }}</v-card-title>
-    <v-card-text class="text-center"> Size: {{ group.size }}vw </v-card-text>
-  </v-card>
-</template>
-
 <script setup>
 import { computed } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
@@ -21,14 +13,21 @@ const props = defineProps({
   }
 })
 
-const store = useMushroomStore()
+const mushroomStore = useMushroomStore()
+const mushroomImage = computed(() => mushroomStore.getMushroomImage(props.group.size))
 
-const mushroomImage = computed(() => store.getMushroomImage(props.group.size))
-
-const handleClick = () => {
-  store.onGroupMushroomClick(props.group)
+const changeClick = () => {
+  mushroomStore.onChangeClick(props.id)
 }
 </script>
+
+<template>
+  <v-card class="group-mushroom-card" @click="changeClick">
+    <v-img :src="mushroomImage" aspect-ratio="1" class="mushroom-image" />
+    <v-card-title class="text-center">{{ group.name }}</v-card-title>
+    <v-card-text class="text-center"> Size: {{ group.size }}vw </v-card-text>
+  </v-card>
+</template>
 
 <style scoped>
 .group-mushroom-card {
