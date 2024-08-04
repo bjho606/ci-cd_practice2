@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useRoomStore = defineStore('room', {
   state: () => ({
+    userCount: 0,
     roomCount: 10,
     rooms: Array.from({ length: 10 }, () => ({
       occupants: 0,
@@ -17,18 +18,19 @@ export const useRoomStore = defineStore('room', {
       this.rooms = Array.from({ length: count }, () => ({
         occupants: 0,
         capacity: 8,
-        buttonClicked: false
+        buttonClicked: false,
+        roomName: '',
+        sessionId: ''
       }))
     },
     setRooms(groups) {
       groups.forEach((group, index) => {
         if (index < this.rooms.length) {
           this.rooms[index] = {
-            // ...this.rooms[index],
             occupants: group.currentUserCount,
             capacity: group.maxUserCount,
             buttonClicked: true,
-            groupName: group.groupName,
+            roomName: group.groupName,
             sessionId: group.sessionId
           }
         }
@@ -50,11 +52,19 @@ export const useRoomStore = defineStore('room', {
       if (index >= 0 && index < this.roomCount) {
         this.rooms[index].buttonClicked = state
       }
+    },
+    setUserCount(count) {
+      this.userCount = count
     }
   },
   getters: {
     getRoomCount: (state) => state.roomCount,
-    getRooms: (state) => state.rooms
+    getRooms: (state) => state.rooms,
+    getUserCount: (state) => state.userCount,
+    getOccupantsBySessionId: (state) => (sessionId) => {
+      const room = state.rooms.find(room => room.sessionId === sessionId)
+      return room ? room.occupants : null 
+    }
   },
   persist: {
     key: 'room-info-store',

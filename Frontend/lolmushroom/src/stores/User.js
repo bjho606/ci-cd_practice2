@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 export const useUserStore = defineStore('user', {
   state: () => ({
     userNickname: '닉네임을 설정해주세요',
-    userTOFstatements: {}
+    userTOFstatements: {},    
   }),
   actions: {
     setNickname(nickname) {
