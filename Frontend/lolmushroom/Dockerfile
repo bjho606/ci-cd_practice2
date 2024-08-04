@@ -1,18 +1,14 @@
-FROM node:20-alpine
-
+# Stage 1: Build the Vue.js app
+FROM node:16 AS build-stage
 WORKDIR /app
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
-
 RUN npm run build
 
-RUN npm install -g http-server
+# Stage 2: Serve the app with Nginx
+FROM nginx:alpine
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-EXPOSE 80
-
-# http-server를 사용하여 빌드된 애플리케이션 실행
-CMD [ "http-server", "dist", "-p", "80" ]
+EXPOSE 5173
+CMD ["nginx", "-g", "daemon off;"]
