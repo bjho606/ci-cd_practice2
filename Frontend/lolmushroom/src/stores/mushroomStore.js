@@ -11,8 +11,6 @@ export const useMushroomStore = defineStore('mushroomStore', {
     midSize: 30,
     finalSize: 40,
     maxSize: 50,
-    // IMP : Group Real State View Size
-    previewSize: 10,
 
     // IMP : User Group Check and Total Mushroom Information
     userGroup: null,
@@ -26,7 +24,8 @@ export const useMushroomStore = defineStore('mushroomStore', {
      * * 1.1. mushroomMap 정보에 대한 초기화를 진행함.
      * * 1.2. userGroup과 currentGroup에 대한 초기화를 진행함.
      * * 1.3. mushroomGrow에 대한 Subscription을 진행함.
-     * REQ 1. Main Session ID, 2. SubSession ID ( USER ), 3. group 정보 (getSessionInfo())
+     * REQ 1. Main Session ID, 2. SubSession ID ( USER ), 3. group 정보 ( progress Socket )
+     * ! Progress Socekt -> groups : group Array { sessionId, groupName, maxUserCount, currentUserCount, users Array }
      * @param {*} sessionId
      * @param {*} subSessionId
      * @param {*} groups
@@ -43,7 +42,8 @@ export const useMushroomStore = defineStore('mushroomStore', {
       webSocketAPI.connect({
         sessionId: sessionId,
         contentsName: 'touch',
-        onEventReceived: this.fetchMushroomData
+        onEventReceived: this.fetchMushroomData,
+        subscriptions: ['game']
       })
     },
 
@@ -51,17 +51,17 @@ export const useMushroomStore = defineStore('mushroomStore', {
      * IMP 2. Socket으로부터 Data를 수신하여 각각의 Mushroom 정보를 Update
      * * 2.1 subSessionID와 변화된 Size를 받아낸다.
      * @param {*} event
-     * RES sessionId, subSessionId, size
+     * RES mainSessionId ( Main Session ), sessionId ( Sub Session ), size
      */
     // 소켓으로부터 데이터를 수신하여 버섯 정보를 업데이트
     fetchMushroomData(event) {
-      const { subSessionId, size } = event
-      this.mushroomMap.set(subSessionId, size)
+      const { sessionId, size } = event
+      this.mushroomMap.set(sessionId, size)
     },
 
     /**
      * IMP 3. Socket을 통해 Click 정보를 Server에 Publish한다.
-     * REQ sessionId ( SubSession ID ), actionType ( Increase, Decrease )
+     * REQ sessionId ( SubSession ID ), actionType ( INCREASE, DECREASE )
      */
     onMushroomClick(sessionId) {
       const clickData = {
@@ -87,40 +87,41 @@ export const useMushroomStore = defineStore('mushroomStore', {
     }
   },
   getters: {
+    // Getter Of Current Group Id
     getCurrentGroup: (state) => {
       return state.currentGroup
     },
-    // ID에 따른 Group Name 반환
+    // Specific Group Id에 따른 Group Name
     getMushroomName: (state) => (groupId) => {
       return state.groupNameMap.get(groupId)
     },
-    // 버섯 크기에 따른 이미지 반환
+
+    // Specific Group Id에 따른 Group Size
+    getMushroomSize: (state) => (groupId) => {
+      return state.mushroomMap.get(groupId)
+    },
+    // Mushroom Size에 따른 Mushroom Image 반환
     getMushroomImage: (state) => (size) => {
       if (size < state.midSize) return smallNormal
       if (size < state.finalSize) return midNormal
       return bigNormal
     },
 
-    // 버섯 크기에 따른 레벨 반환
+    // Mushroom Size에 따른 Mushroom Lv 반환
     getMushroomLevel: (state) => (size) => {
       if (size < state.midSize) return 1 // Small Level
       if (size < state.finalSize) return 2 // Mid Level
       return 3 // Final Level
     },
 
-    // 특정 GroupId에 해당하는 버섯 정보를 가져오는 Getter 함수
-    getMushroomSize: (state) => (groupId) => {
-      return state.mushroomMap.get(groupId)
-    },
-
+    // 현재 그룹이 아닌 다른 그룹의 버섯 정보를 반환
     getOtherMushrooms: (state) => {
-      // 현재 그룹이 아닌 다른 그룹의 버섯 정보를 반환
       const otherMushrooms = []
       state.mushroomMap.forEach((size, sessionId) => {
         if (sessionId !== state.userGroup) {
           otherMushrooms.push({
             sessionId,
-            name: state.groupNameMap.get(sessionId),
+            groupName: state.groupNameMap.get(sessionId),
             size
           })
         }

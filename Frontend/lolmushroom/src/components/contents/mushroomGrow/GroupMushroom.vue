@@ -6,26 +6,22 @@ const props = defineProps({
   group: {
     type: Object,
     required: true
-  },
-  previewSize: {
-    type: Number,
-    default: 10
   }
 })
 
 const mushroomStore = useMushroomStore()
 const mushroomImage = computed(() => mushroomStore.getMushroomImage(props.group.size))
 
-const changeClick = () => {
-  mushroomStore.onChangeClick(props.id)
+const onChangeClick = () => {
+  mushroomStore.onChangeClick(props.group.sessionId)
 }
 </script>
 
 <template>
-  <v-card class="group-mushroom-card" @click="changeClick">
+  <v-card class="group-mushroom-card" @click="onChangeClick">
     <v-img :src="mushroomImage" aspect-ratio="1" class="mushroom-image" />
-    <v-card-title class="text-center">{{ group.name }}</v-card-title>
-    <v-card-text class="text-center"> Size: {{ group.size }}vw </v-card-text>
+    <v-card-title class="text-center">{{ group.groupName }}</v-card-title>
+    <v-card-text class="text-center"> Size: {{ group.size / 2 }}vw </v-card-text>
   </v-card>
 </template>
 

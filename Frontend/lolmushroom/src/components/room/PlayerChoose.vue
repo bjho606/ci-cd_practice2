@@ -101,7 +101,9 @@ const handleRoomClick = async (index) => {
     // roomStore.setButtonState(index, true)
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
+    const isFirstUserInGroup = room.occupants === 0
     await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
+    if (isFirstUserInGroup) userStore.setTeamLeader(true)
     sessionStore.setSubSessionId(room.sessionId)
     router.push({
       name: 'roomwaiting',
@@ -117,9 +119,9 @@ const handleRoomClick = async (index) => {
  */
 
 onMounted(async () => {
-  setInterval(async () => {
-    await getSessionInfo(sessionStore.sessionId)
-  }, 5000) // 5000 milliseconds = 5 seconds
+  // setInterval(async () => {
+  //   await getSessionInfo(sessionStore.sessionId)
+  // }, 5000) // 5000 milliseconds = 5 seconds
 })
 </script>
 

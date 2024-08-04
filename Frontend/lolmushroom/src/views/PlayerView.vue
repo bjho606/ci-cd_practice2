@@ -80,13 +80,17 @@ const getSessionInfo = async (sessionId) => {
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
+const onProgressEventReceived = (message) => {
+  console.log(message)
+}
 
 /**
  * IMP 4. Player가 Main Session에 입장했을 때, Flow를 관리하는 함수
  * * getSessionConection() API를 호출한다.
  * IMP 4.1. Main Session과 Connection을 만들어 준다.
  * IMP 4.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
- * TODO 4.3. MeshRoom Flow에 대한 Socket 연결을 진행해야 한다.
+ * IMP 4.3  MeshRoom의 Progress에 대한 Socket 연결을 진행한다.
+ * TODO 제대로 동작을 해야 한다.
  */
 const userFlowHandler = async () => {
   const sessionId = route.params.sessionId
@@ -99,12 +103,14 @@ const userFlowHandler = async () => {
   await getSessionInfo(sessionId)
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
-    onMessageReceived: onMainSessionMessageReceived
+    onMessageReceived: onMainSessionMessageReceived,
+    onEventReceived: onProgressEventReceived,
+    subscriptions: ['chat', 'progress']
   })
 }
 
 /**
- * IMP PlayerView에 들어왔을 때, 요구되는 API 호출
+ * IMP 5. PlayerView에 들어왔을 때, 요구되는 API 호출
  * * 1. WebSocket 연결
  * TODO IF -> NickName을 설정하지 않았다면, 주기적으로 안내를 보내야 한다.
  * TODO -> 조금 불안한 점은 Group Socket도 함께 연결해줘야 할 것 같기도 하다..
@@ -116,7 +122,9 @@ onMounted(async () => {
   } else {
     webSocketAPI.connect({
       sessionId: sessionStore.sessionId,
-      onMessageReceived: onMainSessionMessageReceived
+      onMessageReceived: onMainSessionMessageReceived,
+      onEventReceived: onProgressEventReceived,
+      subscriptions: ['chat', 'progress']
     })
   }
 })

@@ -9,6 +9,11 @@ import GroupMushroomContainer from './GroupMushroomContainer.vue'
 
 const mushroomStore = useMushroomStore()
 const sessionStore = useSessionStore()
+
+/**
+ * * TEST GROUP DATA
+ * IMP Progress Socket을 통해 정보를 가져올 것
+ */
 const groups = [
   { sessionId: 'group-session-101', groupName: 'Group 1' },
   { sessionId: 'group-session-102', groupName: 'Group 2' },
@@ -19,7 +24,12 @@ const groups = [
   { sessionId: 'group-session-107', groupName: 'Group 7' },
   { sessionId: 'group-session-108', groupName: 'Group 8' },
   { sessionId: 'group-session-109', groupName: 'Group 9' },
-  { sessionId: 'group-session-110', groupName: 'Group 10' }
+  { sessionId: 'group-session-110', groupName: 'Group 10' },
+  { sessionId: 'group-session-111', groupName: 'Group 11' },
+  { sessionId: 'group-session-112', groupName: 'Group 12' },
+  { sessionId: 'group-session-113', groupName: 'Group 13' },
+  { sessionId: 'group-session-114', groupName: 'Group 14' },
+  { sessionId: 'group-session-115', groupName: 'Group 15' }
 ]
 
 /**

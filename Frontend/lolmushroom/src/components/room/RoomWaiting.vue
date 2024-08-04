@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/User'
 import { useChatStore } from '@/stores/chatStore'
 import { useSessionStore } from '@/stores/session'
-import { useRouter } from 'vue-router'
 import webSocketAPI from '@/api/webSocket'
+import RoomNameInput from '@/components/room/RoomNameInput.vue'
 
+const userStore = useUserStore()
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const router = useRouter()
@@ -25,7 +28,8 @@ const onSubSessionMessageReceived = (message) => {
 onMounted(() => {
   webSocketAPI.connect({
     sessionId: sessionStore.subSessionId,
-    onMessageReceived: onSubSessionMessageReceived
+    onMessageReceived: onSubSessionMessageReceived,
+    subscriptions: ['chat']
   })
 })
 </script>
