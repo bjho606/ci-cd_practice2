@@ -13,6 +13,9 @@ export const useSessionStore = defineStore('sessionInfo', {
       this.subSessionId = subSessionId
     }
   },
+  getters: {
+    getSubSessionId: (state) => state.subSessionId,
+  },
   persist: {
     key: 'session-info-store',
     storage: sessionStorage, // 세션 스토리지에 저장

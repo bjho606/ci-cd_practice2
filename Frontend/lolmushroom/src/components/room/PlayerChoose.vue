@@ -54,7 +54,7 @@ const getSessionInfo = async (sessionId) => {
     if (response.data.isSuccess) {
       const groups = response.data.result.groups
       console.log('현재 Session의 정보를 가져왔습니다:) 현재 Session 상태는 다음과 같습니다:)')
-      console.log(response.data.result)
+      console.log(groups)
       roomStore.setRooms(groups)
     }
   } catch (error) {
