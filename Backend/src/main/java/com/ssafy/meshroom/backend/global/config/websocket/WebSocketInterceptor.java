@@ -29,7 +29,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
         if (accessor.getCommand() == StompCommand.CONNECT) {
             Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-            log.info((String) sessionAttributes.get("token"));
+            log.info("session attributes token : " + (String) sessionAttributes.get("token"));
             Authentication authentication = jwtProvider.getAuthentication((String) sessionAttributes.get("token"));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             accessor.setUser(authentication);
