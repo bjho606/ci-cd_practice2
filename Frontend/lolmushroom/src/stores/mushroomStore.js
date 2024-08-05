@@ -37,7 +37,7 @@ export const useMushroomStore = defineStore('mushroomStore', {
         this.groupNameMap.set(group.sessionId, group.groupName)
         this.mushroomMap.set(group.sessionId, 20) // 초기 사이즈 설정
       })
-      this.userGroup = this.currentGroup = subSessionId
+      this.userGroup = this.currentGroup = subSessionId // UserGroup 설정
 
       webSocketAPI.connect({
         sessionId: sessionId,

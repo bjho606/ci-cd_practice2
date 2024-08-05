@@ -154,6 +154,12 @@ const addContentsSubscription = (sessionId, onEventReceived) => {
   }
 }
 
+/**
+ * IMP : ContentsName을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
+ * @param {*} sessionId
+ * @param {*} contentsName
+ * @param {*} onEventReceived
+ */
 const addGameSubscription = (sessionId, contentsName, onEventReceived) => {
   const gameKey = `game-${contentsName}`
   if (!subscriptionMap.has(gameKey)) {

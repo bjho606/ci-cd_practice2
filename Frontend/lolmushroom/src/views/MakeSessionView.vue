@@ -41,6 +41,9 @@ const updateSelectedContents = (newSelectedContents) => {
 }
 
 // Contents를 Server를 통해 가져온다.
+/**
+ * IMP Contents Socket이 생기면서, 필요성이 저하됨.
+ */
 const fetchContents = () => {
   contentsAPI.getContents(
     (response) => {
