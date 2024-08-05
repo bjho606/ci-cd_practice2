@@ -19,16 +19,11 @@ public class KafkaTouchMeshProducer {
 
     public void sendEvent(TouchDto touchEvent) {
 
-        TouchDto filteredTouchEvent = new TouchDto();
-
-        filteredTouchEvent.setMainSessionId(touchEvent.getMainSessionId());
-        filteredTouchEvent.setSessionId(touchEvent.getSessionId());
-        filteredTouchEvent.setType(touchEvent.getType());
         // session Sid  두개 뽑을 수 있음
         // findby id Session객체
         // isMain, sessionId
         // => 내 그룹의 sessionID
         // 사용자가 클릭한 sessionID
-        kafkaTemplate.send(TOPIC, filteredTouchEvent);
+        kafkaTemplate.send(TOPIC, touchEvent);
     }
 }
