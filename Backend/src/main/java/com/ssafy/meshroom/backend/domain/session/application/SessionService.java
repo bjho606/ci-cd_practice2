@@ -128,15 +128,15 @@ public class SessionService {
             throw new RuntimeException("없는 세션");
         });
 
+        // 2. 유저 정보 저장
         String userId = "";
-        // 2. user 컬렉션과 token 컬렉션에 관계 추가
         if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
             userId = userDetailService.saveUser(userName, userRole.get());
         } else {
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
         }
+
         log.info("userId : {}", userId);
-        ovTokenService.save(sessionAtomicReference.get().get_id(), userId);
 
         if (isMain.get()) {
             // 3-1. 유저 jwtToken 발행
@@ -152,12 +152,17 @@ public class SessionService {
                 .build();
         Connection connection = session.createConnection(connectionProperties);
         String token = connection.getToken(); // Send this string to the client side
+        log.info("OV Token : " + token);
         if(isMain.get()){
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
         }else{
             String mainSessionId = sessionAtomicReference.get().getMainSession();
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + mainSessionId, getSessionInfo(mainSessionId).getResult());
         }
+
+        // 4. user 컬렉션과 token 컬렉션에 관계 추가
+        ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
+
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
                 , new ConnectionCreateResponse(token));
     }

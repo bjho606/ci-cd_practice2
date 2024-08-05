@@ -20,10 +20,11 @@ public class OVTokenService {
     private final UserDetailService userDetailService;
     private final SessionRepository sessionRepository;
 
-    public void save(String sessionSid, String userSid) {
+    public void save(String sessionSid, String userSid, String ovToken) {
         ovTokenRepository.save(OVToken.builder()
                 .sessionSid(sessionSid)
                 .userSid(userSid)
+                .ovToken(ovToken)
                 .build()
         );
     }

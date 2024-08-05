@@ -7,21 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TFInfoResponse {
-    String ovToken;
-    ArrayList<String> truths;
-    String false1;
+public class AllTFInfosResponse {
+    List<TFInfoResponse> allTFInfos;
 
-    public static TFInfoResponse from (TFInfo tfInfo) {
-        return new TFInfoResponse(
-                tfInfo.getOvToken(),
-                tfInfo.getTruths(),
-                tfInfo.getFalse1()
-        );
-    }
 }
