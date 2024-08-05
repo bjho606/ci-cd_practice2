@@ -38,6 +38,16 @@ const connect = ({
       if (onConnect) {
         onConnect(frame)
       }
+
+      const joinMessage = {
+        sessionId: sessionId,
+        content: '',
+        timestamp: new Date().toISOString()
+      }
+      stompClient.publish({
+        destination: `/publish/chat/join`,
+        body: JSON.stringify(joinMessage)
+      })
     },
     onStompError: (frame) => {
       console.error('Broker reported error: ' + frame.headers['message'])

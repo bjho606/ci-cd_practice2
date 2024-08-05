@@ -1,31 +1,54 @@
+<script setup>
+  const emit = defineEmits(['endCountDown'])
+
+  const props = defineProps({
+    time: {
+      type: String,
+      required: true
+    },
+    text: {
+      type: String,
+      required: false
+    },
+  })
+
+  const endCountDown = () => {
+    emit('endCountDown', true)
+  }
+</script>
+
 <template>
   <vue-countdown :time="`${props.time}` * 1000" v-slot="{ seconds }" @end="endCountDown()">
-    <h1 style="font-size: 80px;">{{ seconds }}초 {{ props.text1 }}</h1>
-    <h1 style="font-size: 80px;">{{ props.text2 }}</h1>
-    
+    <h1 class="countdown-number">
+      {{ seconds }}
+    </h1>
   </vue-countdown>
+  <div class="countdown-tooltip">
+    <h1>{{ props.text }}</h1>
+  </div>
 </template>
 
-<script setup>
 
-const emit = defineEmits(['endCountDown'])
+<style scoped>
+  .countdown-number {
+    font-size: 120px;
+    animation: countdown-animation 1s linear infinite;
+  }
 
-const props = defineProps({
-  time: {
-    type: String,
-    required: true
-  },
-  text1: {
-    type: String,
-    required: false
-  },
-  text2: {
-    type: String,
-    required: false
-  },
-})
+  @keyframes countdown-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 
-const endCountDown = () => {
-  emit('endCountDown', true)
-}
-</script>
+  .countdown-tooltip h1 {
+    font-size: 40px;
+    margin: 10px 0;
+  }
+</style>

@@ -1,24 +1,37 @@
 <script setup>
+  import { useUserStore } from '@/stores/User';
   import { ref, computed } from 'vue';
-
+  
+  const props = defineProps({
+    targetNickName: String,
+    choiceAnswerMatrix: Array,
+    statements: Array,
+  })
+  const store = useUserStore()
   // 하드코딩한 것은 대부분 API로 받아올 것
-  const myNickName = '나이스한 강아지'
-  const targetNickName = '나이스한 강아지'
+  const myNickName = store.userNickname
+  const targetNickName = props.targetNickName
   const answer = ref('4');
-  const statements = ref({
-    1: '나는 최고다',
-    2: '나는 천재다.',
-    3: '나는 잘생겼다.',
-    4: '나는 공부를 잘 한다.',
-  });
-  const choiceAnswerMatrix = {
-    '나이스한 강아지': {
-      1: [],
-      2: ['재빠른 날다람쥐', '영민한 뱅갈호랑이'],
-      3: ['얍삽한 치타'],
-      4: ['여유로운 오징어', '거대한 사막여우'],
-    }
-  };
+
+  // const statements = ref({
+  //   1: '나는 최고다',
+  //   2: '나는 천재다.',
+  //   3: '나는 잘생겼다.',
+  //   4: '나는 공부를 잘 한다.',
+  // });
+
+  // const choiceAnswerMatrix = {
+  //   '나이스한 강아지': {
+  //     1: [],
+  //     2: ['재빠른 날다람쥐', '영민한 뱅갈호랑이'],
+  //     3: ['얍삽한 치타'],
+  //     4: ['여유로운 오징어', '거대한 사막여우'],
+  //   }
+  // };
+  
+  const statements = props.targetNickName
+  const choiceAnswerMatrix = props.choiceAnswerMatrix
+
   const expanded = ref({});
   
   const toggleList = (choice) => {

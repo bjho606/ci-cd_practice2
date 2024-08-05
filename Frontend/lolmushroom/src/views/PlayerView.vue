@@ -43,7 +43,7 @@ const getSessionConnection = async (sessionId, userName) => {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data.result)
+      userStore.userOvToken = response.data.result['ovToken'].slice(-16)
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -93,7 +93,7 @@ const userFlowHandler = async () => {
  */
 onMounted(async () => {
   if (userStore.userNickname === '닉네임을 설정해주세요') {
-    // showNicknameModal.value = true
+    showNicknameModal.value = true
     await userFlowHandler()
   } else {
     webSocketAPI.connect({
