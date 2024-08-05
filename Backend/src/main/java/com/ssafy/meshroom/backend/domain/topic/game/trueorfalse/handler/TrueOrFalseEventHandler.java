@@ -63,17 +63,36 @@ public class TrueOrFalseEventHandler {
     }
 
     @Operation(
+<<<<<<< HEAD
             summary = "모든 진실or거짓 진술서들 불러오기",
             description = "현재 세션에 포함된 모든 사용자의 ovToken과 진술서 내용들을 불러옵니다.",
             parameters = {
                     @Parameter(name = "sessionId", description = "그룹(하위) 세션의 ID", required = true)
             },
+=======
+            summary = "진실or거짓 진술서 불러오기",
+            description = "한 사용자에 대한 진술서를 불러옵니다.",
+            parameters = {
+                    @Parameter(name = "sessionId", description = "그룹(하위) 세션의 ID", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "진술서 불러오기를 위한 요청 본문",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = TFInfoRequest.class)
+                    )
+            ),
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
             responses = {
                     @ApiResponse(
                             responseCode = "2000",
                             description = "성공적으로 진술서를 불러옴",
                             content = @Content(
+<<<<<<< HEAD
                                     schema = @Schema(implementation = AllTFInfosResponse.class)
+=======
+                                    schema = @Schema(implementation = TFInfoResponse.class)
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
                             )
                     ),
                     @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -81,10 +100,18 @@ public class TrueOrFalseEventHandler {
             }
     )
     @GetMapping("/api/v1/game/tf/{sessionId}")
+<<<<<<< HEAD
     public ResponseEntity<Response<AllTFInfosResponse>> getAllTFInfos (
             @PathVariable String sessionId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(trueOrFalseService.getAllTFInfo(sessionId));
+=======
+    public ResponseEntity<Response<TFInfoResponse>> getTFInfo (
+            @PathVariable String sessionId,
+            @RequestBody TFInfoRequest tfInfoRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(trueOrFalseService.getTFInfo(sessionId, tfInfoRequest));
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
     }
 
 
@@ -103,6 +130,7 @@ public class TrueOrFalseEventHandler {
         return answerSignal;
     }
 
+<<<<<<< HEAD
     @MessageMapping("/game/tf/next/{sessionId}")
     @SendTo("/subscribe/game/tf/next/{sessionId}")
     public Boolean handleNextTF(@DestinationVariable String sessionId, Boolean isDone) {
@@ -110,6 +138,8 @@ public class TrueOrFalseEventHandler {
         return isDone;
     }
 
+=======
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
     @MessageMapping("/game/tf/finish")
     @SendTo("/subscribe/game/tf/finish")
     public String handleFinishTF(String sessionId) {

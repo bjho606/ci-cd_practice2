@@ -14,12 +14,20 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class TFInfoResponse {
     String ovToken;
+<<<<<<< HEAD
+=======
+    String sessionId;
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
     ArrayList<String> truths;
     String false1;
 
     public static TFInfoResponse from (TFInfo tfInfo) {
         return new TFInfoResponse(
                 tfInfo.getOvToken(),
+<<<<<<< HEAD
+=======
+                tfInfo.getSessionId(),
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
                 tfInfo.getTruths(),
                 tfInfo.getFalse1()
         );

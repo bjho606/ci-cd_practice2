@@ -1,9 +1,8 @@
 <script setup>
-import { defineEmits } from 'vue'
-const emit = defineEmits(['close'])
-const closeNotice = () => {
-  emit('close')
-}
+  const emit = defineEmits(['close'])
+  const closeNotice = () => {
+    emit('close')
+  }
 </script>
 
 <template>

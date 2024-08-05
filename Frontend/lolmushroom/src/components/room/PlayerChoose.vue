@@ -28,7 +28,7 @@ const getSessionConnection = async (sessionId, userName) => {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data.result)
+      console.log(response.data)
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -69,12 +69,16 @@ const handleRoomClick = async (index) => {
   const room = rooms.value[index]
   if (!room.buttonClicked) {
     await createSubSessionHandler(sessionStore.sessionId)
+    sessionStore.setSessionId(sessionStore.sessionId)
+    // roomStore.setButtonState(index, true)
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
     const isFirstUserInGroup = room.occupants === 0
     await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
     if (isFirstUserInGroup) userStore.setTeamLeader(true)
     sessionStore.setSubSessionId(room.sessionId)
+    // 세션 정보 저장
+    
     router.push({
       name: 'roomwaiting',
       params: { sessionId: sessionStore.sessionId, subSessionId: room.sessionId }
