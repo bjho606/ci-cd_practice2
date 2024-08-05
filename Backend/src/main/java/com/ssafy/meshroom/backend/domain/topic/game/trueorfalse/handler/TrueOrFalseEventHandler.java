@@ -63,24 +63,17 @@ public class TrueOrFalseEventHandler {
     }
 
     @Operation(
-            summary = "진실or거짓 진술서 불러오기",
-            description = "한 사용자에 대한 진술서를 불러옵니다.",
+            summary = "모든 진실or거짓 진술서들 불러오기",
+            description = "현재 세션에 포함된 모든 사용자의 ovToken과 진술서 내용들을 불러옵니다.",
             parameters = {
                     @Parameter(name = "sessionId", description = "그룹(하위) 세션의 ID", required = true)
             },
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "진술서 불러오기를 위한 요청 본문",
-                    required = true,
-                    content = @Content(
-                            schema = @Schema(implementation = TFInfoRequest.class)
-                    )
-            ),
             responses = {
                     @ApiResponse(
                             responseCode = "2000",
                             description = "성공적으로 진술서를 불러옴",
                             content = @Content(
-                                    schema = @Schema(implementation = TFInfoResponse.class)
+                                    schema = @Schema(implementation = AllTFInfosResponse.class)
                             )
                     ),
                     @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -88,11 +81,10 @@ public class TrueOrFalseEventHandler {
             }
     )
     @GetMapping("/api/v1/game/tf/{sessionId}")
-    public ResponseEntity<Response<TFInfoResponse>> getTFInfo (
-            @PathVariable String sessionId,
-            @RequestBody TFInfoRequest tfInfoRequest) {
+    public ResponseEntity<Response<AllTFInfosResponse>> getAllTFInfos (
+            @PathVariable String sessionId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(trueOrFalseService.getTFInfo(sessionId, tfInfoRequest));
+                .body(trueOrFalseService.getAllTFInfo(sessionId));
     }
 
 
