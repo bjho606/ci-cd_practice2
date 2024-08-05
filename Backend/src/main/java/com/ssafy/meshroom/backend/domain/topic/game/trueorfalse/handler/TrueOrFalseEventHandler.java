@@ -111,6 +111,13 @@ public class TrueOrFalseEventHandler {
         return answerSignal;
     }
 
+    @MessageMapping("/game/tf/next/{sessionId}")
+    @SendTo("/subscribe/game/tf/next/{sessionId}")
+    public Boolean handleNextTF(@DestinationVariable String sessionId, Boolean isDone) {
+        log.info("presentation finished signal recieved : " + sessionId + " - " + isDone);
+        return isDone;
+    }
+
     @MessageMapping("/game/tf/finish")
     @SendTo("/subscribe/game/tf/finish")
     public String handleFinishTF(String sessionId) {
