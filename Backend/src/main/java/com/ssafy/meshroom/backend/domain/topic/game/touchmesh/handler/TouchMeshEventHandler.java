@@ -16,7 +16,9 @@ public class TouchMeshEventHandler {
 
     @MessageMapping("/game/touch")
     public void handleTouchEvent(TouchDto touchEvent) {
+        System.out.println(touchEvent.toString());
         kafkaTouchMeshProducer.sendEvent(touchEvent);
+
 
     }
 
