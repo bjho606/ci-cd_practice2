@@ -50,7 +50,12 @@ export const useRoomStore = defineStore('room', {
   getters: {
     getRooms: (state) => state.rooms,
     getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
-    getActiveButtonIndex: (state) => state.activeButtonIndex
+    getActiveButtonIndex: (state) => state.activeButtonIndex,
+    getUserCount: (state) => state.userCount,
+    getOccupantsBySessionId: (state) => (sessionId) => {
+      const room = state.rooms.find((room) => room.sessionId === sessionId)
+      return room ? room.occupants : null
+    }
   },
   persist: {
     key: 'room-info-store',

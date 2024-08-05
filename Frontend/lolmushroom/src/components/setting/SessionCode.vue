@@ -4,7 +4,7 @@ import { useSessionStore } from '@/stores/session'
 import QrcodeVue from 'qrcode.vue'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 
-const baseURL = 'http://localhost:5173'
+const baseURL = 'i11a401.p.ssafy.io'
 const sessionStore = useSessionStore()
 const sessionURL = computed(() => {
   return `${baseURL}/${sessionStore.sessionId}`

@@ -4,11 +4,16 @@ import { useSessionStore } from '@/stores/session'
 import { useChatStore } from '@/stores/chatStore'
 import avatarImg from '@/assets/origbig.png'
 import webSocketAPI from '@/api/webSocket'
+import { useRoomStore } from '@/stores/roomStore'
 
 const menu = ref(false)
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
+const roomStore = useRoomStore()
 const text = ref('')
+
+
+const nowSubsession = sessionStore.getSubSessionId 
 
 /**
  * * 1. 사용자에게 보이는 채팅의 내용은 currentMode에 따라 다르다.
@@ -22,7 +27,7 @@ const currentMessages = computed(() => {
 const currentTitle = computed(() =>
   isMainMode.value ? '전체 그룹의 재잘재잘' : '우리 그룹의 재잘재잘'
 )
-const currentSubtitle = computed(() => (isMainMode.value ? '60명' : '10명'))
+const currentSubtitle = computed(() => (isMainMode.value ? roomStore.getUserCount+'명' : roomStore.getOccupantsBySessionId(nowSubsession)+'명'))
 
 /**
  * * 2. CurrentMode를 Toggle한다.
@@ -92,14 +97,19 @@ const sendMessage = () => {
 
         <v-divider></v-divider>
 
-        <v-list max-height="300px" overflow-y: auto>
-          <v-list-item v-for="(message, index) in currentMessages" :key="index">
-            <v-banner :avatar="avatarImg" color="black" :text="message.content" :stacked="false">
-              <template v-slot:actions>
-                <v-btn>추후 구현 必</v-btn>
-              </template>
-            </v-banner>
-          </v-list-item>
+        <v-list max-height="300px" style="overflow-y: auto;">
+        <v-list-item v-for="(message, index) in currentMessages" :key="index">
+          <v-banner
+            :avatar="avatarImg"
+            :text="message.userName"
+            color="black"
+            :stacked="false"
+          >
+            <template v-slot:actions>
+              <div>{{ message.content }}</div>
+            </template>
+          </v-banner>
+         </v-list-item>
         </v-list>
 
         <v-card-actions>
