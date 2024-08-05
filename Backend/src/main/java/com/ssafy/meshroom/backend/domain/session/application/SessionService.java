@@ -5,6 +5,7 @@ import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderServi
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.dto.*;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
+import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
@@ -16,11 +17,15 @@ import io.openvidu.java.client.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -39,6 +44,7 @@ public class SessionService {
     private final OpenViduService openViduService;
     private final TokenProvider tokenProvider;
     private final OVTokenService ovTokenService;
+    private final User user;
 
 
     @Transactional
@@ -94,7 +100,8 @@ public class SessionService {
     public Response<ConnectionCreateResponse> createConnection(String userName, String sessionId, HttpServletResponse response) throws OpenViduJavaClientException, OpenViduHttpException {
         // 1. 세션 인원 검사
         Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
-        long curCount = openViduService.getSessionCount(session);
+        com.ssafy.meshroom.backend.domain.session.domain.Session meshSession = sessionRepository.findBySessionId(sessionId).orElseThrow(SessionNotExistException::new);
+        long curCount = ovTokenService.getUserCountInSession(meshSession.get_id());
 
         AtomicReference<Boolean> isMain = new AtomicReference<>();
         AtomicReference<UserRole> userRole = new AtomicReference<>(UserRole.PARTICIPANT);
@@ -128,6 +135,7 @@ public class SessionService {
         } else {
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
         }
+        log.info("userId : {}", userId);
         ovTokenService.save(sessionAtomicReference.get().get_id(), userId);
 
         if (isMain.get()) {
@@ -156,30 +164,26 @@ public class SessionService {
 
     @Transactional
     public Response<SessionInfoResponse> getSessionInfo(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
+//        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         AtomicReference<SessionInfoResponse> sessionInfo = new AtomicReference<>();
         List<SubSessionInfoResponse> subs = new ArrayList<>();
         sessionRepository.findBySessionId(sessionId).ifPresent(session -> {
             sessionRepository.findAllByMainSession(sessionId).ifPresent(subSessions -> {
                 subSessions.forEach((subSession) -> {
                     try {
-                        subs.add(getSubsession(sessionId, subSession.getSessionId()).orElseThrow());
+                        subs.add(getSubsession(sessionId, subSession.getSessionId(), subSession.get_id()).orElseThrow());
                     } catch (OpenViduJavaClientException | OpenViduHttpException e) {
                         throw new OpenViduException();
                     }
                 });
             });
-            try {
-                sessionInfo.set(SessionInfoResponse.builder()
-                        .maxUserCount(session.getMaxUserCount())
-                        .currentUserCount(openViduService.getSessionCount(openViduService.getSession(sessionId)))
-                        .url(session.getUrl())
-                        .groups(subs)
-                        .build()
-                );
-            } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-                throw new OpenViduException();
-            }
+            sessionInfo.set(SessionInfoResponse.builder()
+                    .maxUserCount(session.getMaxUserCount())
+                    .currentUserCount(ovTokenService.getUserCountInSession(session.get_id()) )
+                    .url(session.getUrl())
+                    .groups(subs)
+                    .build()
+            );
         });
 
         return new Response<SessionInfoResponse>(true, 2010L, "SUCCESS",
@@ -187,11 +191,12 @@ public class SessionService {
     }
 
     public Response<SubSessionInfoResponse> getSubSessionInfo(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        com.ssafy.meshroom.backend.domain.session.domain.Session subSession = sessionRepository.findBySessionId(subSessionId).orElseThrow(SessionNotExistException::new);
         return new Response<SubSessionInfoResponse>(true, 2000L, "SUCCESS"
-                , getSubsession(sessionId, subSessionId).orElseThrow());
+                , getSubsession(sessionId, subSessionId, subSession.get_id()).orElseThrow());
     }
 
-    public Optional<SubSessionInfoResponse> getSubsession(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public Optional<SubSessionInfoResponse> getSubsession(String sessionId, String subSessionId, String subSessionSid) throws OpenViduJavaClientException, OpenViduHttpException {
         AtomicReference<SubSessionInfoResponse> ret = new AtomicReference<>();
 
         sessionRepository.findBySessionId(subSessionId).ifPresentOrElse(
@@ -215,11 +220,11 @@ public class SessionService {
                     throw new RuntimeException();
                 }
         );
-        Session session = openViduService.getSession(sessionId);
-        ret.get().setCurrentUserCount(openViduService.getSessionCount(session));
+        ret.get().setCurrentUserCount(ovTokenService.getUserCountInSession(subSessionSid));
 //        ret.get().setUsername(openViduService.getUsernameInSession(session))
         return Optional.ofNullable(ret.get());
     }
+
 
     @Transactional
     public Response<?> deleteSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {

@@ -6,12 +6,14 @@ import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.domain.Session;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class OVTokenService {
     private final OVTokenRepository ovTokenRepository;
@@ -36,6 +38,11 @@ public class OVTokenService {
         return ret;
     }
 
+    public Long getUserCountInSession(String sessionSid) {
+        List<OVToken> li = ovTokenRepository.findAllBySessionSid(sessionSid);
+        return (long)li.size();
+    }
+
     public void removeSession(String sessionSid) {
         ovTokenRepository.deleteAllBySessionSid(sessionSid);
     }
@@ -46,7 +53,6 @@ public class OVTokenService {
 
     public Session getMainSessionFromUserId(String userSid){
         List<OVToken> ovTokens = ovTokenRepository.findAllByUserSid(userSid);
-
         for(OVToken ovToken: ovTokens){
             Session s = sessionRepository.findById(ovToken.getSessionSid()).orElseThrow();
             if(s.getIsMain()){ return s; }
