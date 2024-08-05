@@ -100,7 +100,7 @@ onMounted(async () => {
       sessionId: sessionStore.sessionId,
       onMessageReceived: onMainSessionMessageReceived,
       onEventReceived: onProgressEventReceived,
-      subscriptions: ['chat', 'progress']
+      subscriptions: ['chat', 'session']
     })
   }
 })

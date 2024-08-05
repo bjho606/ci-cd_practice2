@@ -80,10 +80,10 @@ const addSubscriptions = (
       case 'chat':
         addChatSubscription(sessionId, onMessageReceived)
         break
-      case 'progress':
-        addProgressSubscription(sessionId, onEventReceived)
+      case 'session':
+        addSessionSubscription(sessionId, onEventReceived)
         break
-      case 'contents':
+      case 'progress':
         addContentsSubscription(sessionId, onEventReceived)
         break
       case 'game':
@@ -122,19 +122,19 @@ const addChatSubscription = (sessionId, onMessageReceived) => {
   }
 }
 
-const addProgressSubscription = (sessionId, onEventReceived) => {
-  const progressKey = `progress`
-  if (!subscriptionMap.has(progressKey)) {
-    const progressSubscription = stompClient.subscribe(
+const addSessionSubscription = (sessionId, onEventReceived) => {
+  const sessionKey = `session`
+  if (!subscriptionMap.has(sessionKey)) {
+    const sessionSubscription = stompClient.subscribe(
       `/subscribe/sessions/${sessionId}`,
       (message) => {
-        console.log('Received event from progress Subscribe:', message.body)
+        console.log('Received event from session Subscribe:', message.body)
         if (onEventReceived) {
           onEventReceived(JSON.parse(message.body))
         }
       }
     )
-    subscriptionMap.set(progressKey, progressSubscription)
+    subscriptionMap.set(sessionKey, sessionSubscription)
   }
 }
 
@@ -146,7 +146,7 @@ const addContentsSubscription = (sessionId, onEventReceived) => {
       (message) => {
         console.log('Received event from Contents Subscribe', message.body)
         if (onEventReceived) {
-          onEventReceived(message)
+          onEventReceived(JSON.parse(message.body))
         }
       }
     )

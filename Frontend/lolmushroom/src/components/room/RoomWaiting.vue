@@ -1,12 +1,14 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useContentsStore } from '@/stores/contents'
 import { useUserStore } from '@/stores/User'
 import { useChatStore } from '@/stores/chatStore'
 import { useSessionStore } from '@/stores/session'
 import webSocketAPI from '@/api/webSocket'
 import RoomNameInput from '@/components/room/RoomNameInput.vue'
 
+const contentsStore = useContentsStore()
 const userStore = useUserStore()
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
@@ -21,7 +23,17 @@ const onSubSessionMessageReceived = (message) => {
 }
 
 /**
+ * * 2. Player는 Session Contents 진행에 대한 Event를 구독한다.
+ * IMP : Event에 의해서 맞는 Routing이 이루어져야 한다.
+ * TODO : Routing!!
+ */
+const onContentsRecdived = (event) => {
+  contentsStore.setContentsInfo(event)
+}
+
+/**
  * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
+ * TODO 2. 팀장에 대한 View를 만들어야 함.
  * TODO 2. 진행자의 Signal을 await하고 있다가, 다음 Component로 이동할 수 있어야 한다.
  */
 
@@ -29,7 +41,8 @@ onMounted(() => {
   webSocketAPI.connect({
     sessionId: sessionStore.subSessionId,
     onMessageReceived: onSubSessionMessageReceived,
-    subscriptions: ['chat']
+    onEventReceived: onContentsRecdived,
+    subscriptions: ['chat', 'contents']
   })
 })
 </script>
