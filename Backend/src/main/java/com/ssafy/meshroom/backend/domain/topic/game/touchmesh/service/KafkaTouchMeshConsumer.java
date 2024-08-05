@@ -2,7 +2,6 @@ package com.ssafy.meshroom.backend.domain.topic.game.touchmesh.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
 import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.UpdatedMushroom;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,6 @@ public class KafkaTouchMeshConsumer {
     private final RedisTemplate<String, Integer> redisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final SessionRepository sessionRepository;
 
     @KafkaListener(topics = "game-touchmesh", groupId = "mesh-chat")
     public void listen(TouchDto touchEvent) throws JsonProcessingException {
@@ -36,14 +34,17 @@ public class KafkaTouchMeshConsumer {
         // Redis에셔 현재 크기 가져오기
         Integer currSize = redisTemplate.opsForValue().get(key);
 
+        System.out.println(touchEvent.getType());
+
+
         if (currSize == null) {
             currSize = 100;
             redisTemplate.opsForValue().set(key, currSize);
         } else {
-            if (touchEvent.getType() == TouchDto.TouchType.INCREASE) {
-                redisTemplate.opsForValue().set(key, currSize + 1);
-            } else {
+            if (touchEvent.getType() == TouchDto.TouchType.DECREASE) {
                 redisTemplate.opsForValue().set(key, currSize - 1);
+            } else {
+                redisTemplate.opsForValue().set(key, currSize + 1);
             }
         }
     }
