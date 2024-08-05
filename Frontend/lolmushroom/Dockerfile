@@ -1,4 +1,3 @@
-# Stage 1: Build the Vue.js app
 FROM node:16 AS build-stage
 WORKDIR /app
 COPY package*.json ./
@@ -11,4 +10,5 @@ FROM nginx:alpine
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 EXPOSE 80
+EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
