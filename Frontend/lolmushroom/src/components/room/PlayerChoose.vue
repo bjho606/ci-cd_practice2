@@ -63,7 +63,7 @@ const createSubSessionHandler = async (sessionId) => {
  * IMP 3.2 Room이 활성 상태인 경우 -> 해당 Sub Session으로 들어가는 Routing을 해주고, 동시에 Sub Session과 Connection을 만들어준다.
  * * 이때, 'subSessionId : room.sessionId'을 통해 Sub Session Routing을 시켜주고 있음
  * * Room 배열에 이미 subSessionId가 붙어 있기 때문에, 가능한 Process
- *
+ * ! Leader가 2개가 만들어질 수 있을까?
  */
 const handleRoomClick = async (index) => {
   const room = rooms.value[index]

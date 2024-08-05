@@ -12,9 +12,9 @@ export const useContentsStore = defineStore('contents', {
       this.totalContents = contents
     },
     setContentsInfo(event) {
-      this.currentContentsId = event.contentsId
-      this.currentContents = event.sequence
-      this.selectedContents = event.total
+      this.currentContentsId = event.contentsId // 현재 진행되는 Contents의 아이디
+      this.currentContents = event.sequence // 현재 진행될 순서
+      this.selectedContents = event.total // 총 컨텐츠 갯수
     }
   }
 })

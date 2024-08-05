@@ -35,7 +35,7 @@ const toggleMicIcon = () => {
  * @param userName
  *
  * RES openvide_token, user_token
- * ! Connection Token은 OpenVidu에서 주는 Token
+ * ! Connection Token은 OpenVidu에서 주는 Token -> OpenVidu Token 저장 염두
  * ! Server와 인증에 사용되는 User JWT Token은 Cookie에 저장됨
  */
 const getSessionConnection = async (sessionId, userName) => {
