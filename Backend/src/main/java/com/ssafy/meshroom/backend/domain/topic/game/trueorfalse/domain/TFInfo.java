@@ -19,15 +19,8 @@ public class TFInfo {
     @Indexed(unique=true)
     private String _id;
 
-<<<<<<< HEAD
     private String ovToken;
     private String sessionId;
     private ArrayList<String> truths;
     private String false1;
-=======
-    String ovToken;
-    String sessionId;
-    ArrayList<String> truths;
-    String false1;
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 }

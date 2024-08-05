@@ -42,11 +42,7 @@ public class ChatEventHandler {
     public void sendMessage(Principal p, ChatMessagePublish chatMessagePublish) {
         log.info("Message Mapping /chat/message");
 
-<<<<<<< HEAD
         log.info(((UsernamePasswordAuthenticationToken)p).getAuthorities().toString());
-=======
-//        log.info(((UsernamePasswordAuthenticationToken)p).getAuthorities().toString());
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         String userSid = ((UsernamePasswordAuthenticationToken)p).getName();
         log.info("userSid : " + userSid);
 

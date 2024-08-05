@@ -25,7 +25,3 @@ server:
   port: 5000
   ssl:
     enabled: false
-<<<<<<< HEAD
-
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173

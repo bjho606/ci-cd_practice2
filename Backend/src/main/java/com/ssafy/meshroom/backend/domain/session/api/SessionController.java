@@ -208,11 +208,7 @@ public class SessionController {
     @PatchMapping("/{sessionId}")
     public ResponseEntity<Response<?>> updateSessionUserCounts(
             @PathVariable String sessionId,
-<<<<<<< HEAD
             @RequestBody UpdateSessionRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-=======
-            @RequestBody UpdateSessionRequest request) {
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSessionUserCounts(sessionId, request));
     }
 
@@ -245,11 +241,7 @@ public class SessionController {
     @PatchMapping("/{subsessionId}/group-name")
     public ResponseEntity<Response<?>> updateSubSessionGroupName(
             @PathVariable String subsessionId,
-<<<<<<< HEAD
             @RequestBody UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-=======
-            @RequestBody UpdateGroupNameRequest request) {
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId, request));
     }
 }

@@ -4,10 +4,6 @@ import com.ssafy.meshroom.backend.global.common.properties.OpenViduProperties;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
-=======
-import org.springframework.beans.factory.annotation.Value;
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 import org.springframework.stereotype.Service;
 
 import java.util.List;

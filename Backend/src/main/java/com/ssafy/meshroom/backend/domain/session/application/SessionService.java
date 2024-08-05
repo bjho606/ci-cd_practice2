@@ -152,7 +152,6 @@ public class SessionService {
                 .build();
         Connection connection = session.createConnection(connectionProperties);
         String token = connection.getToken(); // Send this string to the client side
-<<<<<<< HEAD
         log.info("OV Token : " + token);
         if(isMain.get()){
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
@@ -162,12 +161,8 @@ public class SessionService {
         }
 
         // 4. user 컬렉션과 token 컬렉션에 관계 추가
-<<<<<<< HEAD
         if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)
             ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
-=======
-        ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
->>>>>>> a2199c36a24ab5301b2e1b9ac82e7202b6c1e65f
 
 =======
 >>>>>>> a76be45b45b028351e20ba8df5734d3378267173
@@ -177,28 +172,19 @@ public class SessionService {
 
     @Transactional
     public Response<SessionInfoResponse> getSessionInfo(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-<<<<<<< HEAD
 //        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
-=======
-        Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         AtomicReference<SessionInfoResponse> sessionInfo = new AtomicReference<>();
         List<SubSessionInfoResponse> subs = new ArrayList<>();
         sessionRepository.findBySessionId(sessionId).ifPresent(session -> {
             sessionRepository.findAllByMainSession(sessionId).ifPresent(subSessions -> {
                 subSessions.forEach((subSession) -> {
                     try {
-<<<<<<< HEAD
                         subs.add(getSubsession(sessionId, subSession.getSessionId(), subSession.get_id()).orElseThrow());
-=======
-                        subs.add(getSubsession(sessionId, subSession.getSessionId()).orElseThrow());
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
                     } catch (OpenViduJavaClientException | OpenViduHttpException e) {
                         throw new OpenViduException();
                     }
                 });
             });
-<<<<<<< HEAD
             sessionInfo.set(SessionInfoResponse.builder()
                     .maxUserCount(session.getMaxUserCount())
                     .currentUserCount(ovTokenService.getUserCountInSession(session.get_id()) )
@@ -206,19 +192,6 @@ public class SessionService {
                     .groups(subs)
                     .build()
             );
-=======
-            try {
-                sessionInfo.set(SessionInfoResponse.builder()
-                        .maxUserCount(session.getMaxUserCount())
-                        .currentUserCount(openViduService.getSessionCount(openViduService.getSession(sessionId)))
-                        .url(session.getUrl())
-                        .groups(subs)
-                        .build()
-                );
-            } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-                throw new OpenViduException();
-            }
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         });
 
         return new Response<SessionInfoResponse>(true, 2010L, "SUCCESS",
@@ -226,31 +199,19 @@ public class SessionService {
     }
 
     public Response<SubSessionInfoResponse> getSubSessionInfo(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-<<<<<<< HEAD
         com.ssafy.meshroom.backend.domain.session.domain.Session subSession = sessionRepository.findBySessionId(subSessionId).orElseThrow(SessionNotExistException::new);
         return new Response<SubSessionInfoResponse>(true, 2000L, "SUCCESS"
                 , getSubsession(sessionId, subSessionId, subSession.get_id()).orElseThrow());
     }
 
     public Optional<SubSessionInfoResponse> getSubsession(String sessionId, String subSessionId, String subSessionSid) throws OpenViduJavaClientException, OpenViduHttpException {
-=======
-        return new Response<SubSessionInfoResponse>(true, 2000L, "SUCCESS"
-                , getSubsession(sessionId, subSessionId).orElseThrow());
-    }
-
-    public Optional<SubSessionInfoResponse> getSubsession(String sessionId, String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         AtomicReference<SubSessionInfoResponse> ret = new AtomicReference<>();
 
         sessionRepository.findBySessionId(subSessionId).ifPresentOrElse(
                 (session) -> {
                     // 1. subSession과 session이 부모자식관계인지
                     if (!session.getMainSession().equals(sessionId)) {
-<<<<<<< HEAD
                         throw new RuntimeException(sessionId + "의 하위세션이 아닙니다.");
-=======
-                        throw new RuntimeException(sessionId+"의 하위세션이 아닙니다.");
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
                     }
 
                     ret.set(SubSessionInfoResponse.builder()
@@ -267,20 +228,11 @@ public class SessionService {
                     throw new RuntimeException();
                 }
         );
-<<<<<<< HEAD
         ret.get().setCurrentUserCount(ovTokenService.getUserCountInSession(subSessionSid));
-=======
-        Session session = openViduService.getSession(sessionId);
-        ret.get().setCurrentUserCount(openViduService.getSessionCount(session));
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 //        ret.get().setUsername(openViduService.getUsernameInSession(session))
         return Optional.ofNullable(ret.get());
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
     @Transactional
     public Response<?> deleteSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         com.ssafy.meshroom.backend.domain.session.domain.Session _session
@@ -306,11 +258,7 @@ public class SessionService {
     }
 
     @Transactional
-<<<<<<< HEAD
     public Response<?> updateSessionUserCounts(String sessionId, UpdateSessionRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-=======
-    public Response<?> updateSessionUserCounts(String sessionId, UpdateSessionRequest request) {
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(sessionId)
                 .orElseThrow(SessionNotExistException::new);
 
@@ -318,29 +266,19 @@ public class SessionService {
         session.setMaxSubuserCount(request.getMaxSubuserCount());
         sessionRepository.save(session);
 
-<<<<<<< HEAD
         simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         return new Response<>(true, 2000L, "세션 정보가 성공적으로 수정되었습니다.", null);
     }
 
     @Transactional
-<<<<<<< HEAD
     public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-=======
-    public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) {
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subsessionId)
                 .orElseThrow(SessionNotExistException::new);
 
         session.setGroupName(request.getGroupName());
         sessionRepository.save(session);
 
-<<<<<<< HEAD
         simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         return new Response<>(true, 2000L, "하위 세션의 그룹 이름이 성공적으로 수정되었습니다.", null);
     }
 
@@ -363,7 +301,3 @@ public class SessionService {
 
 
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173

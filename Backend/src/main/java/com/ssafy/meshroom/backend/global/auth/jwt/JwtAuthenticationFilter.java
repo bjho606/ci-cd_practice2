@@ -1,9 +1,5 @@
 package com.ssafy.meshroom.backend.global.auth.jwt;
 
-<<<<<<< HEAD
-=======
-import com.ssafy.meshroom.backend.global.error.exception.SecurityAuthenticationException;
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 import com.ssafy.meshroom.backend.global.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,7 +24,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
-<<<<<<< HEAD
         String token = CookieUtil.getCookie(request, "token").orElseThrow().getValue();
 
         if (cookies != null) {
@@ -39,10 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-=======
-        String token = CookieUtil.getCookie(request,"token").orElseThrow(()->new SecurityAuthenticationException("Invalid token")).getValue();
-
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         log.info(token);
         if (token == null || !tokenProvider.validToken(token)) {
             throw new RuntimeException("Invalid token");
@@ -62,15 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return ("test-token".equals(request.getHeader("X-Test-Token")))
                 // 아래 조건을 만족하면 필터링을 해야만 함!
                 || !(
-<<<<<<< HEAD
                 (request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
                         || CookieUtil.getCookie(request, "token").isPresent()
         )
-=======
-                        (request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
-                        || CookieUtil.getCookie(request,"token").isPresent()
-                    )
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 
 //                || path.startsWith(("/swagger-ui"))
 //                || path.startsWith(("/api-docs"))
