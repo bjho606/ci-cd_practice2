@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import StatusBar from './StatusBar.vue'
 
+const sessionStore = useSessionStore()
 const mushroomStore = useMushroomStore()
 const currentGroup = computed(() => mushroomStore.getCurrentGroup)
 const currentGroupName = computed(() => mushroomStore.getMushroomName(currentGroup.value))
@@ -11,6 +13,8 @@ const currentGroupImage = computed(() => mushroomStore.getMushroomImage(currentG
 
 /**
  * IMP 1. User의 Main Mushroom을 Click에 대한 EventHandler
+ * * 1. Click에 대한 Effect를 정의
+ * * 2. Click 정보를 Publish하는 mushroomStore의 onMushroomClick()
  */
 const clickEffect = ref(false)
 const clickPosition = ref({ x: 0, y: 0 })
@@ -22,7 +26,7 @@ const onMushroomClick = (event) => {
   }
   clickEffect.value = true
   setTimeout(() => (clickEffect.value = false), 200)
-  mushroomStore.onMushroomClick(currentGroup.value)
+  mushroomStore.onMushroomClick(sessionStore.sessionId, currentGroup.value)
 }
 /**
  * TODO StatusBar
@@ -33,7 +37,7 @@ const onMushroomClick = (event) => {
 <template>
   <v-card class="solo-mushroom-card">
     <!-- 상단에 현재 그룹 정보를 표시 -->
-    <v-card-title>{{ currentGroup }}</v-card-title>
+    <v-card-title>{{ currentGroupName }}</v-card-title>
     <v-card-text>Size: {{ currentGroupSize }}</v-card-text>
 
     <!-- 버섯 이미지 클릭 -->

@@ -6,58 +6,35 @@ import GroupMushroom from './GroupMushroom.vue'
 
 const mushroomStore = useMushroomStore()
 
-// Group mushrooms in pairs for 2-column layout
-const chunkedMushrooms = computed(() => {
-  const otherMushrooms = mushroomStore.getOtherMushrooms
-  const chunkSize = 2
-  const chunks = []
-  for (let i = 0; i < otherMushrooms.length; i += chunkSize) {
-    chunks.push(otherMushrooms.slice(i, i + chunkSize))
-  }
-  return chunks
-})
+// Get the other mushrooms directly
+const otherMushrooms = computed(() => mushroomStore.getOtherMushrooms)
 </script>
 
 <template>
-  <v-card class="main-mushroom-card">
-    <StatusBar title="Main Mushroom" status="Growing" />
-    <v-virtual-scroll
-      :items="chunkedMushrooms"
-      :height="580"
-      item-height="90"
-      class="custom-scroll full-height"
-    >
-      <template v-slot:default="{ item: mushroomPair }">
-        <v-row no-gutters>
-          <v-col v-for="(mushroom, index) in mushroomPair" :key="index" cols="12" sm="6">
-            <GroupMushroom
-              :group="{ id: mushroom.sessionId, name: mushroom.name, size: mushroom.size }"
-            />
-          </v-col>
-        </v-row>
-      </template>
-    </v-virtual-scroll>
+  <v-card class="group-mushroom">
+    <StatusBar title="Group Mushroom" status="Growing" />
+    <v-container class="mushroom-grid">
+      <GroupMushroom
+        v-for="mushroom in otherMushrooms"
+        :key="mushroom.sessionId"
+        :group="mushroom"
+      />
+    </v-container>
   </v-card>
 </template>
 
 <style scoped>
-.main-mushroom-card {
+.group-mushroom {
+  height: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
-.custom-scroll::-webkit-scrollbar {
-  width: 4px; /* 스크롤바 너비 조정 */
-}
 
-.custom-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1; /* 스크롤바 트랙 배경색 */
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
-  background: #888; /* 스크롤바 색상 */
-}
-
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #555; /* 호버 시 스크롤바 색상 */
+.mushroom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 항상 2개의 열로 유지 */
+  gap: 10px;
+  max-height: calc(100vh - 150px); /* 원하는 높이로 조정 가능 */
+  overflow-y: auto;
 }
 </style>

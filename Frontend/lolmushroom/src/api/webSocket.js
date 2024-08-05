@@ -1,5 +1,4 @@
 import { Client } from '@stomp/stompjs'
-
 const { VITE_API_WEBSOCKET_URL } = import.meta.env
 
 let stompClient = null
@@ -11,14 +10,15 @@ const connect = ({
   onMessageReceived,
   onEventReceived,
   onConnect,
-  onError
+  onError,
+  subscriptions // 추가된 파라미터: 구독할 리스트
 }) => {
   // stompClient가 이미 존재하고 연결된 상태라면 새로운 클라이언트를 생성하지 않음
   if (stompClient && stompClient.connected) {
     console.log('Already connected, adding new subscriptions')
 
     // 기존 연결 상태에서 새 구독 추가
-    addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived)
+    addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions)
 
     if (onConnect) {
       onConnect('Already connected')
@@ -33,7 +33,7 @@ const connect = ({
       console.log('Connected: ' + frame)
 
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
-      addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived)
+      addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions)
 
       if (onConnect) {
         onConnect(frame)
@@ -62,11 +62,40 @@ const connect = ({
   stompClient.activate()
 }
 
-const addSubscriptions = (sessionId, contentsName, onMessageReceived, onEventReceived) => {
-  /**
-   * IMP 1. Chatting을 위한 Socket 연결
-   * * => 여러 Session을 연결할 수 있지만, Main과 1개의 SubSession에 대한 Socket 연결만 함
-   */
+const addSubscriptions = (
+  sessionId,
+  contentsName,
+  onMessageReceived,
+  onEventReceived,
+  subscriptions
+) => {
+  if (!subscriptions || subscriptions.length === 0) {
+    console.warn('No subscriptions provided')
+    return
+  }
+
+  // 구독을 선택적으로 추가
+  subscriptions.forEach((subscription) => {
+    switch (subscription) {
+      case 'chat':
+        addChatSubscription(sessionId, onMessageReceived)
+        break
+      case 'session':
+        addSessionSubscription(sessionId, onEventReceived)
+        break
+      case 'progress':
+        addContentsSubscription(sessionId, onEventReceived)
+        break
+      case 'game':
+        addGameSubscription(sessionId, contentsName, onEventReceived)
+        break
+      default:
+        console.warn(`Unknown subscription type: ${subscription}`)
+    }
+  })
+}
+
+const addChatSubscription = (sessionId, onMessageReceived) => {
   const sessionKey = `session-${sessionId}`
   if (!subscriptionMap.has(sessionKey)) {
     const sessionSubscription = stompClient.subscribe(
@@ -91,29 +120,25 @@ const addSubscriptions = (sessionId, contentsName, onMessageReceived, onEventRec
       body: JSON.stringify(joinMessage)
     })
   }
+}
 
-  /**
-   * IMP 2. MeshRoom의 Room 생성, Room 입장에 대한 Event에 대한 Socket
-   * * Main과 SubSession들에 대한 실시간 정보에 대한 SubScription
-   */
-  const progressKey = `progress`
-  if (!subscriptionMap.has(progressKey)) {
-    const progressSubscription = stompClient.subscribe(
-      `/subscribe/progress/${sessionId}`,
+const addSessionSubscription = (sessionId, onEventReceived) => {
+  const sessionKey = `session`
+  if (!subscriptionMap.has(sessionKey)) {
+    const sessionSubscription = stompClient.subscribe(
+      `/subscribe/sessions/${sessionId}`,
       (message) => {
-        console.log('Received event from progress Subscribe:', message.body)
+        console.log('Received event from session Subscribe:', message.body)
         if (onEventReceived) {
-          onEventReceived(message)
+          onEventReceived(JSON.parse(message.body))
         }
       }
     )
-    subscriptionMap.set(progressKey, progressSubscription)
+    subscriptionMap.set(sessionKey, sessionSubscription)
   }
+}
 
-  /**
-   * IMP 3. MeshRoom 진행자의 Contents의 흐름제어 Event에 대한 Socket
-   * * 현재 Contents에 대한 정보를 전체 참여자들에게 반환한다.
-   */
+const addContentsSubscription = (sessionId, onEventReceived) => {
   const contentsKey = 'contents'
   if (!subscriptionMap.has(contentsKey)) {
     const contentsSubscription = stompClient.subscribe(
@@ -121,24 +146,26 @@ const addSubscriptions = (sessionId, contentsName, onMessageReceived, onEventRec
       (message) => {
         console.log('Received event from Contents Subscribe', message.body)
         if (onEventReceived) {
-          onEventReceived(message)
+          onEventReceived(JSON.parse(message.body))
         }
       }
     )
     subscriptionMap.set(contentsKey, contentsSubscription)
   }
+}
 
-  /**
-   * IMP 4. MeshRoom 참여자가 각 Contents Data에 대한 Subscribe
-   */
+const addGameSubscription = (sessionId, contentsName, onEventReceived) => {
   const gameKey = `game-${contentsName}`
   if (!subscriptionMap.has(gameKey)) {
-    const gameSubscription = stompClient.subscribe(`/subscribe/game/${contentsName}`, (event) => {
-      console.log(`Received event from ${contentsName} Subscribe`)
-      if (onEventReceived) {
-        onEventReceived(JSON.parse(event.body))
+    const gameSubscription = stompClient.subscribe(
+      `/subscribe/game/${contentsName}/${sessionId}`,
+      (event) => {
+        console.log(`Received event from ${contentsName} Subscribe`)
+        if (onEventReceived) {
+          onEventReceived(JSON.parse(event.body))
+        }
       }
-    })
+    )
     console.log('Mushroom Grow Game에 입장했습니다.')
     subscriptionMap.set(gameKey, gameSubscription)
   }

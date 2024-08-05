@@ -6,26 +6,29 @@ const props = defineProps({
   group: {
     type: Object,
     required: true
-  },
-  previewSize: {
-    type: Number,
-    default: 10
   }
 })
 
 const mushroomStore = useMushroomStore()
 const mushroomImage = computed(() => mushroomStore.getMushroomImage(props.group.size))
+const mushroomSize = computed(() => `${props.group.size / 4}vw`) // MainMushroom과 비율을 고려하여 크기 조정
 
-const changeClick = () => {
-  mushroomStore.onChangeClick(props.id)
+const onChangeClick = () => {
+  mushroomStore.onChangeClick(props.group.sessionId)
 }
 </script>
 
 <template>
-  <v-card class="group-mushroom-card" @click="changeClick">
-    <v-img :src="mushroomImage" aspect-ratio="1" class="mushroom-image" />
-    <v-card-title class="text-center">{{ group.name }}</v-card-title>
-    <v-card-text class="text-center"> Size: {{ group.size }}vw </v-card-text>
+  <v-card class="group-mushroom-card" @click="onChangeClick">
+    <div class="mushroom-container">
+      <v-img
+        :src="mushroomImage"
+        :style="{ width: mushroomSize, height: mushroomSize }"
+        class="mushroom-image"
+      />
+    </div>
+    <v-card-title class="text-center">{{ group.groupName }}</v-card-title>
+    <v-card-text class="text-center">Size: {{ group.size }}vw</v-card-text>
   </v-card>
 </template>
 
@@ -42,7 +45,17 @@ const changeClick = () => {
   transform: scale(1.05);
 }
 
+.mushroom-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
 .mushroom-image {
   object-fit: cover;
+  transition:
+    width 0.5s,
+    height 0.5s; /* 크기 변화 애니메이션 */
 }
 </style>
