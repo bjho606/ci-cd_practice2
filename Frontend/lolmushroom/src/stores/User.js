@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 // userStore 정의
 export const useUserStore = defineStore('user', {
   state: () => ({
+    userOvToken: ref('undefined'),
     userNickname: '닉네임을 설정해주세요',
     isTeamLeader: false,
-    userTOFstatements: {}
   }),
   actions: {
     setNickname(nickname) {
@@ -18,6 +19,6 @@ export const useUserStore = defineStore('user', {
   persist: {
     key: 'user-store',
     storage: sessionStorage,
-    paths: ['userNickname', 'userTOFstatements']
+    paths: ['userNickname', 'userOvToken', 'isTeamLeader']
   }
 })

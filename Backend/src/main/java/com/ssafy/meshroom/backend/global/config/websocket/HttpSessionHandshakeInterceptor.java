@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+<<<<<<< HEAD
+=======
+import org.springframework.security.authorization.AuthorizationDeniedException;
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -23,6 +27,7 @@ public class HttpSessionHandshakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest servletServerRequest) {
             HttpServletRequest servletRequest = servletServerRequest.getServletRequest();
             Cookie token = CookieUtil.getCookie(servletRequest, "token").orElseThrow(AuthException::new);
+<<<<<<< HEAD
 
             log.info("token:::");
 //            log.info(token.getValue());
@@ -32,6 +37,14 @@ public class HttpSessionHandshakeInterceptor implements HandshakeInterceptor {
         return true;
     }
 
+=======
+            log.info("token:::");
+            log.info(token.getValue());
+            attributes.put("token", token.getValue());
+        }
+        return true;
+    }
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
         log.info("==============after handshake===============");

@@ -56,7 +56,8 @@ const rankingData = [
             :key="index"
           >
             <v-list-item-content>
-              <v-list-item-title>{{ item.rank }}. {{ item.sessionName }}</v-list-item-title>
+              <v-list-item-title>
+                <v-icon icon="mdi-emoticon-poop"/>{{ item.sessionName }}</v-list-item-title>
               <v-list-item-subtitle>{{ item.time }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>

@@ -16,9 +16,15 @@ public class OVToken {
     @Indexed(unique=true)
     private String _id;
 
+<<<<<<< HEAD
     private String userSid;
 
     private String sessionSid;
 
     private String ovToken;
+=======
+    String userSid;
+
+    String sessionSid;
+>>>>>>> a76be45b45b028351e20ba8df5734d3378267173
 }

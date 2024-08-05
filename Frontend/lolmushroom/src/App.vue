@@ -115,4 +115,34 @@ import GlobalFooter from '@/components/common/GlobalFooter.vue'
     left: 20%;
   }
 }
+
+@keyframes moveMushroom2 {
+  0% {
+    left: 10%;
+  }
+  50% {
+    left: 90%;
+  }
+  100% {
+    left: 10%;
+  }
+}
+
+@keyframes moveMushroom3 {
+  0% {
+    left: 20%;
+  }
+  50% {
+    left: 70%;
+  }
+  100% {
+    left: 20%;
+  }
+}
+
+/* .chat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+} */
 </style>

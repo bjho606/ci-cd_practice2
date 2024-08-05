@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, reactive, onBeforeUnmount, onMounted, watch, onUpdated } from 'vue';
+  import { ref, reactive, onBeforeUnmount, onMounted, watch, nextTick } from 'vue';
   import { OpenVidu } from 'openvidu-browser';
   import { useSessionStore } from '@/stores/session';
   import { useUserStore } from '@/stores/User';
@@ -18,7 +18,7 @@
     socketConnected: Boolean,
   });
 
-  const emit = defineEmits(['update:nickName', 'publish']);
+  const emit = defineEmits(['update:nickName']);
 
   const state = reactive({
     OV: undefined,
@@ -27,17 +27,12 @@
     publisher: undefined,
     subscribers: [],
     joinedPlayer: 0,
+    userTokens: [],
   })
-
-  // const OV = ref(undefined);
-  // const session = ref(undefined);
-  // const mainStreamManager = ref(undefined);
-  // const publisher = ref(undefined);
-  // const subscribers = ref([]);
 
   const myGroupId = ref(store.subSessionId);  
   const myUserName = ref(useUserStore().userNickname)
-
+  const videoContainer = ref('')
   // API 요청을 통해 발표자 정보 내려 받기
   const nickNames = props.userName
   let iii = 0;
@@ -48,6 +43,7 @@
   const changeNickName = () => {
     iii = (iii + 1) % nickNames.length;
     nickName.value = nickNames[iii];
+    console.log(document.querySelectorAll('video'), '닉네임 변경')
     };
   
   const joinSession = async () => {
@@ -75,23 +71,31 @@
 
     // --- 3) 세션 내 이벤트 처리 ---
     state.session.on('streamCreated', ({ stream }) => {
-      // const subscriber = session.value.subscribe(stream, 'video-container');
-      console.log('Stream created:', stream);
-      const subscriber = state.session.subscribe(stream, 'video-container')
+      addUserName(stream.connection)
+      const subscriber = state.session.subscribe(stream, 'video-container');
+      // const subscriber = state.session.subscribe(stream);
       state.subscribers.push(subscriber)
-      // console.log('Subscriber:', subscriber);
-      if (subscriber.videos.length !== 0) { state.joinedPlayer++ }
-    });
+      // 구독자 토큰 추가
+      state.userTokens.push(subscriber['stream']['connection']['connectionId'])
+      state.joinedPlayer++
+    })
+
 
     state.session.on('streamDestroyed', ({ stream }) => {
+      const pElements = videoContainer.value.querySelectorAll('p');
+      pElements.forEach(elements => {
+        if (elements.id === stream.connection.connectionId) {
+          elements.remove()
+        }
+      })
       const index = state.subscribers.indexOf(stream.streamManager, 0);
       if (index >= 0) {
         const subscriber = state.subscribers[index]
-        if (subscriber.videos.length !== 0) { state.joinedPlayer++ }
+        if (subscriber.videos.length !== 0) { state.joinedPlayer-- }
         state.subscribers.splice(index, 1);
-      }
-    });
 
+      }
+    })
     state.session.on('exception', ({ exception }) => {
       console.warn(exception);
     });
@@ -116,8 +120,7 @@
       await state.session.connect(token, { clientData: myUserName.value })
       // await session.value.connect(token, { clientData: props.userName });
 
-      // --- 5) 원하는 속성으로 카메라 스트림 초기화 ---
-      const publisher = state.OV.initPublisher(undefined, {
+      const publisher = state.OV.initPublisher('video-container', {
         audioSource: undefined,
         videoSource: undefined,
         publishAudio: true,
@@ -133,17 +136,19 @@
       // 이거를 이제 순번에 맞게 설정하면 된다.
       state.mainStreamManager = publisher;
       state.publisher = publisher
-      // console.log('publisher', publisher)
-      // store.state.root.publisher = publisher
-      state.joinedPlayerNumbers++
-      console.log(state.subscribers)
-      
+
+      // 본인(발행자) ovtoken 추가
+      state.userTokens.push(state.publisher['session']['connection']['connectionId'])
+      // 유저 정보 하단에 추가
+      state.joinedPlayer++
+
       // --- 6) 스트림 발행 ---
     } catch (error) {
       console.log('세션 연결 중 오류가 발생했습니다:', error.code, error.message);
     }
     
     window.addEventListener('beforeunload', leaveSession);
+    addUserName(state.publisher.stream.connection)
   };
 
   const leaveSession = () => {
@@ -161,12 +166,17 @@
     window.removeEventListener('beforeunload', leaveSession);
   };
 
-  const updateMainVideoStreamManager = (stream) => {
-    // 메인 비디오 교체 -> 이거를 매턴 마다 돌려가면서 사용해야지
-    if (state.mainStreamManager !== stream) {
-      state.mainStreamManager = stream;
+  // props로 어떤 값을 받으면 watch로 감시하고 있다가 이거 실행해서 특정 카메라만 display 하는 함수
+  const updateMainVideoStreamManager = (id) => {
+    const elements = videoContainer.value.children;
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].id !== id) {
+        elements[i].style.display = 'none';
+      } else {
+        elements[i].style.display = ''
+      }
     }
-  };
+  }
 
   const getToken = async (mySessionId) => {
     const sessionId = await createSession(mySessionId);
@@ -187,6 +197,33 @@
     return response.data;
   };
 
+  const applyVideoStyles = () => {
+    nextTick(() => {
+      const videos = document.querySelectorAll('video');
+      let i = 0
+      videos.forEach(video => {
+        video.id = state.userTokens[i]
+        i ++
+      });
+    });
+  };
+
+  // 유저 정보를 추출하여 비디오 상단에 추가
+  const addUserName = (connectionData) => {
+    const pElement = document.createElement('p')
+    pElement.textContent = JSON.parse(connectionData.data).clientData
+    pElement.setAttribute('id', connectionData.connectionId)
+    videoContainer.value.appendChild(pElement)
+  }
+
+  // `state.joinedPlayer`가 변경될 때마다 `applyVideoStyles` 호출
+  watch(() => state.joinedPlayer, applyVideoStyles);
+  watch(state.joinedPlayer, (newValue, oldValue) => {
+    if (newValue > oldValue) {
+      applyVideoStyles()
+    }
+  })
+
   onBeforeUnmount(() => {
     leaveSession();
   });
@@ -199,37 +236,25 @@
     emit('update:nickName', newVal);
   });
 
-  watch(state.subscribers, () => {
-    emit('publish', true);
-  })
-
 </script>
 
 <template>
   <div id="session" v-if="state.session">
     <div id="session-header">
       <h1 id="session-title">{{ myGroupId }}</h1>
-      <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="세션 나가기" />
     </div>
-    <!-- 메인 송출 비디오 -->
-    <div id="main-video" class="col-md-6">
-      <UserVideo :stream-manager="state.mainStreamManager"/>
-    </div>
-    <v-btn @click="changeNickName">
-      발표 종료
-    </v-btn>
-    <!-- 주변 비디오 이거 렌더링만 안 하고 뒀다가 메인이랑 엿 바꿔먹는 데 사용할까?-->
-    <div id="video-container" class="col-md-6">
-      <!-- <UserVideo :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
-      <UserVideo
-        v-for="sub in state.subscribers"
-        :key="sub.stream.connection.connectionId"
-        :stream-manager="sub"
-        @click="updateMainVideoStreamManager(sub)"
-      /> -->
-    </div>
+    <v-btn @click="updateMainVideoStreamManager(state.userTokens[1])">카메라변경.</v-btn>
+    <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="세션 나가기" />
+    <div id="video-container" class="col-md-6" ref="videoContainer"></div>
   </div>
 </template>
 
 <style scoped>
+#video-container > #local-video-undefined{
+  display: none;
+}
+
+#remote-video-str_CAM_LZKP_con_EnkzQoI6M8 {
+  background-color: aqua;
+}
 </style>
