@@ -1,12 +1,13 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import { useSessionStore } from '@/stores/session'
-import sessionAPI from '@/api/session'
+import { useRoomStore } from '@/stores/roomStore'
 import StatusBar from './StatusBar.vue'
 import MainMushroomContainer from './MainMushroomContainer.vue'
 import GroupMushroomContainer from './GroupMushroomContainer.vue'
 
+const roomStore = useRoomStore()
 const mushroomStore = useMushroomStore()
 const sessionStore = useSessionStore()
 
@@ -14,30 +15,44 @@ const sessionStore = useSessionStore()
  * * TEST GROUP DATA
  * IMP Progress Socket을 통해 정보를 가져올 것
  */
-const groups = [
-  { sessionId: 'group-session-101', groupName: 'Group 1' },
-  { sessionId: 'group-session-102', groupName: 'Group 2' },
-  { sessionId: 'group-session-103', groupName: 'Group 3' },
-  { sessionId: sessionStore.subSessionId, groupName: 'User Group' }, // 현재 사용자의 그룹
-  { sessionId: 'group-session-105', groupName: 'Group 5' },
-  { sessionId: 'group-session-106', groupName: 'Group 6' },
-  { sessionId: 'group-session-107', groupName: 'Group 7' },
-  { sessionId: 'group-session-108', groupName: 'Group 8' },
-  { sessionId: 'group-session-109', groupName: 'Group 9' },
-  { sessionId: 'group-session-110', groupName: 'Group 10' },
-  { sessionId: 'group-session-111', groupName: 'Group 11' },
-  { sessionId: 'group-session-112', groupName: 'Group 12' },
-  { sessionId: 'group-session-113', groupName: 'Group 13' },
-  { sessionId: 'group-session-114', groupName: 'Group 14' },
-  { sessionId: 'group-session-115', groupName: 'Group 15' }
-]
+
+const groups = computed(() => {
+  return roomStore.getActiveRooms.map((room) => ({
+    sessionId: room.sessionId,
+    groupName: room.groupName
+  }))
+})
 
 /**
  * TODO : MushroomGrow Contents에 대한 Socket 연결
  * IMP Socket 연결하는 중...
  */
 onMounted(() => {
-  mushroomStore.initSocketConnection(sessionStore.sessionId, sessionStore.subSessionId, groups)
+  mushroomStore.initSocketConnection(
+    sessionStore.sessionId,
+    sessionStore.subSessionId,
+    groups.value
+  )
+  // mushroomStore.initLocalData('group-session-104', groups)
+  // setInterval(() => {
+  //   groups.forEach((group) => {
+  //     const currentSize = mushroomStore.getMushroomSize(group.sessionId)
+
+  //     // 70% 확률로 크기 감소, 30% 확률로 크기 증가
+  //     const isDecreasing = Math.random() < 0.7
+  //     const changeAmount = Math.floor(Math.random() * 5) + 1 // 1~5 사이의 랜덤 크기 변화
+
+  //     let newSize
+  //     if (isDecreasing) {
+  //       newSize = currentSize - changeAmount
+  //       if (newSize < 0) newSize = 0 // 크기가 음수가 되지 않도록 방지
+  //     } else {
+  //       newSize = currentSize + changeAmount
+  //     }
+
+  //     mushroomStore.updateMushroomSize(group.sessionId, newSize)
+  //   })
+  // }, 1000)
 })
 </script>
 
@@ -76,6 +91,10 @@ onMounted(() => {
 }
 
 .bottom-container {
-  margin-bottom: 3%;
+  flex-grow: 1; /* Bottom Container가 남은 공간을 차지하도록 */
+  overflow: hidden; /* 내부 요소가 커져도 넘치지 않도록 */
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 3.5%;
 }
 </style>

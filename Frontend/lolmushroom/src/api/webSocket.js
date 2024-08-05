@@ -87,7 +87,7 @@ const addSubscriptions = (
         addContentsSubscription(sessionId, onEventReceived)
         break
       case 'game':
-        addGameSubscription(contentsName, onEventReceived)
+        addGameSubscription(sessionId, contentsName, onEventReceived)
         break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
@@ -126,11 +126,11 @@ const addProgressSubscription = (sessionId, onEventReceived) => {
   const progressKey = `progress`
   if (!subscriptionMap.has(progressKey)) {
     const progressSubscription = stompClient.subscribe(
-      `/subscribe/progress/${sessionId}`,
+      `/subscribe/sessions/${sessionId}`,
       (message) => {
         console.log('Received event from progress Subscribe:', message.body)
         if (onEventReceived) {
-          onEventReceived(message)
+          onEventReceived(JSON.parse(message.body))
         }
       }
     )

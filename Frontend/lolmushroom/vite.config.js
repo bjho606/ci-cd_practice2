@@ -13,8 +13,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://http://127.0.0.1:5000',
-        // target: 'https://i11a401.p.ssafy.io',
+        // target: 'http://http://127.0.0.1:5000',
+        target: 'http://i11a401.p.ssafy.io:5000',
         changeOrigin: true
       }
     }

@@ -1,20 +1,17 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
 import { useUserStore } from '@/stores/User'
 import { useSessionStore } from '@/stores/session'
 import { useRouter } from 'vue-router'
-import RoomNameInput from '@/components/room/RoomNameInput.vue'
 import sessionAPI from '@/api/session'
 
 const router = useRouter()
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const sessionStore = useSessionStore()
-const { rooms } = storeToRefs(roomStore)
-const showRoomNameInput = ref(false)
-const activeButtonIndex = ref(0)
+const { rooms, activeButtonIndex } = storeToRefs(roomStore)
 
 /**
  * IMP 1. SubSession에 대한 Connection을 생성한다.
@@ -39,31 +36,7 @@ const getSessionConnection = async (sessionId, userName) => {
 }
 
 /**
- * IMP 2. Main Session에 대한 정보를 받아낸다.
- * * 2.1 Main Session에 대한 정보를 바탕으로, 현재 활성화된 Group을 갱신한다.
- * REQ
- * @param sessionId
- *
- * RES url, groups, max_user_count, current_user_count
- * * groups : Group List => subSessionId, groupName, maxUserCount, currentUserCount, userName_Array
- * ! MeshRoom 진행에 대한 Socket 연걸이 가능해지면 Deprecated될 동작 방식
- */
-const getSessionInfo = async (sessionId) => {
-  try {
-    const response = await sessionAPI.getSessionInfo(sessionId)
-    if (response.data.isSuccess) {
-      const groups = response.data.result.groups
-      console.log('현재 Session의 정보를 가져왔습니다:) 현재 Session 상태는 다음과 같습니다:)')
-      console.log(response.data.result)
-      roomStore.setRooms(groups)
-    }
-  } catch (error) {
-    console.error('Error Getting Session Information', error)
-  }
-}
-
-/**
- * IMP 3. SubSession을 '생성'한다 -> '생성'과 '입장'은 구분되어 있음.
+ * IMP 2. SubSession을 '생성'한다 -> '생성'과 '입장'은 구분되어 있음.
  * REQ
  * @param sessionId
  *
@@ -77,7 +50,6 @@ const createSubSessionHandler = async (sessionId) => {
     const response = await sessionAPI.createSubSession(sessionId)
     if (response.data.isSuccess) {
       console.log('하부 Session의 생성이 완료되었습니다:) 현재 Session의 상태를 가져올게요:)')
-      await getSessionInfo(sessionId)
     }
   } catch (error) {
     console.error('Error Creating SubSession', error)
@@ -85,10 +57,10 @@ const createSubSessionHandler = async (sessionId) => {
 }
 
 /**
- * * 4. Room을 클릭한다 => 2가지의 User Flow로 분기된다.
+ * * 3. Room을 클릭한다 => 2가지의 User Flow로 분기된다.
  * @param index
- * IMP 4.1 Room이 비활성 상태인 경우 -> 1번 createSubSessionHandler를 통해, 새로운 Sub Session을 생성한다.
- * IMP 4.2 Room이 활성 상태인 경우 -> 해당 Sub Session으로 들어가는 Routing을 해주고, 동시에 Sub Session과 Connection을 만들어준다.
+ * IMP 3.1 Room이 비활성 상태인 경우 -> 1번 createSubSessionHandler를 통해, 새로운 Sub Session을 생성한다.
+ * IMP 3.2 Room이 활성 상태인 경우 -> 해당 Sub Session으로 들어가는 Routing을 해주고, 동시에 Sub Session과 Connection을 만들어준다.
  * * 이때, 'subSessionId : room.sessionId'을 통해 Sub Session Routing을 시켜주고 있음
  * * Room 배열에 이미 subSessionId가 붙어 있기 때문에, 가능한 Process
  *
@@ -96,9 +68,7 @@ const createSubSessionHandler = async (sessionId) => {
 const handleRoomClick = async (index) => {
   const room = rooms.value[index]
   if (!room.buttonClicked) {
-    activeButtonIndex.value += 1
     await createSubSessionHandler(sessionStore.sessionId)
-    // roomStore.setButtonState(index, true)
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
     const isFirstUserInGroup = room.occupants === 0
@@ -109,7 +79,6 @@ const handleRoomClick = async (index) => {
       name: 'roomwaiting',
       params: { sessionId: sessionStore.sessionId, subSessionId: room.sessionId }
     })
-    // roomStore.updateRoomOccupants(index)
   }
 }
 
@@ -118,11 +87,7 @@ const handleRoomClick = async (index) => {
  * ! IF -> MeshRoom Flow에 대한 Socket 연결이 진행되면 Deprecated될 동작
  */
 
-onMounted(async () => {
-  // setInterval(async () => {
-  //   await getSessionInfo(sessionStore.sessionId)
-  // }, 5000) // 5000 milliseconds = 5 seconds
-})
+onMounted(async () => {})
 </script>
 
 <template>
@@ -167,10 +132,6 @@ onMounted(async () => {
         </template>
       </v-col>
     </v-row>
-    <!-- Room Name Input Dialog -->
-    <v-dialog v-model="showRoomNameInput" max-width="1000px">
-      <RoomNameInput />
-    </v-dialog>
   </div>
 </template>
 

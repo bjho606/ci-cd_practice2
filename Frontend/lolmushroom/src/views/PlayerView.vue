@@ -51,45 +51,22 @@ const getSessionConnection = async (sessionId, userName) => {
 }
 
 /**
- * IMP 2. Main Session에 대한 정보를 받아낸다.
- * * 2.1 Main Session에 대한 정보를 바탕으로, 현재 활성화된 Group을 갱신한다.
- * REQ
- * @param sessionId
- *
- * RES url, groups, max_user_count, current_user_count
- * * groups : Group List => subSessionId, groupName, maxUserCount, currentUserCount, userName_Array
- */
-const getSessionInfo = async (sessionId) => {
-  try {
-    const response = await sessionAPI.getSessionInfo(sessionId)
-    if (response.data.isSuccess) {
-      const groups = response.data.result.groups
-      console.log('현재 Session의 정보를 가져왔습니다:) 현재 Session 상태는 다음과 같습니다:)')
-      console.log(response.data.result)
-      roomStore.setRooms(groups)
-    }
-  } catch (error) {
-    console.error('Error Getting Session Information', error)
-  }
-}
-
-/**
- * IMP 3. Player가 Main Session Message에 대한 메시지를 구독한다.
+ * IMP 2. Player가 Main Session Message에 대한 메시지를 구독한다.
  * ! webSocketAPI.connect()의 CallBack에 들어갈 함수 ( Pinia의 MainSessionMessage에 저장 )
  */
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
 const onProgressEventReceived = (message) => {
-  console.log(message)
+  roomStore.setSessionData(message) // 방 정보를 업데이트
 }
 
 /**
- * IMP 4. Player가 Main Session에 입장했을 때, Flow를 관리하는 함수
+ * IMP 3. Player가 Main Session에 입장했을 때, Flow를 관리하는 함수
  * * getSessionConection() API를 호출한다.
- * IMP 4.1. Main Session과 Connection을 만들어 준다.
- * IMP 4.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
- * IMP 4.3  MeshRoom의 Progress에 대한 Socket 연결을 진행한다.
+ * IMP 3.1. Main Session과 Connection을 만들어 준다.
+ * IMP 3.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
+ * IMP 3.3  MeshRoom의 Progress에 대한 Socket 연결을 진행한다.
  * TODO 제대로 동작을 해야 한다.
  */
 const userFlowHandler = async () => {
@@ -100,7 +77,6 @@ const userFlowHandler = async () => {
     `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
   )
   await getSessionConnection(sessionId, { userName: userStore.userNickname })
-  await getSessionInfo(sessionId)
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
     onMessageReceived: onMainSessionMessageReceived,
@@ -110,7 +86,7 @@ const userFlowHandler = async () => {
 }
 
 /**
- * IMP 5. PlayerView에 들어왔을 때, 요구되는 API 호출
+ * IMP 4. PlayerView에 들어왔을 때, 요구되는 API 호출
  * * 1. WebSocket 연결
  * TODO IF -> NickName을 설정하지 않았다면, 주기적으로 안내를 보내야 한다.
  * TODO -> 조금 불안한 점은 Group Socket도 함께 연결해줘야 할 것 같기도 하다..

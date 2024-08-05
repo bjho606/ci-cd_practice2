@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import StatusBar from './StatusBar.vue'
 
+const sessionStore = useSessionStore()
 const mushroomStore = useMushroomStore()
 const currentGroup = computed(() => mushroomStore.getCurrentGroup)
 const currentGroupName = computed(() => mushroomStore.getMushroomName(currentGroup.value))
@@ -24,7 +26,7 @@ const onMushroomClick = (event) => {
   }
   clickEffect.value = true
   setTimeout(() => (clickEffect.value = false), 200)
-  mushroomStore.onMushroomClick(currentGroup.value)
+  mushroomStore.onMushroomClick(sessionStore.sessionId, currentGroup.value)
 }
 /**
  * TODO StatusBar
@@ -70,7 +72,7 @@ const onMushroomClick = (event) => {
 
 <style scoped>
 .solo-mushroom-card {
-  height: 95%;
+  height: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   display: flex;

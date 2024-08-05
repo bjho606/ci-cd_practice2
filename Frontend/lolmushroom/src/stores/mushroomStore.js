@@ -7,10 +7,10 @@ import smallNormal from '@/assets/mushroomGrow/SmallNormal.svg'
 export const useMushroomStore = defineStore('mushroomStore', {
   state: () => ({
     // IMP : Mushroom Size BreakPoints
-    initSize: 20,
-    midSize: 30,
-    finalSize: 40,
-    maxSize: 50,
+    initSize: 10,
+    midSize: 20,
+    finalSize: 30,
+    maxSize: 40,
 
     // IMP : User Group Check and Total Mushroom Information
     userGroup: null,
@@ -55,6 +55,7 @@ export const useMushroomStore = defineStore('mushroomStore', {
      */
     // 소켓으로부터 데이터를 수신하여 버섯 정보를 업데이트
     fetchMushroomData(event) {
+      console.log(event)
       const { sessionId, size } = event
       this.mushroomMap.set(sessionId, size)
     },
@@ -63,15 +64,17 @@ export const useMushroomStore = defineStore('mushroomStore', {
      * IMP 3. Socket을 통해 Click 정보를 Server에 Publish한다.
      * REQ sessionId ( SubSession ID ), actionType ( INCREASE, DECREASE )
      */
-    onMushroomClick(sessionId) {
+    onMushroomClick(sessionId, subSessionId) {
       const clickData = {
-        sessionId: sessionId,
-        action: 'DECREASE'
+        mainSessionId: sessionId,
+        sessionId: subSessionId,
+        type: 'DECREASE'
       }
       if (this.currentGroup === this.userGroup) {
-        clickData.action = 'INCREASE'
+        clickData.type = 'INCREASE'
       }
-      webSocketAPI.sendClickData(`/publish/mushroom/touch`, clickData)
+      console.log(clickData)
+      webSocketAPI.sendClickData(`/publish/game/touch`, clickData)
     },
 
     /**
@@ -84,6 +87,28 @@ export const useMushroomStore = defineStore('mushroomStore', {
     },
     onReturnClick() {
       this.currentGroup = this.userGroup
+    },
+
+    /**
+     * ! Initialize mushroom data locally for testing purposes
+     */
+    initLocalData(subSessionId, groups) {
+      groups.forEach((group) => {
+        this.groupNameMap.set(group.sessionId, group.groupName)
+        this.mushroomMap.set(group.sessionId, 30) // Initial size set to 20
+      })
+      this.userGroup = this.currentGroup = subSessionId // Set the first group as the user's group
+    },
+    updateMushroomSize(sessionId, size) {
+      this.mushroomMap.set(sessionId, size)
+    },
+    onMushroomClickLocal(sessionId) {
+      const currentSize = this.mushroomMap.get(sessionId)
+      if (this.currentGroup === this.userGroup) {
+        this.mushroomMap.set(sessionId, currentSize + 1) // Increase size
+      } else {
+        this.mushroomMap.set(sessionId, currentSize - 1) // Decrease size
+      }
     }
   },
   getters: {

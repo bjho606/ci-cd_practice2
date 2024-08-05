@@ -1,64 +1,60 @@
 import { defineStore } from 'pinia'
 
+/**
+ * Progress Socket Subscribe -> Session에 대한 종합적인 정보
+ * RES maxUserCount, currentUserCount, URL, GroupsArray
+ * IMP : GroupsArray : ( sessionId, groupName, maxUserCount, currentUserCount, UsersArray)
+ */
+
+/**
+ * TODO : roomStore을 SubScribe된 Data로 받아내야 한다.
+ */
+
 export const useRoomStore = defineStore('room', {
   state: () => ({
+    activeButtonIndex: 0,
+    maxUserCount: 0,
+    currentUserCount: 0,
+    url: '',
     roomCount: 10,
     rooms: Array.from({ length: 10 }, () => ({
-      occupants: 0,
+      sessionId: '',
+      groupName: '',
       capacity: 8,
-      buttonClicked: false,
-      roomName: '',
-      sessionId: ''
+      occupants: 0,
+      users: [],
+      buttonClicked: false
     }))
   }),
   actions: {
-    setRoomCount(count) {
-      this.roomCount = count
-      this.rooms = Array.from({ length: count }, () => ({
-        occupants: 0,
-        capacity: 8,
-        buttonClicked: false
-      }))
+    setSessionData(sessionData) {
+      this.maxUserCount = sessionData.maxUserCount
+      this.currentUserCount = sessionData.currentUserCount
+      this.url = sessionData.url
+      this.setRooms(sessionData.groups)
     },
     setRooms(groups) {
       groups.forEach((group, index) => {
-        if (index < this.rooms.length) {
-          this.rooms[index] = {
-            // ...this.rooms[index],
-            occupants: group.currentUserCount,
-            capacity: group.maxUserCount,
-            buttonClicked: true,
-            groupName: group.groupName,
-            sessionId: group.sessionId
-          }
+        this.rooms[index] = {
+          sessionId: group.sessionId,
+          groupName: group.groupName,
+          capacity: group.maxUserCount,
+          occupants: group.currentUserCount,
+          users: group.users,
+          buttonClicked: true
         }
+        this.activeButtonIndex = index + 1
       })
-    },
-    updateRoomOccupants(index) {
-      if (
-        index >= 0 &&
-        index < this.roomCount &&
-        this.rooms[index].occupants < this.rooms[index].capacity
-      ) {
-        this.rooms[index].occupants += 1
-      }
-    },
-    setRoomName(name) {
-      this.roomName = name
-    },
-    setButtonState(index, state) {
-      if (index >= 0 && index < this.roomCount) {
-        this.rooms[index].buttonClicked = state
-      }
     }
   },
   getters: {
-    getRoomCount: (state) => state.roomCount,
-    getRooms: (state) => state.rooms
+    getRooms: (state) => state.rooms,
+    getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
+    getActiveButtonIndex: (state) => state.activeButtonIndex
   },
   persist: {
     key: 'room-info-store',
     storage: sessionStorage,
-    paths: ['roomCount', 'rooms']
+    paths: ['activeButtonIndex', 'maxUserCount', 'currentUserCount', 'roomCount', 'rooms']
   }
 })
