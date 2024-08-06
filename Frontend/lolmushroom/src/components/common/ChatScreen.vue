@@ -69,9 +69,7 @@ const sendMessage = () => {
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" location="top">
       <template v-slot:activator="{ props }">
-        <v-badge :offset-y="7" :offset-x="7" :content="23">
           <v-icon icon="custom:chatButton" v-bind="props" class="icon-size"> </v-icon>
-        </v-badge>
       </template>
 
       <v-card min-width="300" min-height="300" max-height="500" overflow-y: auto>
