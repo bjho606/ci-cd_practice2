@@ -36,20 +36,20 @@ public class SessionSocketListener {
         log.info("SessionConnectedEvent = {}", event);
     }
 
-    @EventListener
-    public void sessionDisconnectEventHandler(SessionDisconnectEvent event) throws OpenViduJavaClientException, OpenViduHttpException {
-        Principal p = event.getUser();
-        Session session = ovTokenService.getMainSessionFromUserId(p.getName());
-
-        // sessionId 에 해당하는 토큰 삭제 ovTokenService 에서 삭제
-//        ovTokenService.removeSession(session.get_id());
-        log.info("session remove!!!");
-
-        // session service의 session info 보내기
-        sendMessage(session);
-
-        log.info("SessionConnectedEvent = {}", event);
-    }
+//    // 새로고침 흐름 토론 필요
+//    @EventListener
+//    public void sessionDisconnectEventHandler(SessionDisconnectEvent event) throws OpenViduJavaClientException, OpenViduHttpException {
+//        Principal p = event.getUser();
+//        // sessionId 에 해당하는 토큰 삭제 ovTokenService 에서 삭제
+//
+//        Session session = ovTokenService.deleteAllSubSessionConnectionFromUserId(p.getName());
+//        log.info("session remove!!!");
+//
+//        // session service의 session info 보내기
+//        sendMessage(session);
+//
+//        log.info("SessionDisconnectEvent = {}", event);
+//    }
 
     private void sendMessage(Session session) throws OpenViduJavaClientException, OpenViduHttpException {
         boolean isMain = session.getIsMain();

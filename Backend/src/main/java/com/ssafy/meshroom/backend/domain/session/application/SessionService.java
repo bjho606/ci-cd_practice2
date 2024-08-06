@@ -1,6 +1,7 @@
 package com.ssafy.meshroom.backend.domain.session.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
+import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderService;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.dto.*;
@@ -23,9 +24,6 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -45,7 +43,6 @@ public class SessionService {
     private final TokenProvider tokenProvider;
     private final OVTokenService ovTokenService;
     private final User user;
-
 
     @Transactional
     public Response<SessionCreateResponse> createSession(List<String> contents) throws OpenViduJavaClientException, OpenViduHttpException {
@@ -86,6 +83,7 @@ public class SessionService {
                         .maxUserCount(60L)
                         .maxSubuserCount(10L)
                         .mainSession(sessionId)
+                        .isReady(false)
                         .build()
         );
 
@@ -186,7 +184,7 @@ public class SessionService {
             });
             sessionInfo.set(SessionInfoResponse.builder()
                     .maxUserCount(session.getMaxUserCount())
-                    .currentUserCount(ovTokenService.getUserCountInSession(session.get_id()) )
+                    .currentUserCount(ovTokenService.getUserCountInSession(session.get_id()))
                     .url(session.getUrl())
                     .groups(subs)
                     .build()
@@ -217,6 +215,7 @@ public class SessionService {
                             .sessionId(subSessionId)
                             .maxUserCount(sessionRepository.findBySessionId(sessionId).orElseThrow().getMaxSubuserCount())
                             .groupName(session.getGroupName())
+                            .isReady(session.getIsReady())
                             .username(
                                     ovTokenService.getUsersInSession(session.get_id())
                             )
@@ -298,5 +297,24 @@ public class SessionService {
         return new Response<>(true, 2000L, "사용자가 세션에서 성공적으로 제거되었습니다.", null);
     }
 
+    public Response<?> subSessionReady(String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        // session정보에 대한 수정을 한다.
+        com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subSessionId).orElseThrow(SessionNotExistException::new);
+        session.setIsReady(true);
+        sessionRepository.save(session);
+        simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
+        return new Response<>(true, 2000L, "준비 완료 되었습니다.", null);
+    }
+
+    public Response<?> subSessionQuit(String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        // ov token에서 해당 세션의 사용자를 삭제한다.
+        com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subSessionId).orElseThrow(SessionNotExistException::new);
+//        com.ssafy.meshroom.backend.domain.session.domain.Session Mainsession = sessionRepository.findBySessionId(session.getMainSession()).orElseThrow(SessionNotExistException::new);
+        String userSid = SecurityContextHolder.getContext().getAuthentication().getName();
+        ovTokenService.removeUserFromSession(session.get_id(), userSid);
+//        ovTokenService.removeUserFromSession(Mainsession.get_id(), userSid);
+        simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
+        return new Response<>(true, 2000L, "그룹에서 성공적으로 나갔습니다.", null);
+    }
 
 }

@@ -30,4 +30,6 @@ public class Session {
     private Boolean isMain;
 
     private String mainSession;
+
+    private Boolean isReady;
 }

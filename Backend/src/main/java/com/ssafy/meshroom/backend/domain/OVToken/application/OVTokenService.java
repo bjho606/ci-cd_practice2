@@ -61,6 +61,20 @@ public class OVTokenService {
 
         return null;
     }
+    public Session deleteAllSubSessionConnectionFromUserId(String userSid){
+        List<OVToken> ovTokens = ovTokenRepository.findAllByUserSid(userSid);
+        Session ret = null;
+        for(OVToken ovToken: ovTokens){
+            Session s = sessionRepository.findById(ovToken.getSessionSid()).orElseThrow();
+            if(s.getIsMain()) {
+                ret = s;
+                continue;
+            }
+            removeUserFromSession(s.get_id(), userSid);
+        }
+
+        return ret;
+    }
 
     public boolean checkIfTokenExists(String userSid, String sessionSid) {
         return ovTokenRepository.existsByUserSidAndSessionSid(userSid, sessionSid);
