@@ -61,4 +61,8 @@ public class OVTokenService {
 
         return null;
     }
+
+    public boolean checkIfTokenExists(String userSid, String sessionSid) {
+        return ovTokenRepository.existsByUserSidAndSessionSid(userSid, sessionSid);
+    }
 }
