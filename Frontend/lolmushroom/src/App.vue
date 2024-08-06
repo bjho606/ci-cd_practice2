@@ -1,9 +1,32 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
 import './assets/fonts.css'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useContentsStore } from './stores/contentsStore'
+import contentsAPI from './api/contents'
 import GlobalHeader from '@/components/common/GlobalHeader.vue'
 import GlobalFooter from '@/components/common/GlobalFooter.vue'
+
+/**
+ * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
+ */
+
+const contentsStore = useContentsStore()
+const fetchContents = () => {
+  try {
+    const response = contentsAPI.getContents()
+    if (response.data.isSuccess) {
+      console.log('Meshroom의 모든 Contents를 가져왔습니다:)')
+      contentsStore.setContents(response.data.result.contents)
+    }
+  } catch (error) {
+    console.log('Error Getting Meshroom Contents', error)
+  }
+}
+
+onMounted(() => {
+  fetchContents()
+})
 </script>
 
 <template>

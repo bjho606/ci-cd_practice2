@@ -1,18 +1,18 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/User'
-
+import { useUserStore } from '@/stores/userStore'
+import { useContentsStore } from '@/stores/contentsStore'
 import NicknameModal from '@/components/common/NicknameModal.vue'
 import FullNotice from '@/components/info/FullNotice.vue'
 import contentsAPI from '@/api/contents'
 import ContentsDictonary from '@/components/info/ContentsDictonary.vue'
 
-const contents = ref([])
 const showNicknameModal = ref(false)
 const noticeInfo = ref(false)
 const dictionaryInfo = ref(false)
 const userStore = useUserStore()
+const contentsStore = useContentsStore()
 
 const openNotice = () => {
   noticeInfo.value = true
@@ -30,25 +30,18 @@ const closeNotice = () => {
   noticeInfo.value = false
 }
 
-const fetchContents = () => {
-  contentsAPI.getContents(
-    (response) => {
-      contents.value = response.data.result.contents
-    },
-    (error) => {
-      console.error('오류', error)
-    }
-  )
-}
+// const fetchContents = () => {
+//   contentsAPI.getContents(
+//     (response) => {
+//       contents.value = response.data.result.contents
+//     },
+//     (error) => {
+//       console.error('오류', error)
+//     }
+//   )
+// }
 // 2초 후에 모달 창 열기
-onMounted(() => {
-  fetchContents()
-  /*
-  setTimeout(() => {
-    showNicknameModal.value = true
-  }, 2000)
-  */
-})
+onMounted(() => {})
 </script>
 
 <template>
@@ -91,7 +84,7 @@ onMounted(() => {
     <FullNotice @close="closeNotice" />
   </v-dialog>
   <v-dialog v-model="dictionaryInfo" max-width="1200px">
-    <ContentsDictonary :contents="contents" @close="closeDictionary" />
+    <ContentsDictonary :contents="contentsStore.getContents" @close="closeDictionary" />
   </v-dialog>
 </template>
 <style scoped>

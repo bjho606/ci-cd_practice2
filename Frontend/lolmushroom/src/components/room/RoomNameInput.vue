@@ -1,21 +1,22 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { useRoomStore } from '@/stores/roomStore'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 
 const message = ref('')
-const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
 const isButtonDisabled = ref(true)
+const emit = defineEmits(['name-registered'])
 
 /**
  * IMP 1. TeamLeader가 GroupName을 변경한다.
  */
 
-const registerRoomName = () => {
+const registerRoomName = async () => {
   if (message.value.length > 0) {
-    sessionAPI.changeSubSessionName(sessionStore.subSessionId, { groupName: message.value })
+    await sessionAPI.changeSubSessionName(sessionStore.subSessionId, { groupName: message.value })
+    // Emit an event to notify the parent component that the dialog can be closed
+    emit('name-registered')
   }
 }
 

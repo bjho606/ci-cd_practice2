@@ -1,10 +1,10 @@
 <!-- makegame.vue -->
 <script setup>
 import { ref, watch, onMounted } from 'vue'
+import { useContentsStore } from '@/stores/contentsStore'
 import SettingHeader from '@/components/setting/SettingHeader.vue'
 import SettingContents from '@/components/setting/SettingContents.vue'
 import SettingFooter from '@/components/setting/SettingFooter.vue'
-import contentsAPI from '@/api/contents'
 import '@/assets/fonts.css'
 
 // Setting Step
@@ -34,30 +34,13 @@ const prevStep = () => {
   if (step.value == 2) step.value--
 }
 
-const contents = ref([])
+const contentsStore = useContentsStore()
 const selectedContents = ref([])
 const updateSelectedContents = (newSelectedContents) => {
   selectedContents.value = newSelectedContents
 }
 
-// Contents를 Server를 통해 가져온다.
-/**
- * IMP Contents Socket이 생기면서, 필요성이 저하됨.
- */
-const fetchContents = () => {
-  contentsAPI.getContents(
-    (response) => {
-      contents.value = response.data.result.contents
-    },
-    (error) => {
-      console.error('오류', error)
-    }
-  )
-}
-
-onMounted(() => {
-  fetchContents()
-})
+onMounted(() => {})
 </script>
 
 <template>
@@ -66,7 +49,7 @@ onMounted(() => {
     <SettingContents
       :step="step"
       :nextStep="nextStep"
-      :contents="contents"
+      :contents="contentsStore.contents"
       :selectedContents="selectedContents"
       @update-selected-contents="updateSelectedContents"
     />

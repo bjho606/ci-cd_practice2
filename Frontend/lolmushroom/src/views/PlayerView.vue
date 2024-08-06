@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useContentsStore } from '@/stores/contents'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
-import { useUserStore } from '@/stores/User'
+import { useUserStore } from '@/stores/userStore'
 import { useRoomStore } from '@/stores/roomStore'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useRoute } from 'vue-router'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 import AudioPlayer from '@/components/common/AudioPlayer.vue'
@@ -66,7 +66,7 @@ const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message) // 방 정보를 업데이트
 }
 const onProgressEventReceived = (message) => {
-  contentsStore.setCurrentContents(message)
+  contentsStore.setCurrentContentsState(message)
 }
 
 /**

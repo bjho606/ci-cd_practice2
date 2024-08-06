@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import QrcodeVue from 'qrcode.vue'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 

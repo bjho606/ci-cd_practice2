@@ -1,104 +1,105 @@
 <script setup>
-  import { ref, computed, reactive, onMounted } from 'vue'
-  import { useRouter } from 'vue-router';
-  import { useUserStore } from '@/stores/User';
-  import { useSessionStore } from '@/stores/session';
-  import ProgressBar from '@/components/common/ProgressBar.vue';
-  import RoomWating from '@/components/room/RoomWaiting.vue'
-  import contentsAPI from '@/api/contents'
-  import sessionAPI from '@/api/session'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import { useSessionStore } from '@/stores/sessionStore'
+import ProgressBar from '@/components/common/ProgressBar.vue'
+import RoomWating from '@/components/room/RoomWaiting.vue'
+import contentsAPI from '@/api/contents'
+import sessionAPI from '@/api/session'
 
-  const router = useRouter()
-  const store = useUserStore()
-  const sessionStore = useSessionStore()
-  
-  const statements = reactive({
-    firstTrue: '',
-    secondTrue: '',
-    thirdTrue: '',
-    firstFalse: '',
-  })
-  const isSubmitAnswer = ref()
-  const totalUserCount = ref()
+const router = useRouter()
+const store = useUserStore()
+const sessionStore = useSessionStore()
 
-  // 입력 개수 출력
-  const AnswerCountFunction = (a1, a2, a3, a4) => {
-    let result = 0
-    if (a1.length > 0) {
-      result++
-    }
-    if (a2.length > 0) {
-      result++
-    }
-    if (a3.length > 0) {
-      result++
-    }
-    if (a4.length > 0) {
-      result++
-    }
-    return result
+const statements = reactive({
+  firstTrue: '',
+  secondTrue: '',
+  thirdTrue: '',
+  firstFalse: ''
+})
+const isSubmitAnswer = ref()
+const totalUserCount = ref()
+
+// 입력 개수 출력
+const AnswerCountFunction = (a1, a2, a3, a4) => {
+  let result = 0
+  if (a1.length > 0) {
+    result++
   }
-
-  // 몇 개 입력했는지 계산하는 코드
-  const answerCount = computed(() => {
-    return AnswerCountFunction(
-      statements.firstTrue,
-      statements.secondTrue,
-      statements.thirdTrue,
-      statements.firstFalse,
-    )
-  })
-
-  // 텍스트가 입력되지 않으면 자동으로 발동
-  const NotNullRules = (value) => {
-    if (value.length > 0) {
-      return true
-    } else {
-      return '입력해 주시기 바랍니다.'
-    }
+  if (a2.length > 0) {
+    result++
   }
-
-  // 모든 사람이 준비되었을 때 TOF main으로 이동하는 함수
-  const readyAllGuys = () => {
-    router.push({name: 'TOFContent'})
+  if (a3.length > 0) {
+    result++
   }
-
-  // TOF 제출하기 버튼을 눌렀을 때 동작
-  const tofAnswerSubmit = (a1, a2, a3, a4) => {
-    addTOFAnswers(a1, a2, a3, a4)
-    isSubmitAnswer.value = true
-    // 실제로는 소켓통신과 watch를 통해 readyallguys를 실행
-    readyAllGuys()
+  if (a4.length > 0) {
+    result++
   }
+  return result
+}
 
-  // store에 TOF 진술을 추가하는 코드
-  const addTOFAnswers = async (a1, a2, a3, a4) => {
-    const statesObject = {
-      ovToken: store.userOvToken,
-      truths: [a1, a2, a3],
-      false1: a4,
-    }
-    await contentsAPI.createStatements(sessionStore.subSessionId, statesObject)
+// 몇 개 입력했는지 계산하는 코드
+const answerCount = computed(() => {
+  return AnswerCountFunction(
+    statements.firstTrue,
+    statements.secondTrue,
+    statements.thirdTrue,
+    statements.firstFalse
+  )
+})
+
+// 텍스트가 입력되지 않으면 자동으로 발동
+const NotNullRules = (value) => {
+  if (value.length > 0) {
+    return true
+  } else {
+    return '입력해 주시기 바랍니다.'
   }
+}
 
-  // 세션에 참가한 유저 정보를 요청하는 함수
-  // const getSubSessionInfo = async (sessionId, subSessionId) => {
-  //     const response = await sessionAPI.getSubSessionInfo(sessionId, subSessionId);
-  //     currentUserCount.value = response.data.result.username.length
-  //   }
+// 모든 사람이 준비되었을 때 TOF main으로 이동하는 함수
+const readyAllGuys = () => {
+  router.push({ name: 'TOFContent' })
+}
 
+// TOF 제출하기 버튼을 눌렀을 때 동작
+const tofAnswerSubmit = (a1, a2, a3, a4) => {
+  addTOFAnswers(a1, a2, a3, a4)
+  isSubmitAnswer.value = true
+  // 실제로는 소켓통신과 watch를 통해 readyallguys를 실행
+  readyAllGuys()
+}
 
+// store에 TOF 진술을 추가하는 코드
+const addTOFAnswers = async (a1, a2, a3, a4) => {
+  const statesObject = {
+    ovToken: store.userOvToken,
+    truths: [a1, a2, a3],
+    false1: a4
+  }
+  await contentsAPI.createStatements(sessionStore.subSessionId, statesObject)
+}
 
-  // 현재 하위 세션에 존재하는 전체 유저의 수를 반환하는 함수
-  async function getUserCount() {
-    const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
-      return response['data']['result']['currentUserCount']
-      }
+// 세션에 참가한 유저 정보를 요청하는 함수
+// const getSubSessionInfo = async (sessionId, subSessionId) => {
+//     const response = await sessionAPI.getSubSessionInfo(sessionId, subSessionId);
+//     currentUserCount.value = response.data.result.username.length
+//   }
 
-  // 컴포넌트가 마운트될 때 getUserCount 함수를 호출하여 totalUserCount를 설정
-  onMounted(async () => {
-    totalUserCount.value = await getUserCount();
-  });
+// 현재 하위 세션에 존재하는 전체 유저의 수를 반환하는 함수
+async function getUserCount() {
+  const response = await sessionAPI.getSubSessionInfo(
+    sessionStore.sessionId,
+    sessionStore.subSessionId
+  )
+  return response['data']['result']['currentUserCount']
+}
+
+// 컴포넌트가 마운트될 때 getUserCount 함수를 호출하여 totalUserCount를 설정
+onMounted(async () => {
+  totalUserCount.value = await getUserCount()
+})
 </script>
 
 <template>
@@ -167,7 +168,14 @@
           type="submit"
           block
           color="#3ABF38"
-          @click="tofAnswerSubmit(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+          @click="
+            tofAnswerSubmit(
+              statements.firstTrue,
+              statements.secondTrue,
+              statements.thirdTrue,
+              statements.firstFalse
+            )
+          "
           >제출
         </v-btn>
       </v-form>
@@ -176,11 +184,8 @@
 
   <!-- 진술을 제출했다면 -->
   <v-container v-else>
-    <ProgressBar
-      current="1"
-      :total="totalUserCount"
-    />
-     <!-- <RoomWating /> -->
+    <ProgressBar current="1" :total="totalUserCount" />
+    <!-- <RoomWating /> -->
   </v-container>
 </template>
 

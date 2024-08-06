@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useUserStore } from '@/stores/User'
+import { useUserStore } from '@/stores/userStore'
 
 import Mushroom1 from '@/assets/mushroom1.svg'
 import Mushroom2 from '@/assets/mushroom2.svg'

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import StatusBar from './StatusBar.vue'
 

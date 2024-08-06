@@ -9,7 +9,7 @@ import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
-import MushroomContent from '@/components/contents/MushroomContent.vue'
+import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGrowContainer.vue'
 import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
 import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
 
@@ -36,18 +36,23 @@ const routes = [
       {
         path: ':subSessionId/GroupSessionView',
         component: GroupSessionView,
-          children: [
-            { path: 'TOF', name: 'TOF', component: TOFInputsComponent },
-            { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent }
-          ]
+        children: [
+          { path: 'TOF', name: 'TOF', component: TOFInputsComponent },
+          { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent }
+        ]
       },
       {
         path: ':subSessionId/GroupFightSessionView',
         name: 'GroupFightSessionView',
         component: GroupFightSessionView,
-        children: [{ path: 'MushroomContent', name: 'MushroomContent', component: MushroomContent }]
-      },
-      { path: 'playerchoose', name: 'playerChoose', component: PlayerChoose }
+        children: [
+          {
+            path: 'MushroomGrowContainer',
+            name: 'MushroomGrowContainer',
+            component: MushroomGrowContainer
+          }
+        ]
+      }
     ]
   }
 ]

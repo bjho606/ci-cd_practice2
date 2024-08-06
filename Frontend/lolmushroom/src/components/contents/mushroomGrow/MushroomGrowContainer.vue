@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, computed } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import StatusBar from './StatusBar.vue'
 import MainMushroomContainer from './MainMushroomContainer.vue'
