@@ -15,4 +15,6 @@ public interface OVTokenRepository extends MongoRepository<OVToken, String> {
     void deleteAllBySessionSid(String sessionSid);
 
     void deleteBySessionSidAndUserSid(String sessionSid, String userSid);
+
+    boolean existsByUserSidAndSessionSid(String userSid, String sessionSid);
 }
