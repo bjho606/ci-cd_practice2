@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useContentsStore } from '@/stores/contents'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useRoomStore } from '@/stores/roomStore'
-import { useUserStore } from '@/stores/User'
+import { useUserStore } from '@/stores/userStore'
 import { useChatStore } from '@/stores/chatStore'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import webSocketAPI from '@/api/webSocket'
 import RoomNameInput from '@/components/room/RoomNameInput.vue'
 
@@ -33,31 +33,41 @@ console.log(groupInfo.value)
 
 /**
  * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
+ * * 3. Team Leader는 Room의 이름을 바꿀 수 있다.
+ * * 3.1. Dialog를 통해 Room Name을 바꾼다.
  */
 const isTeamLeader = userStore.isTeamLeader
 const showRoomNameInput = ref(false)
-const openRoomNameInput = () => {
+const openDialog = () => {
   showRoomNameInput.value = true
 }
-
-/**
- * TODO 2. 팀장에 대한 View를 만들어야 함. -> 준비 완료 ( Contents 종료 )( -> 진행자에게 시그널로 가야 한다. )
- */
-
-/**
- * IMP 진행자의 Signal을 await하고 있다가, 다음 Component로 이동할 수 있어야 한다. => Routing이 이루어져야 한다.
- */
-// Contents를 가져올 수도 있다.
-const routeMapping = {
-  1: { name: 'TOF', params: { id: 1 } },
-  2: { name: 'MushroomContent', params: { id: 2 } }
+const closeDialog = () => {
+  showRoomNameInput.value = false
 }
 
+/**
+ * TODO 2. 팀장은 진행자에게 '완료' Signal을 보낸다.
+ * IMP : 팀장은 Waiting이 아닌 Contents를 진행 중일 때, '완료'를 누르면, Room Waiting으로 돌아온다.
+ */
+
+/**
+ * TODO 3. 모든 Player는 진행자의 Signal을 구독하고 있다가, 다음 Component로 이동할 수 있어야 함.
+ * ! Watch를 통해, currentContentsId만 Watch하면, reload가 어려울 수 있음 -> 전체를 watch할까?
+ * IMP : 다음 Component로 Routing이 이루어져야 한다.
+ */
+
+const routeMapping = contentsStore.getRouteMapping
 watch(
-  () => contentsStore.currentContents,
+  () => contentsStore.currentContentsId,
   (newContentsId) => {
     if (newContentsId && routeMapping[newContentsId]) {
-      router.push(routeMapping[newContentsId])
+      router.push({
+        name: routeMapping[newContentsId],
+        params: {
+          sessionId: sessionStore.sessionId, // Replace with actual session ID
+          subSessionId: sessionStore.subSessionId // Replace with actual sub-session ID
+        }
+      })
     }
   }
 )
@@ -73,9 +83,9 @@ onMounted(() => {
 
 <template>
   <div class="main">
-    <v-btn v-if="isTeamLeader" @click="openRoomNameInput" color="primary">Change Room Name</v-btn>
+    <v-btn v-if="isTeamLeader" @click="openDialog" color="primary">Change Room Name</v-btn>
     <v-dialog v-model="showRoomNameInput" max-width="1000px">
-      <RoomNameInput />
+      <RoomNameInput @name-registerd="closeDialog" />
     </v-dialog>
     <v-container class="group-info" fluid>
       <v-row justify="center" align="center">

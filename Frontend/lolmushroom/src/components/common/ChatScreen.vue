@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useChatStore } from '@/stores/chatStore'
 import avatarImg from '@/assets/origbig.png'
 import webSocketAPI from '@/api/webSocket'

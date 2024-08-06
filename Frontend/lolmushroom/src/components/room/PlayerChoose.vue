@@ -1,9 +1,8 @@
 <script setup>
 import { onMounted, computed } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
-import { useUserStore } from '@/stores/User'
-import { useSessionStore } from '@/stores/session'
+import { useUserStore } from '@/stores/userStore'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useRouter } from 'vue-router'
 import sessionAPI from '@/api/session'
 
@@ -72,14 +71,13 @@ const handleRoomClick = async (index) => {
   if (!room.buttonClicked) {
     await createSubSessionHandler(sessionStore.sessionId)
     sessionStore.setSessionId(sessionStore.sessionId)
-    // roomStore.setButtonState(index, true)
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
     const isFirstUserInGroup = room.occupants === 0
     await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
     if (isFirstUserInGroup) userStore.setTeamLeader(true)
+    else userStore.setTeamLeader(false)
     sessionStore.setSubSessionId(room.sessionId)
-    // 세션 정보 저장
 
     router.push({
       name: 'roomwaiting',

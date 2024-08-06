@@ -23,7 +23,7 @@ export const useRoomStore = defineStore('room', {
       capacity: 8,
       occupants: 0,
       users: [],
-      reddy: true,
+      ready: true,
       buttonClicked: false
     }))
   }),

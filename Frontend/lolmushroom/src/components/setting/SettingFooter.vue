@@ -2,7 +2,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 

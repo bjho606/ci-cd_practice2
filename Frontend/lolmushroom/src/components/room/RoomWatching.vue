@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
