@@ -20,12 +20,6 @@ public class ChatMessageSubscribe {
     private Instant timestamp;
 //    private Date timestamp = new Date(System.currentTimeMillis());
 
-    public ChatMessageSubscribe(String sessionId, String content, Instant timestamp) {
-        this.sessionId = sessionId;
-        this.content = content;
-        this.timestamp = timestamp;
-    }
-
     public static ChatMessageSubscribe from (ChatMessagePublish chatMessagePublish, String userName) {
         return new ChatMessageSubscribe(
             userName,
