@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,8 +59,9 @@ public class TrueOrFalseEventHandler {
     public ResponseEntity<Response<TFInfoCreateResponse>> createTFInfo (
             @PathVariable String sessionId,
             @RequestBody TFInfoCreateRequest tfInfoCreateRequest) {
+        String userSid = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(trueOrFalseService.createTFInfo(sessionId, tfInfoCreateRequest));
+                .body(trueOrFalseService.createTFInfo(sessionId, userSid, tfInfoCreateRequest));
     }
 
     @Operation(

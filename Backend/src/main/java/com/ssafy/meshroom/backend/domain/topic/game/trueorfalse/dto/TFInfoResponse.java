@@ -13,15 +13,22 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TFInfoResponse {
+    String userName;
     String ovToken;
-    ArrayList<String> truths;
-    String false1;
+    ArrayList<String> statements;
+    int falseIndex;
 
     public static TFInfoResponse from (TFInfo tfInfo) {
-        return new TFInfoResponse(
-                tfInfo.getOvToken(),
-                tfInfo.getTruths(),
-                tfInfo.getFalse1()
-        );
+        TFInfoResponse tfInfoResponse = new TFInfoResponse();
+        tfInfoResponse.userName = tfInfo.getUserName();
+        tfInfoResponse.ovToken = tfInfo.getOvToken();
+
+        ArrayList<String> mixedStatements = new ArrayList<>(tfInfo.getTruths());
+        tfInfoResponse.falseIndex = (int)(Math.random()*10) % tfInfo.getTruths().size();
+        mixedStatements.add(tfInfoResponse.falseIndex, tfInfo.getFalse1());
+
+        tfInfoResponse.statements = mixedStatements;
+
+        return tfInfoResponse;
     }
 }

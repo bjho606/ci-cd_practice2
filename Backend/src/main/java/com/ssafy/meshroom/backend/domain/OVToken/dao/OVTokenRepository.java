@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OVTokenRepository extends MongoRepository<OVToken, String> {
@@ -17,4 +18,7 @@ public interface OVTokenRepository extends MongoRepository<OVToken, String> {
     void deleteBySessionSidAndUserSid(String sessionSid, String userSid);
 
     boolean existsByUserSidAndSessionSid(String userSid, String sessionSid);
+
+    Optional<OVToken> findByOvToken(String ovToken);
+
 }
