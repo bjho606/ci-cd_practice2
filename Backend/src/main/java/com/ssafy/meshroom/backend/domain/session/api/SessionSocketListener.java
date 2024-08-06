@@ -42,7 +42,7 @@ public class SessionSocketListener {
         Session session = ovTokenService.getMainSessionFromUserId(p.getName());
 
         // sessionId 에 해당하는 토큰 삭제 ovTokenService 에서 삭제
-        ovTokenService.removeSession(session.get_id());
+//        ovTokenService.removeSession(session.get_id());
         log.info("session remove!!!");
 
         // session service의 session info 보내기
