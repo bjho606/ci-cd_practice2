@@ -37,6 +37,8 @@ const connect = ({
   stompClient = new Client({
     brokerURL: VITE_API_WEBSOCKET_URL,
     reconnectDelay: 5000,
+    heartbeatIncoming: 4000, // 서버에서 클라이언트로 보내는 심장박동 간격
+    heartbeatOutgoing: 4000, // 클라이언트에서 서버로 보내는 심장박동 간격
     onConnect: (frame) => {
       console.log('Connected: ' + frame)
 

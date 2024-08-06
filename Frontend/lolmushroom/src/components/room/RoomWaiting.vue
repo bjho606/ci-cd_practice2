@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contents'
 import { useRoomStore } from '@/stores/roomStore'
@@ -41,10 +41,26 @@ const openRoomNameInput = () => {
 }
 
 /**
- * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
  * TODO 2. 팀장에 대한 View를 만들어야 함. -> 준비 완료 ( Contents 종료 )( -> 진행자에게 시그널로 가야 한다. )
+ */
+
+/**
  * IMP 진행자의 Signal을 await하고 있다가, 다음 Component로 이동할 수 있어야 한다. => Routing이 이루어져야 한다.
  */
+// Contents를 가져올 수도 있다.
+const routeMapping = {
+  1: { name: 'TOF', params: { id: 1 } },
+  2: { name: 'MushroomContent', params: { id: 2 } }
+}
+
+watch(
+  () => contentsStore.currentContents,
+  (newContentsId) => {
+    if (newContentsId && routeMapping[newContentsId]) {
+      router.push(routeMapping[newContentsId])
+    }
+  }
+)
 
 onMounted(() => {
   webSocketAPI.connect({
