@@ -4,14 +4,17 @@ import com.ssafy.meshroom.backend.global.error.code.CommonErrorCode;
 import com.ssafy.meshroom.backend.global.error.code.ErrorCode;
 import com.ssafy.meshroom.backend.global.error.dto.ErrorResponse;
 import com.ssafy.meshroom.backend.global.error.exception.*;
+import jakarta.security.auth.message.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -26,6 +29,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<String> handleAuthException(AuthException ex) {
+        log.error("인증 에러입니다. 없는 사용자이거나 잘못된 토큰입니다.");
+        return new ResponseEntity<>("Authentication failed: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
     @ExceptionHandler(SecurityAuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(SecurityAuthenticationException ex) {
         return handleExceptionInternal(ex.getErrorCode());
