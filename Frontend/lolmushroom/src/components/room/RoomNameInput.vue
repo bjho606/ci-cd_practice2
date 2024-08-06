@@ -1,15 +1,22 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoomStore } from '@/stores/roomStore'
+import { useSessionStore } from '@/stores/session'
 import { useRouter } from 'vue-router'
+import sessionAPI from '@/api/session'
 
 const router = useRouter()
 const message = ref('')
 const roomStore = useRoomStore()
+const sessionStore = useSessionStore()
 const isButtonDisabled = ref(true)
 
 const registerRoomName = () => {
   if (message.value.length > 0) {
+    sessionAPI.changeSubSessionName(sessionStore.subSessionId, message.value, () => {
+      console.log('Room Name ')
+    })
+
     roomStore.setRoomName(message.value)
     console.log('Room Name:', roomStore.roomName)
     roomStore.showRoomNameInput = false

@@ -51,10 +51,11 @@ export const useRoomStore = defineStore('room', {
     getRooms: (state) => state.rooms,
     getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
     getActiveButtonIndex: (state) => state.activeButtonIndex,
-    getUserCount: (state) => state.userCount,
-    getOccupantsBySessionId: (state) => (sessionId) => {
-      const room = state.rooms.find((room) => room.sessionId === sessionId)
-      return room ? room.occupants : null
+    getTotalUserCount: (state) => state.currentUserCount,
+    getTotalMaxUserCount: (state) => state.maxUserCount,
+    getGroupInfoBySessionId: (state) => (sessionId) => {
+      const groupInfo = state.rooms.find((room) => room.sessionId === sessionId)
+      return groupInfo
     }
   },
   persist: {

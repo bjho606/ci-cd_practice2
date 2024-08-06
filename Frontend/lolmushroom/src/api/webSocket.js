@@ -9,6 +9,7 @@ const connect = ({
   contentsName,
   onMessageReceived,
   onEventReceived,
+  onProgressReceived,
   onConnect,
   onError,
   subscriptions // 추가된 파라미터: 구독할 리스트
@@ -18,7 +19,14 @@ const connect = ({
     console.log('Already connected, adding new subscriptions')
 
     // 기존 연결 상태에서 새 구독 추가
-    addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions)
+    addSubscriptions(
+      sessionId,
+      contentsName,
+      onMessageReceived,
+      onEventReceived,
+      onProgressReceived,
+      subscriptions
+    )
 
     if (onConnect) {
       onConnect('Already connected')
@@ -33,7 +41,14 @@ const connect = ({
       console.log('Connected: ' + frame)
 
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
-      addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions)
+      addSubscriptions(
+        sessionId,
+        contentsName,
+        onMessageReceived,
+        onEventReceived,
+        onProgressReceived,
+        subscriptions
+      )
 
       if (onConnect) {
         onConnect(frame)
@@ -77,6 +92,7 @@ const addSubscriptions = (
   contentsName,
   onMessageReceived,
   onEventReceived,
+  onProgressReceived,
   subscriptions
 ) => {
   if (!subscriptions || subscriptions.length === 0) {
@@ -93,8 +109,8 @@ const addSubscriptions = (
       case 'session':
         addSessionSubscription(sessionId, onEventReceived)
         break
-      case 'content':
-        addContentsSubscription(sessionId, onEventReceived)
+      case 'progress':
+        addProgressSubscription(sessionId, onProgressReceived)
         break
       case 'game':
         addGameSubscription(sessionId, contentsName, onEventReceived)
@@ -148,19 +164,19 @@ const addSessionSubscription = (sessionId, onEventReceived) => {
   }
 }
 
-const addContentsSubscription = (sessionId, onEventReceived) => {
-  const contentsKey = 'contents'
-  if (!subscriptionMap.has(contentsKey)) {
+const addProgressSubscription = (sessionId, onProgressReceived) => {
+  const progressKey = 'progress'
+  if (!subscriptionMap.has(progressKey)) {
     const contentsSubscription = stompClient.subscribe(
       `/subscribe/contents/${sessionId}`,
       (message) => {
         console.log('Received event from Contents Subscribe', message.body)
-        if (onEventReceived) {
-          onEventReceived(JSON.parse(message.body))
+        if (onProgressReceived) {
+          onProgressReceived(JSON.parse(message.body))
         }
       }
     )
-    subscriptionMap.set(contentsKey, contentsSubscription)
+    subscriptionMap.set(progressKey, contentsSubscription)
   }
 }
 

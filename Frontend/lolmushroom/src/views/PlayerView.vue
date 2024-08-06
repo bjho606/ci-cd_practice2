@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useContentsStore } from '@/stores/contents'
 import { useChatStore } from '@/stores/chatStore'
 import { useUserStore } from '@/stores/User'
 import { useRoomStore } from '@/stores/roomStore'
@@ -12,6 +13,7 @@ import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
 
 const route = useRoute()
+const contentsStore = useContentsStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()
@@ -51,14 +53,20 @@ const getSessionConnection = async (sessionId, userName) => {
 }
 
 /**
- * IMP 2. Player가 Main Session Message에 대한 메시지를 구독한다.
+ * IMP 2. Player가 Server에 대한 필요한 Socket을 연결한다.
  * ! webSocketAPI.connect()의 CallBack에 들어갈 함수 ( Pinia의 MainSessionMessage에 저장 )
+ * * onMainSessionMessageReceived : MainSession Message에 대한 Socket
+ * * onSessionEventReceived : Session Info에 대한 변경 Event에 대한 Socket
+ * * onProgressEventReceived : Contents의 진행 상황 변경 Event에 대한 Socket
  */
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
 const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message) // 방 정보를 업데이트
+}
+const onProgressEventReceived = (message) => {
+  contentsStore.setCurrentContents(message)
 }
 
 /**
@@ -81,7 +89,8 @@ const userFlowHandler = async () => {
     sessionId: sessionStore.sessionId,
     onMessageReceived: onMainSessionMessageReceived,
     onEventReceived: onSessionEventReceived,
-    subscriptions: ['chat', 'session']
+    onProgressReceived: onProgressEventReceived,
+    subscriptions: ['chat', 'session', 'progress']
   })
 }
 
@@ -100,7 +109,8 @@ onMounted(async () => {
       sessionId: sessionStore.sessionId,
       onMessageReceived: onMainSessionMessageReceived,
       onEventReceived: onSessionEventReceived,
-      subscriptions: ['chat', 'session']
+      onProgressReceived: onProgressEventReceived,
+      subscriptions: ['chat', 'session', 'progress']
     })
   }
 })
