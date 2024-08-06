@@ -3,7 +3,7 @@
 import './assets/fonts.css'
 import { onMounted, ref } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
-import contentsAPI from './api/contents'
+import contentsAPI from '@/api/contents'
 import GlobalHeader from '@/components/common/GlobalHeader.vue'
 import GlobalFooter from '@/components/common/GlobalFooter.vue'
 
@@ -12,9 +12,10 @@ import GlobalFooter from '@/components/common/GlobalFooter.vue'
  */
 
 const contentsStore = useContentsStore()
-const fetchContents = () => {
+const fetchContents = async () => {
   try {
-    const response = contentsAPI.getContents()
+    const response = await contentsAPI.getContents()
+    console.log(response.data)
     if (response.data.isSuccess) {
       console.log('Meshroom의 모든 Contents를 가져왔습니다:)')
       contentsStore.setContents(response.data.result.contents)
@@ -23,6 +24,18 @@ const fetchContents = () => {
     console.log('Error Getting Meshroom Contents', error)
   }
 }
+
+// const fetchContents = () => {
+//   contentsAPI.getContents(
+//     (response) => {
+//       contentsStore.setContents(response.data.result.contents)
+//       console.log(contentsStore)
+//     },
+//     (error) => {
+//       console.error('오류', error)
+//     }
+//   )
+// }
 
 onMounted(() => {
   fetchContents()

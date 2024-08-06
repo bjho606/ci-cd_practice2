@@ -4,13 +4,13 @@ const API_URL = '/api/v1'
 
 export default {
   getContents(success, failure) {
-    axios.get(`${API_URL}/contents`).then(success).catch(failure)
+    return axios.get(`${API_URL}/contents`).then(success).catch(failure)
   },
   callNextContents(success, failure) {
-    axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
+    return axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
   },
   recallContents(success, failure) {
-    axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
+    return axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
   },
   // 진실 혹은 거짓 관련 API
   createStatements(sessionId, statesObject, success, failure) {
