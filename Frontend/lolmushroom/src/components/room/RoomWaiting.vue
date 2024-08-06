@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contents'
+import { useRoomStore } from '@/stores/roomStore'
 import { useUserStore } from '@/stores/User'
 import { useChatStore } from '@/stores/chatStore'
 import { useSessionStore } from '@/stores/session'
@@ -9,6 +10,7 @@ import webSocketAPI from '@/api/webSocket'
 import RoomNameInput from '@/components/room/RoomNameInput.vue'
 
 const contentsStore = useContentsStore()
+const roomStore = useRoomStore()
 const userStore = useUserStore()
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
@@ -23,16 +25,22 @@ const onSubSessionMessageReceived = (message) => {
 }
 
 /**
- * * 2. Player는 Session Contents 진행에 대한 Event를 구독한다. => 위치를 PlayerView로 넘어가자!
- * IMP : Event에 의해서 맞는 Routing이 이루어져야 한다.
- * TODO : Routing!!
+ * TODO 0. 모든 사람들은 총 몇명에 현재 몇명이 들어와있는 지 알아야 한다.
+ * * 2. Player는 Group의 현재 정보를 실시간으로 알 수 있다.
  */
-const onContentsReceived = (event) => {
-  contentsStore.setContentsInfo(event)
+const groupInfo = computed(() => roomStore.getGroupInfoBySessionId(sessionStore.subSessionId))
+console.log(groupInfo.value)
+
+/**
+ * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
+ */
+const isTeamLeader = userStore.isTeamLeader
+const showRoomNameInput = ref(false)
+const openRoomNameInput = () => {
+  showRoomNameInput.value = true
 }
 
 /**
- * TODO 0. 모든 사람들은 총 몇명에 현재 몇명이 들어와있는 지 알아야 한다.
  * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
  * TODO 2. 팀장에 대한 View를 만들어야 함. -> 준비 완료 ( Contents 종료 )( -> 진행자에게 시그널로 가야 한다. )
  * IMP 진행자의 Signal을 await하고 있다가, 다음 Component로 이동할 수 있어야 한다. => Routing이 이루어져야 한다.
@@ -42,14 +50,29 @@ onMounted(() => {
   webSocketAPI.connect({
     sessionId: sessionStore.subSessionId,
     onMessageReceived: onSubSessionMessageReceived,
-    onEventReceived: onContentsReceived,
-    subscriptions: ['chat', 'contents']
+    subscriptions: ['chat']
   })
 })
 </script>
 
 <template>
   <div class="main">
+    <v-btn v-if="isTeamLeader" @click="openRoomNameInput" color="primary">Change Room Name</v-btn>
+    <v-dialog v-model="showRoomNameInput" max-width="1000px">
+      <RoomNameInput />
+    </v-dialog>
+    <v-container class="group-info" fluid>
+      <v-row justify="center" align="center">
+        <v-col cols="auto">
+          <v-card color="white" class="pa-4" outlined>
+            <v-card-title class="text-h6">Group: {{ groupInfo.groupName }}</v-card-title>
+            <v-card-subtitle class="text-h5">
+              {{ groupInfo.occupants }} / {{ groupInfo.capacity }} Users
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
     <v-container class="main-space">
       <div class="animated-text">
         <span>게</span><span>임</span><span>을</span><span> </span><span>기</span><span>다</span>

@@ -11,8 +11,7 @@ const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const roomStore = useRoomStore()
 const text = ref('')
-
-const nowSubsession = sessionStore.getSubSessionId
+const subSessionId = sessionStore.getSubSessionId
 
 /**
  * * 1. 사용자에게 보이는 채팅의 내용은 currentMode에 따라 다르다.
@@ -28,8 +27,8 @@ const currentTitle = computed(() =>
 )
 const currentSubtitle = computed(() =>
   isMainMode.value
-    ? roomStore.currentUserCount + '명'
-    : roomStore.getOccupantsBySessionId(nowSubsession) + '명'
+    ? roomStore.getTotalUserCount + '명'
+    : roomStore.getGroupInfoBySessionId(subSessionId).occupants + '명'
 )
 
 /**

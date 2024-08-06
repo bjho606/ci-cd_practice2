@@ -23,5 +23,11 @@ export default {
       .post(`${API_URL}/sessions/${sessionId}/connections`, userName)
       .then(success)
       .catch(failure)
+  },
+  changeSubSessionName(subSessionId, groupName, success, failure) {
+    return axios
+      .patch(`${API_URL}/sessions/${subSessionId}`, groupName)
+      .then(success)
+      .catch(failure)
   }
 }
