@@ -3,12 +3,16 @@ package com.ssafy.meshroom.backend.global.auth.error;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.meshroom.backend.global.error.dto.ErrorResponse;
 import com.ssafy.meshroom.backend.global.error.exception.SecurityAuthenticationException;
+import jakarta.security.auth.message.AuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -35,6 +39,28 @@ public class AuthFailHandlerFilter extends OncePerRequestFilter {
                                     .build()
                     ));
             log.error("Invalid token error");
+        } catch (UsernameNotFoundException e ){
+            response.setStatus(403);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter()
+                    .write(objectMapper.writeValueAsString(
+                            ErrorResponse.builder()
+                                    .code("403")
+                                    .message(e.getMessage())
+                                    .build()
+                    ));
+            log.error("User Not Found Error");
+        } catch (Exception e ){
+            response.setStatus(500);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter()
+                    .write(objectMapper.writeValueAsString(
+                            ErrorResponse.builder()
+                                    .code("500")
+                                    .message(e.getMessage())
+                                    .build()
+                    ));
+            log.error("Auth Error");
         }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +29,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<String> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        log.error("데이터 베이스에 없는 사용자입니다.");
+        return new ResponseEntity<>("UsernameNotFoundException failed: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

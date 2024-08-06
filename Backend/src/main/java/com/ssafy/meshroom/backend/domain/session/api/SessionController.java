@@ -54,6 +54,7 @@ public class SessionController {
     public ResponseEntity<Response<SessionCreateResponse>> createSessions(
             @RequestBody SessionCreateRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session createSessions API");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(sessionService.createSession(request.getContentsOrder()));
     }
@@ -79,6 +80,7 @@ public class SessionController {
     public ResponseEntity<Response<SubSessionCreateResponse>> createSubSessions(
             @PathVariable String sessionId)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session createSubSessions API");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(sessionService.createSubSession(sessionId));
     }
@@ -89,6 +91,7 @@ public class SessionController {
     )
     @GetMapping("/{sessionId}")
     public ResponseEntity<Response<SessionInfoResponse>> sessionInfo(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session sessionInfo API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.getSessionInfo(sessionId));
     }
 
@@ -116,6 +119,7 @@ public class SessionController {
     public ResponseEntity<Response<SubSessionInfoResponse>> subSessionInfo(
             @PathVariable String sessionId, @PathVariable String subSessionId)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session subSessionInfo API");
         return ResponseEntity.status(HttpStatus.OK)
                 .body(sessionService.getSubSessionInfo(sessionId, subSessionId));
     }
@@ -151,6 +155,7 @@ public class SessionController {
             @RequestBody ConnectionCreateRequest req,
             HttpServletResponse response)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session createConnections API");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(sessionService.createConnection(req.getUserName(), sessionId, response));
     }
@@ -176,6 +181,7 @@ public class SessionController {
     )
     @DeleteMapping("/{sessionId}")
     public ResponseEntity<Response<?>> removeSession(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session removeSession API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(sessionId));
     }
 
@@ -209,6 +215,7 @@ public class SessionController {
     public ResponseEntity<Response<?>> updateSessionUserCounts(
             @PathVariable String sessionId,
             @RequestBody UpdateSessionRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session updateSessionUserCounts API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSessionUserCounts(sessionId, request));
     }
 
@@ -242,6 +249,20 @@ public class SessionController {
     public ResponseEntity<Response<?>> updateSubSessionGroupName(
             @PathVariable String subsessionId,
             @RequestBody UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session updateSubSessionGroupName API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId, request));
     }
+
+    @GetMapping("{subSessionId}/ready")
+    public ResponseEntity<Response<?>> getReady(@PathVariable String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session Ready API");
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.subSessionReady(subSessionId));
+    }
+
+    @GetMapping("{subSessionId}/quit")
+    public ResponseEntity<Response<?>> getQuit(@PathVariable String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Session Quit API");
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.subSessionQuit(subSessionId));
+    }
+
 }
