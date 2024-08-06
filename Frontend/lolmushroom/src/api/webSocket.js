@@ -12,21 +12,15 @@ const connect = ({
   onProgressReceived,
   onConnect,
   onError,
-  subscriptions // 추가된 파라미터: 구독할 리스트
+  subscriptions, // 추가된 파라미터: 구독할 리스트
+  onSubmitEvent,
 }) => {
   // stompClient가 이미 존재하고 연결된 상태라면 새로운 클라이언트를 생성하지 않음
   if (stompClient && stompClient.connected) {
     console.log('Already connected, adding new subscriptions')
 
     // 기존 연결 상태에서 새 구독 추가
-    addSubscriptions(
-      sessionId,
-      contentsName,
-      onMessageReceived,
-      onEventReceived,
-      onProgressReceived,
-      subscriptions
-    )
+    addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions, onSubmitEvent)
 
     if (onConnect) {
       onConnect('Already connected')
@@ -43,14 +37,7 @@ const connect = ({
       console.log('Connected: ' + frame)
 
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
-      addSubscriptions(
-        sessionId,
-        contentsName,
-        onMessageReceived,
-        onEventReceived,
-        onProgressReceived,
-        subscriptions
-      )
+      addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions, onSubmitEvent)
 
       if (onConnect) {
         onConnect(frame)
@@ -94,8 +81,9 @@ const addSubscriptions = (
   contentsName,
   onMessageReceived,
   onEventReceived,
+  subscriptions,
+  onSubmitEvent,
   onProgressReceived,
-  subscriptions
 ) => {
   if (!subscriptions || subscriptions.length === 0) {
     console.warn('No subscriptions provided')
@@ -116,6 +104,10 @@ const addSubscriptions = (
         break
       case 'game':
         addGameSubscription(sessionId, contentsName, onEventReceived)
+        break
+      // 이건 뭐냐?
+      case 'tof':
+        addtofSubscription(sessionId, onSubmitEvent)
         break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
@@ -181,6 +173,24 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
     subscriptionMap.set(progressKey, contentsSubscription)
   }
 }
+
+// 진술서 구독 시 내용 전달받기
+const addtofSubscription = (sessionId, onSubmitEvent) => {
+  const sessionKey = `session-${sessionId}`
+  if (!subscriptionMap.has(sessionKey)) {
+    const sessionSubscription = stompClient.subscribe(
+      `/subscribe/game/tf/question/${sessionId}`,
+      (message) => {
+        console.log(`진술서 제출 ${sessionId}:`, message.body)
+        if (onSubmitEvent) {
+          onSubmitEvent(JSON.parse(message.body), sessionId) // sessionId를 함께 전달
+        }
+      }
+    )
+    subscriptionMap.set(sessionKey, sessionSubscription)
+  }
+}
+  
 
 /**
  * IMP : ContentsName을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
@@ -256,10 +266,38 @@ const sendClickData = (destination, click) => {
   }
 }
 
+// 진술서 작성 완료 시, 제출 여부를 전송하는 Code
+const sendSubmitData = (destination, data) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination: destination,
+      body: data,
+    })
+    console.log('진술서에 제출 여부', data)
+  } else {
+    console.error('WebSocket is not Connected')
+  }
+}
+
+// 진술 선택 완료시, 제출 유저와 제출 문항 전달
+const sendChoosenData = (destination, data) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination: destination,
+      body: JSON.stringify(data),
+    })
+    console.log('현재 진술에 대한 정답 번호', data)
+  } else {
+    console.error('WebSocket is not Connected')
+  }
+}
+
 export default {
   connect,
   disconnect,
   sendMessage,
   sendClickData,
-  unsubscribe
+  unsubscribe,
+  sendSubmitData,
+  sendChoosenData,
 }

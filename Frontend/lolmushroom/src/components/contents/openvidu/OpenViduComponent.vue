@@ -8,7 +8,10 @@ import UserVideo from './UserVideo.vue'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5713/'
+  const APPLICATION_SERVER_URL = 'https://i11a401.p.ssafy.io:4443';
+  // const OPENVIDU_SERVER_SECRET = 'meshmeshroomroom';
+
+  // const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5713/';
 
 const store = useSessionStore()
 
@@ -85,6 +88,7 @@ const joinSession = async () => {
         elements.remove()
       }
     })
+
     const index = state.subscribers.indexOf(stream.streamManager, 0)
     if (index >= 0) {
       const subscriber = state.subscribers[index]
@@ -94,6 +98,7 @@ const joinSession = async () => {
       state.subscribers.splice(index, 1)
     }
   })
+  
   state.session.on('exception', ({ exception }) => {
     console.warn(exception)
   })
@@ -139,107 +144,107 @@ const joinSession = async () => {
     // 유저 정보 하단에 추가
     state.joinedPlayer++
 
-    // --- 6) 스트림 발행 ---
-  } catch (error) {
-    console.log('세션 연결 중 오류가 발생했습니다:', error.code, error.message)
-  }
+      // --- 6) 스트림 발행 ---
+    } catch (error) {
+      console.log('세션 연결 중 오류가 발생했습니다:', error.code, error.message);
+    }
+    
+    window.addEventListener('beforeunload', leaveSession);
+    addUserName(state.publisher.stream.connection)
+  };
 
-  window.addEventListener('beforeunload', leaveSession)
-  addUserName(state.publisher.stream.connection)
-}
+  const leaveSession = () => {
+    // --- 7) 세션 나가기 ---
+    if (state.session) state.session.disconnect();
 
-const leaveSession = () => {
-  // --- 7) 세션 나가기 ---
-  if (state.session) state.session.disconnect()
+    // 모든 속성 비우기
+    state.session = undefined;
+    state.mainStreamManager = undefined;
+    state.publisher = undefined;
+    state.subscribers = [];
+    state.OV = undefined;
 
-  // 모든 속성 비우기
-  state.session = undefined
-  state.mainStreamManager = undefined
-  state.publisher = undefined
-  state.subscribers = []
-  state.OV = undefined
+    // beforeunload 리스너 제거
+    window.removeEventListener('beforeunload', leaveSession);
+  };
 
-  // beforeunload 리스너 제거
-  window.removeEventListener('beforeunload', leaveSession)
-}
-
-// props로 어떤 값을 받으면 watch로 감시하고 있다가 이거 실행해서 특정 카메라만 display 하는 함수
-const updateMainVideoStreamManager = (id) => {
-  const elements = videoContainer.value.children
-  for (let i = 0; i < elements.length; i++) {
-    if (elements[i].id !== id) {
-      elements[i].style.display = 'none'
-    } else {
-      elements[i].style.display = ''
+  // props로 어떤 값을 받으면 watch로 감시하고 있다가 이거 실행해서 특정 카메라만 display 하는 함수
+  const updateMainVideoStreamManager = (id) => {
+    const elements = videoContainer.value.children;
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].id !== id) {
+        elements[i].style.display = 'none';
+      } else {
+        elements[i].style.display = ''
+      }
     }
   }
-}
 
-const getToken = async (mySessionId) => {
-  const sessionId = await createSession(mySessionId)
-  return await createToken(sessionId)
-}
+  const getToken = async (mySessionId) => {
+    const sessionId = await createSession(mySessionId)
+    return await createToken(sessionId)
+  }
 
-const createSession = async (sessionId) => {
-  const response = await axios.post(
-    APPLICATION_SERVER_URL + 'api/sessions',
-    { customSessionId: sessionId },
-    {
-      headers: { 'Content-Type': 'application/json' }
-    }
-  )
-  return response.data
-}
+  const createSession = async (sessionId) => {
+    const response = await axios.post(
+      APPLICATION_SERVER_URL + 'api/sessions',
+      { customSessionId: sessionId },
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    return response.data
+  }
 
-const createToken = async (sessionId) => {
-  const response = await axios.post(
-    APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections',
-    {},
-    {
-      headers: { 'Content-Type': 'application/json' }
-    }
-  )
-  return response.data
-}
+  const createToken = async (sessionId) => {
+    const response = await axios.post(
+      APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections',
+      {},
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    return response.data
+  }
 
-const applyVideoStyles = () => {
-  nextTick(() => {
-    const videos = document.querySelectorAll('video')
-    let i = 0
-    videos.forEach((video) => {
-      video.id = state.userTokens[i]
-      i++
+  const applyVideoStyles = () => {
+    nextTick(() => {
+      const videos = document.querySelectorAll('video')
+      let i = 0
+      videos.forEach((video) => {
+        video.id = state.userTokens[i]
+        i++
+      })
     })
-  })
-}
-
-// 유저 정보를 추출하여 비디오 상단에 추가
-const addUserName = (connectionData) => {
-  const pElement = document.createElement('p')
-  pElement.textContent = JSON.parse(connectionData.data).clientData
-  pElement.setAttribute('id', connectionData.connectionId)
-  videoContainer.value.appendChild(pElement)
-}
-
-// `state.joinedPlayer`가 변경될 때마다 `applyVideoStyles` 호출
-watch(() => state.joinedPlayer, applyVideoStyles)
-watch(state.joinedPlayer, (newValue, oldValue) => {
-  if (newValue > oldValue) {
-    applyVideoStyles()
   }
-})
 
-onBeforeUnmount(() => {
-  leaveSession()
-})
+  // 유저 정보를 추출하여 비디오 상단에 추가
+  const addUserName = (connectionData) => {
+    const pElement = document.createElement('p')
+    pElement.textContent = JSON.parse(connectionData.data).clientData
+    pElement.setAttribute('id', connectionData.connectionId)
+    videoContainer.value.appendChild(pElement)
+  }
 
-onMounted(() => {
-  joinSession()
-})
+  watch(nickName, (newVal) => {
+    emit('update:nickName', newVal)
+  })
 
-watch(nickName, (newVal) => {
-  emit('update:nickName', newVal)
-})
+  // `state.joinedPlayer`가 변경될 때마다 `applyVideoStyles` 호출
+  watch(() => state.joinedPlayer, applyVideoStyles);
+  // watch(state.joinedPlayer, (newValue, oldValue) => {
+    //   if (newValue > oldValue) {
+      //     applyVideoStyles()
+      //   }
+      // })
+
+  onBeforeUnmount(() => {
+    leaveSession()
+  })
+  
+  onMounted(() => {
+    joinSession()
+  })
 </script>
 
 <template>
@@ -247,14 +252,9 @@ watch(nickName, (newVal) => {
     <div id="session-header">
       <h1 id="session-title">{{ myGroupId }}</h1>
     </div>
-    <v-btn @click="updateMainVideoStreamManager(state.userTokens[1])">카메라변경.</v-btn>
-    <input
-      class="btn btn-large btn-danger"
-      type="button"
-      id="buttonLeaveSession"
-      @click="leaveSession"
-      value="세션 나가기"
-    />
+    <v-btn @click="updateMainVideoStreamManager(state.userTokens[0])">카메라변경.</v-btn>
+    <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="세션 나가기" />
+    <!-- 주변 비디오 이거 렌더링만 안 하고 뒀다가 메인이랑 엿 바꿔먹는 데 사용할까?-->
     <div id="video-container" class="col-md-6" ref="videoContainer"></div>
   </div>
 </template>
@@ -262,9 +262,5 @@ watch(nickName, (newVal) => {
 <style scoped>
 #video-container > #local-video-undefined {
   display: none;
-}
-
-#remote-video-str_CAM_LZKP_con_EnkzQoI6M8 {
-  background-color: aqua;
 }
 </style>

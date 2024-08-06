@@ -1,116 +1,129 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import { useUserStore } from '@/stores/userStore'
-import { useSessionStore } from '@/stores/sessionStore'
-import { useRoomStore } from '@/stores/roomStore'
-import sessionAPI from '@/api/session'
-import contentsAPI from '@/api/contents'
-import ButtonComponent from '@/components/common/ButtonComponent.vue'
-import ProgressBar from '@/components/common/ProgressBar.vue'
-import OpenViduComponent from '@/components/contents/openvidu/OpenViduComponent.vue'
-import CountDownComponent from '@/components/common/CountDownComponent.vue'
-import TOFResultComponent from '@/components/contents/TOFResultComponent.vue'
-import TOFSideUserComponent from '@/components/contents/TOFSideUserComponent.vue'
-import ResultOverlayComponent from '@/components/common/ResultOverlayComponent.vue'
-import RoomWaiting from '@/components/room/RoomWaiting.vue'
+  import { onMounted, ref } from 'vue';
+  import { useUserStore } from '@/stores/userStore';
+  import { useSessionStore } from '@/stores/sessionStore';
+  import sessionAPI from '@/api/session';
+  import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
+  import ButtonComponent from '@/components/common/ButtonComponent.vue';
+  import ProgressBar from '@/components/common/ProgressBar.vue';
+  import OpenViduComponent from '@/components/contents/openvidu/OpenViduComponent.vue';
+  import CountDownComponent from '@/components/common/CountDownComponent.vue';
+  import TOFResultComponent from '@/components/contents/TOFResultComponent.vue'
+  import TOFSideUserComponent from '@/components/contents/TOFSideUserComponent.vue';
+  // import ResultOverlayComponent from '@/components/common/ResultOverlayComponent.vue';
+  // import RoomWaiting from '@/components/room/RoomWaiting.vue';
 
-const store = useUserStore()
-const sessionStore = useSessionStore()
+  const store = useUserStore()
+  const sessionStore = useSessionStore()
 
-const userNames = []
-const userCards = []
-const firstHalf = ref([])
-const secondHalf = ref([])
+  let index = 0
+  const sessionUserNameList = await getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId);
+  const totalUserCount = sessionUserNameList['data']['result']['currentUserCount'];
+  const orderArr = targetUserOrder(totalUserCount)
+  const targetUser = ref(allStatements[orderArr[index]].ovToken)
+  const userNames = []
+  const userCards = []
+  const firstHalf = ref([]);
+  const secondHalf = ref([]);
 
-// 서버에서 세션에 참여한 유저 정보 가져와 수정해야 함
-const targetUser = ref(userNames[0])
-const allStatements = ref('')
-const totalUserCount = ref()
+  sessionUserNameList.result.username.forEach(name => {
+      userNames.push(name);
+      userCards.push({
+        name,
+        src: '../../../public/favicon.ico',
+      });
+    })
 
-// 이것도 다른 유저의 진술 가져와서 렌더링하게 로직 수정해야 함
-const selectedAnswer = ref(null)
-const isSubmitAnswer = ref(false)
-const areSubmitAnswer = ref(false)
+  const allStatements = ref('')
 
-const isTimeUp = ref('')
+  // 이것도 다른 유저의 진술 가져와서 렌더링하게 로직 수정해야 함
+  const selectedAnswer = ref();
+  const isSubmitAnswer = ref(false);
+  const areSubmitAnswer = ref(false)
 
-// 세션에 참가한 유저 정보를 요청하는 함수
-async function getSubSessionInfo(sessionId, subSessionId) {
-  const response = await sessionAPI.getSubSessionInfo(sessionId, subSessionId)
-  return response.data
-}
+  const isTimeUp = ref('')
+  
 
-// 세션의 참가한 전체 유저의 모든 진술을 가져오는 함수
-async function getStatements() {
-  const response = await contentsAPI.getStatements(store.subSessionId)
-  return response.data
-}
-
-// 구조 분해 할당으로 배열을 섞는 함수
-const arrayShuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    // 무작위로 index 값 생성 (0 이상 i 미만)
-    let j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
+  // 세션에 참가한 유저 정보를 요청하는 함수
+  async function getSubSessionInfo(sessionId, subSessionId) {
+    const response = await sessionAPI.getSubSessionInfo(sessionId, subSessionId);
+    return response.data;
   }
-  return array
-}
 
-// 선택한 버튼 시각적으로 활성화하는 함수
-const buttonActivate = (key) => {
-  selectedAnswer.value = key
-}
+  // 세션의 참가한 전체 유저의 모든 진술을 가져오는 함수
+  async function getStatements() {
+    const response = await contentsAPI.getStatements(sessionStore.subSessionId)
+    return response.data.result.allTFInfos
+  }
 
-// 답변을 제출했다면 제출 현황을 확인
-const submitAnswer = (i) => {
-  // 여기서 선택 결과를 보냄
-  isSubmitAnswer.value = true
-}
+  // 답변을 제출했다면 제출 현황을 확인
+  const submitAnswer = (i) => {
+    const data = {
+      ovToken: store.userOvToken,
+      chosen: i,
+    }
+    webSocketAPI.sendSubmitData(`/publish/game/tf/question/${store.subSessionId}`, data)
+    isSubmitAnswer.value = true
+  }
 
-// 10초의 시간이 지나면 카메라와 질문이 공개됨
-const timeUp = (bool) => {
-  isTimeUp.value = bool
-}
+  // 10초의 시간이 지나면 카메라와 질문이 공개됨
+  const timeUp = (bool) => {
+    isTimeUp.value = bool
+  }
 
-// 타겟 유저가 바뀌면(송출되는 화면이 갱신되면) 해당 유저에게 테두리를 씌움
-// 타겟 유저의 진술로 전환함
-const targetUserUpdate = () => {
-  console.log('추가해야 함')
-}
+  const onSubmitEvent = (data, sessionId) => {
+    console.log('Received message:', data, 'from session:', sessionId)
+  }
+  
+  // 타겟 유저의 순서를 결정함
+  const targetUserOrder = (i) => {
+  const orderArr = Array.from({ length: i }, (_, index) => index);
+  for (let j = orderArr.length - 1; j > 0; j--) {
+    const randomIndex = Math.floor(Math.random() * (j + 1));
+    [orderArr[j], orderArr[randomIndex]] = [orderArr[randomIndex], orderArr[j]];
+  }
+  // orderArr.value = orderArr
+  return orderArr
+  // targetUser.value = allStatements[orderArr.value[index]].ovToken
+};
 
-// 유저 정보를 가져오는 코드
-const fetchUserData = async () => {
-  const sessionUserNameList = await getSubSessionInfo(
-    sessionStore.sessionId,
-    sessionStore.subSessionId
-  )
-  totalUserCount.value = sessionUserNameList['data']['result']['currentUserCount']
-  sessionUserNameList.result.username.forEach((name) => {
-    userNames.push(name)
-    userCards.push({
-      name,
-      src: '../../../public/favicon.ico'
+  // 유저 정보를 가져오는 코드
+  const fetchUserData = async () => {
+    const sessionUserNameList = await getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId);
+    totalUserCount.value = sessionUserNameList['data']['result']['currentUserCount'];
+    targetUserOrder(totalUserCount)
+    sessionUserNameList.result.username.forEach(name => {
+      userNames.push(name);
+      userCards.push({
+        name,
+        src: '../../../public/favicon.ico',
+      });
+    })
+
+    // 랜덤으로 배열 순서를 조작하는 로직 추가 필요 
+    firstHalf.value = userCards.slice(0, Math.ceil(userCards.length / 2));
+    secondHalf.value = userCards.slice(Math.ceil(userCards.length / 2));
+  }
+  
+  // 사람이 추가되면 유저 카드를 갱신
+  // watch(() => store.userTOFstatements.value, (newVal) => {
+  //   if (newVal) {
+  //     fetchUserData();
+  //   }
+  // });
+  
+  onMounted (async () => {
+    allStatements.value = await getStatements()
+    // fetchUserData()
+  })
+
+  onMounted(() => {
+    webSocketAPI.connect({
+      onSubmitEvent
     })
   })
-  targetUser.value = userNames[0]
 
-  // 랜덤으로 배열 순서를 조작하는 로직 추가 필요
-  firstHalf.value = userCards.slice(0, Math.ceil(userCards.length / 2))
-  secondHalf.value = userCards.slice(Math.ceil(userCards.length / 2))
-}
-
-// 사람이 추가되면 유저 카드를 갱신
-// watch(() => store.userTOFstatements.value, (newVal) => {
-//   if (newVal) {
-//     fetchUserData();
-//   }
-// });
-
-onMounted(async () => {
-  fetchUserData()
-  allStatements.value = await getStatements()
-  console.log(allStatements.value)
-})
 </script>
 
 <template>
@@ -121,6 +134,7 @@ onMounted(async () => {
       <v-col>
         <TOFSideUserComponent :users="firstHalf" :target="targetUser" />
       </v-col>
+      
       <v-col md="6" style="text-align: center">
         <OpenViduComponent
           @update:myUserName="sessionStore.subSessionId"
@@ -142,28 +156,29 @@ onMounted(async () => {
 
         <!-- <ResultOverlayComponent /> -->
         <!-- 답안 제출 전 -->
-        <v-card v-if="!isSubmitAnswer" class="mt-5">
-          <v-card-title class="question-font" style="overflow: flip">
-            <pre>{{ targetUser }}에 대한 설명이다. 다음 중 틀린 설명은?</pre>
+        <v-card
+          v-if="!isSubmitAnswer"
+          class="mt-5"
+        >
+          <v-card-title class='question-font' style="overflow: flip;">
+          <pre>{{ allStatements[index].username }}에 대한 설명이다. 다음 중 틀린 설명은?</pre>
           </v-card-title>
-          <v-card-text
-            v-for="(statement, i) in allStatements"
+          {{ orderArr }}
+          <div
+            v-for="(statement, i) in allStatements[0].statements"
             :key="i"
             @click="buttonActivate(i + 1)"
           >
-            <v-icon
-              v-show="selectedAnswer != i + 1"
-              :icon="`mdi-numeric-${i + 1}-circle-outline`"
-            />
-            <v-icon
-              v-show="selectedAnswer === i + 1"
-              :icon="`mdi-numeric-${i + 1}-circle`"
-              color="red"
-            />
-            {{ statement }}
-          </v-card-text>
-          <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
-            <ButtonComponent text="선택하기" size="large" />
+            <v-card-text>
+              <p>
+                <v-icon v-show="selectedAnswer != i + 1" :icon="`mdi-numeric-${i + 1}-circle-outline`" />
+                <v-icon v-show="selectedAnswer === i + 1" :icon="`mdi-numeric-${i + 1}-circle`" color="red"/>
+                {{ statement }}
+              </p>
+            </v-card-text>
+          </div>
+          <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer, key)">
+            <ButtonComponent text="선택하기" size="large"/>
           </div>
         </v-card>
 
@@ -178,7 +193,7 @@ onMounted(async () => {
           <!-- props 추가 -->
           <TOFResultComponent
             target-nick-name=""
-            :statements="allStatements"
+            :statements="allStatements[orderArr[index]]"
             choice-answer-matrix=""
           />
         </v-card>

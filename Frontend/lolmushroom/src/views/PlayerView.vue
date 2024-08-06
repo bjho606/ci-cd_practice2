@@ -80,7 +80,6 @@ const onProgressEventReceived = (message) => {
 const userFlowHandler = async () => {
   const sessionId = route.params.sessionId
   sessionStore.setSessionId(sessionId)
-  console.log(sessionStore.sessionId)
   console.log(
     `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
   )
