@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
 import { useUserStore } from '@/stores/User'
@@ -11,7 +11,9 @@ const router = useRouter()
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const sessionStore = useSessionStore()
-const { rooms, activeButtonIndex } = storeToRefs(roomStore)
+// const { rooms, activeButtonIndex } = storeToRefs(roomStore)
+const rooms = computed(() => roomStore.getRooms)
+const activeButtonIndex = computed(() => roomStore.getActiveButtonIndex)
 
 /**
  * IMP 1. SubSession에 대한 Connection을 생성한다.
@@ -49,7 +51,7 @@ const createSubSessionHandler = async (sessionId) => {
   try {
     const response = await sessionAPI.createSubSession(sessionId)
     if (response.data.isSuccess) {
-      console.log('하부 Session의 생성이 완료되었습니다:) 현재 Session의 상태를 가져올게요:)')
+      console.log('하부 Session의 생성이 완료되었습니다:)')
     }
   } catch (error) {
     console.error('Error Creating SubSession', error)
@@ -78,7 +80,7 @@ const handleRoomClick = async (index) => {
     if (isFirstUserInGroup) userStore.setTeamLeader(true)
     sessionStore.setSubSessionId(room.sessionId)
     // 세션 정보 저장
-    
+
     router.push({
       name: 'roomwaiting',
       params: { sessionId: sessionStore.sessionId, subSessionId: room.sessionId }

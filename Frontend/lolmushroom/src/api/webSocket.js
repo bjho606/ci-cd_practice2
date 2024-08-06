@@ -93,7 +93,7 @@ const addSubscriptions = (
       case 'session':
         addSessionSubscription(sessionId, onEventReceived)
         break
-      case 'progress':
+      case 'content':
         addContentsSubscription(sessionId, onEventReceived)
         break
       case 'game':

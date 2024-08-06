@@ -57,7 +57,7 @@ const getSessionConnection = async (sessionId, userName) => {
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
-const onProgressEventReceived = (message) => {
+const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message) // 방 정보를 업데이트
 }
 
@@ -80,8 +80,8 @@ const userFlowHandler = async () => {
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
     onMessageReceived: onMainSessionMessageReceived,
-    onEventReceived: onProgressEventReceived,
-    subscriptions: ['chat', 'progress']
+    onEventReceived: onSessionEventReceived,
+    subscriptions: ['chat', 'session']
   })
 }
 
@@ -94,12 +94,12 @@ const userFlowHandler = async () => {
 onMounted(async () => {
   if (userStore.userNickname === '닉네임을 설정해주세요') {
     showNicknameModal.value = true
-    await userFlowHandler()
+    // await userFlowHandler()
   } else {
     webSocketAPI.connect({
       sessionId: sessionStore.sessionId,
       onMessageReceived: onMainSessionMessageReceived,
-      onEventReceived: onProgressEventReceived,
+      onEventReceived: onSessionEventReceived,
       subscriptions: ['chat', 'session']
     })
   }
