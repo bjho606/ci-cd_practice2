@@ -161,11 +161,12 @@ public class SessionService {
         }
 
         // 4. user 컬렉션과 token 컬렉션에 관계 추가
-        if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)
+//        if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)
+        if(!ovTokenService.checkIfTokenExists(sessionAtomicReference.get().get_id(), userId)){
             ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
+            log.info("ovt save");
+        }
 
-=======
->>>>>>> a76be45b45b028351e20ba8df5734d3378267173
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
                 , new ConnectionCreateResponse(token));
     }

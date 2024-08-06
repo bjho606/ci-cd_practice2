@@ -28,11 +28,12 @@ public class SessionSocketListener {
     public void sessionConnectedEventHandler(SessionConnectedEvent event) throws OpenViduJavaClientException, OpenViduHttpException {
         // session service의 session info 보내기
         Principal p = event.getUser();
+        log.info(p.getName());
         Session session = ovTokenService.getMainSessionFromUserId(p.getName());
         // session service의 session info 보내기
         sendMessage(session);
 
-        System.out.println("SessionConnectedEvent = " + event);
+        log.info("SessionConnectedEvent = {}", event);
     }
 
     @EventListener
@@ -42,11 +43,12 @@ public class SessionSocketListener {
 
         // sessionId 에 해당하는 토큰 삭제 ovTokenService 에서 삭제
         ovTokenService.removeSession(session.get_id());
+        log.info("session remove!!!");
 
         // session service의 session info 보내기
         sendMessage(session);
 
-        System.out.println("SessionDisconnectEvent = " + event);
+        log.info("SessionConnectedEvent = {}", event);
     }
 
     private void sendMessage(Session session) throws OpenViduJavaClientException, OpenViduHttpException {
