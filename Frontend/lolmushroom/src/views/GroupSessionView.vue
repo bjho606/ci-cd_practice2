@@ -1,8 +1,6 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
-import { ref, onMounted } from 'vue'
-import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
-import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
+import { onMounted } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useChatStore } from '@/stores/chatStore'
 import webSocketAPI from '@/api/webSocket'
@@ -29,7 +27,6 @@ onMounted(() => {
 
 <template>
   <router-view></router-view>
-  <!-- <TOFMainComponent /> -->
 </template>
 
 <style scoped></style>

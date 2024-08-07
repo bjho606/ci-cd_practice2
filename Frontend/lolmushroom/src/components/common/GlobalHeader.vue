@@ -30,17 +30,6 @@ const closeNotice = () => {
   noticeInfo.value = false
 }
 
-// const fetchContents = () => {
-//   contentsAPI.getContents(
-//     (response) => {
-//       contents.value = response.data.result.contents
-//     },
-//     (error) => {
-//       console.error('오류', error)
-//     }
-//   )
-// }
-// 2초 후에 모달 창 열기
 onMounted(() => {})
 </script>
 

@@ -34,6 +34,6 @@ export default {
     return axios.get(`${API_URL}/sessions/${subSessionId}/ready`).then(success).catch(failure)
   },
   getSubSessionQuit(subSessionId, success, failure) {
-    return axios.get(`${API_URL}/sessions/${subSessionId}/ready`).then(success).catch(failure)
+    return axios.get(`${API_URL}/sessions/${subSessionId}/quit`).then(success).catch(failure)
   }
 }

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MakeSessionView from '@/views/MakeSessionView.vue'
 import RoomWatching from '@/components/room/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
-import ManagerWating from '@/components/room/ManagerWating.vue'
+import ManagerWaiting from '@/components/room/ManagerWaiting.vue'
 import PlayerChoose from '@/components/room/PlayerChoose.vue'
 import RoomWaiting from '@/components/room/RoomWaiting.vue'
 import ManagerView from '@/views/ManagerView.vue'
@@ -23,7 +23,7 @@ const routes = [
     children: [
       { path: 'multiroom', name: 'multiroom', component: MultiRoom },
       { path: 'roomwatching', name: 'roomwatching', component: RoomWatching },
-      { path: 'managerwating', name: 'managerwating', component: ManagerWating }
+      { path: 'managerwaiting', name: 'managerwaiting', component: ManagerWaiting }
     ]
   },
 

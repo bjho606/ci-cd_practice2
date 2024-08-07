@@ -25,18 +25,6 @@ const fetchContents = async () => {
   }
 }
 
-// const fetchContents = () => {
-//   contentsAPI.getContents(
-//     (response) => {
-//       contentsStore.setContents(response.data.result.contents)
-//       console.log(contentsStore)
-//     },
-//     (error) => {
-//       console.error('오류', error)
-//     }
-//   )
-// }
-
 onMounted(() => {
   fetchContents()
 })
@@ -175,10 +163,4 @@ onMounted(() => {
     left: 20%;
   }
 }
-
-/* .chat {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-} */
 </style>
