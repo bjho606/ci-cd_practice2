@@ -204,7 +204,12 @@ const addtofSubscription = (sessionId, onSubmitEvent) => {
  */
 const addGameSubscription = (sessionId, contentsName, onEventReceived) => {
   const gameKey = `game-${contentsName}`
+  console.log('Mushroom Grow Game에 입장했습니다.')
+
   if (!subscriptionMap.has(gameKey)) {
+    console.log(stompClient)
+    console.log(sessionId)
+    console.log(contentsName)
     const gameSubscription = stompClient.subscribe(
       `/subscribe/game/${contentsName}/${sessionId}`,
       (event) => {
@@ -214,7 +219,8 @@ const addGameSubscription = (sessionId, contentsName, onEventReceived) => {
         }
       }
     )
-    console.log('Mushroom Grow Game에 입장했습니다.')
+
+    console.log('나와라잇')
     subscriptionMap.set(gameKey, gameSubscription)
   }
 }

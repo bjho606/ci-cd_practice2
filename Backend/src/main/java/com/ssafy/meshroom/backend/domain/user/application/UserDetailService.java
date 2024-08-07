@@ -26,14 +26,5 @@ public class UserDetailService implements UserDetailsService {
         return userRepository.save(new User(username, userRole)).get_id();
     }
 
-    public Response<?> changeUserName(String username) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(()-> new RuntimeException("유저 없음"));
 
-        foundUser.setUsername(username);
-        userRepository.save(foundUser);
-
-        return new Response<>(true, 2000L, "유저 닉네임 정보가 성공적으로 수정되었습니다.", null);
-    }
 }

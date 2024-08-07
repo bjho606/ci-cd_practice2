@@ -4,9 +4,9 @@ import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.OVToken.domain.OVToken;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.domain.Session;
-import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class OVTokenService {
     private final OVTokenRepository ovTokenRepository;
-    private final UserDetailService userDetailService;
+    private final UserDetailsService userDetailService;
     private final SessionRepository sessionRepository;
 
     public void save(String sessionSid, String userSid, String ovToken) {
@@ -79,4 +79,5 @@ public class OVTokenService {
     public boolean checkIfTokenExists(String userSid, String sessionSid) {
         return ovTokenRepository.existsByUserSidAndSessionSid(userSid, sessionSid);
     }
+
 }
