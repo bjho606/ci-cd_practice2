@@ -14,10 +14,19 @@ const emit = defineEmits(['name-registered'])
 
 const registerRoomName = async () => {
   if (message.value.length > 0) {
-    await sessionAPI.changeSubSessionName(sessionStore.subSessionId, { groupName: message.value })
-    // Emit an event to notify the parent component that the dialog can be closed
-    emit('name-registered')
+    try {
+      const response = await sessionAPI.changeSubSessionName(sessionStore.subSessionId, {
+        groupName: message.value
+      })
+      console.log(response)
+      if (response.data.isSuccess) console.log('Team 이름을 변경했습니다!')
+    } catch (error) {
+      console.error('Team 이름을 변경하는데 오류가 발생했습니다!')
+    }
+  } else {
+    alert('최소 1자 이상은 팀 이름으로 등록해야 합니다.')
   }
+  emit('name-registered')
 }
 
 // 입력 방 길이 유효성 검사

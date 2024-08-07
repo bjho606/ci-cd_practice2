@@ -26,7 +26,7 @@ export default {
   },
   changeSubSessionName(subSessionId, groupName, success, failure) {
     return axios
-      .patch(`${API_URL}/sessions/${subSessionId}`, groupName)
+      .patch(`${API_URL}/sessions/${subSessionId}/group-name`, groupName)
       .then(success)
       .catch(failure)
   },

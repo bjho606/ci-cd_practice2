@@ -8,7 +8,6 @@ import contents from '@/api/contents'
 // 상태 관리 사용
 const router = useRouter()
 const roomStore = useRoomStore()
-const { rooms } = storeToRefs(roomStore)
 
 // RoomWatching으로 라우팅
 const goToMultiRoom = () => {

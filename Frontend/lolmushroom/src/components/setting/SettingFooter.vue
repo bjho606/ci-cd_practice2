@@ -60,7 +60,7 @@ const createSessionHandler = async () => {
 
 const goToSession = () => {
   const sessionId = sessionStore.sessionId
-  router.push({ name: 'managerwating', params: { sessionId: sessionId } })
+  router.push({ name: 'managerwaiting', params: { sessionId: sessionId } })
 }
 </script>
 
