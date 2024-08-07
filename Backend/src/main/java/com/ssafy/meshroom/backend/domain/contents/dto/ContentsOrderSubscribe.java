@@ -10,6 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 public class ContentsOrderSubscribe {
     private String contentsId;
-    private Long sequence;
-    private Long total;
+    private Long contentsSequence;
+    private Long totalContentsCount;
+    private Long finishGroupCount;
+    private Long totalGroupCount;
+    private CurrentGroupState currentGroupState;
 }
