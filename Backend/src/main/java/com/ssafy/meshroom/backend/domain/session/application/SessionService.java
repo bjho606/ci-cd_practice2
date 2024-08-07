@@ -22,6 +22,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,19 +128,25 @@ public class SessionService {
             throw new RuntimeException("없는 세션");
         });
 
-        // 2. 유저 정보 저장
         String userId = "";
-        if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
-            userId = userDetailService.saveUser(userName, userRole.get());
-        } else {
-            userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        }
-
-
+        // 메인 세션에 접속하는 사람은 무조건 새로운 사람으로 간주
         if (isMain.get()) {
-            // 3-1. 유저 jwtToken 발행
+            // 근데 만약 토큰이 존재한다...? 그럼 그사람 들어와 있는 정보 삭제해야지
+//            if(!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)){
+//                // TODO:: ovtoken테이블에서 해당 사용자 이름을 가진 데이터 모두 삭제
+//                log.info("{} => 사용자 이름을 가진 데이터 모두 삭제",SecurityContextHolder.getContext().getAuthentication().getName());
+//                ovTokenService.removeSession(SecurityContextHolder.getContext().getAuthentication().getName());
+//            }
+            userId = userDetailService.saveUser(userName, userRole.get());
             String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
             CookieUtil.addCookie(response, "token", jwtToken);
+            log.info("토큰 새로 발급합니다잇!");
+        }else{
+            // 메인이 아닌데 하부세션에 들어간다? => 예외 발생
+            if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken){
+                throw new UsernameNotFoundException("존재하지 않은 유저입니다.");
+            }
+            userId = SecurityContextHolder.getContext().getAuthentication().getName();
         }
 
         // 3-2. session 접속 토큰 발행
