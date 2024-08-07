@@ -47,7 +47,7 @@ const routes = [
         component: GroupFightSessionView,
         children: [
           {
-            path: 'MushroomGrowContainer',
+            path: '',
             name: 'MushroomGrowContainer',
             component: MushroomGrowContainer
           }

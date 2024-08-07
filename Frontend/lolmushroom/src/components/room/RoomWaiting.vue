@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, ref, watch } from 'vue'
+import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useRoomStore } from '@/stores/roomStore'
@@ -83,11 +83,28 @@ watch(
   }
 )
 
-// New computed property to check if the room is ready
+/**
+ * TODO 4. 팀장이 Ready를 누르면 Room의 UI가 바뀐다.
+ */
 const isRoomReady = computed(() => {
   const group = groupInfo.value
-  return group && group.ready
+  return group && group.isReady
 })
+
+/**
+ * TODO 5. Player는 방을 나갈 수 있다.
+ */
+const handleLeaveSession = () => {
+  sessionAPI.getSubSessionQuit(
+    sessionStore.subSessionId,
+    () => {
+      router.push({ name: 'mainSession', params: { sessionId: sessionStore.sessionId } })
+    },
+    () => {
+      alert('세션을 나가는 데 실패했습니다.')
+    }
+  )
+}
 
 onMounted(() => {
   webSocketAPI.connect({
@@ -95,11 +112,35 @@ onMounted(() => {
     onMessageReceived: onSubSessionMessageReceived,
     subscriptions: ['chat']
   })
+  window.addEventListener('popstate', handlePopState)
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('popstate', handlePopState)
+})
+
+const handlePopState = (event) => {
+  if (confirm('이 페이지를 떠나시겠습니까? 변경사항이 저장되지 않을 수 있습니다.')) {
+    // 사용자가 확인을 누르면 나가기
+    handleLeaveSession()
+  } else {
+    // 사용자가 취소를 누르면 페이지 이동을 막기 위해 앞으로 다시 이동
+    router.push(router.currentRoute.value.fullPath)
+  }
+}
+
+const goToGroupFightSession = () => {
+  router.push({
+    name: 'GroupFightSessionView',
+    params: { subSessionId: sessionStore.subSessionId }
+  })
+}
 </script>
 
 <template>
   <div class="main">
+    <v-btn @click="goToGroupFightSession" color="primary">Go to Group Fight Session</v-btn>
+    <v-btn @click="handleLeaveSession" color="primary">나가기</v-btn>
     <v-btn v-if="isTeamLeader" @click="openDialog" color="primary">Change Room Name</v-btn>
     <v-btn v-if="isTeamLeader" @click="sendReadyMessage(sessionStore.subSessionId)" color="primary">
       Are We Ready?

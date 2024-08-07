@@ -42,6 +42,7 @@ export const useRoomStore = defineStore('room', {
           capacity: group.maxUserCount,
           occupants: group.currentUserCount,
           users: group.users,
+          isReady: group.isReady,
           buttonClicked: true
         }
         this.activeButtonIndex = index + 1
