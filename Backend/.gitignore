@@ -1,6 +1,6 @@
 .env*
 src/main/env
-
+LOG_PATH_IS_UNDEFINED/
 logs
 
 HELP.md
