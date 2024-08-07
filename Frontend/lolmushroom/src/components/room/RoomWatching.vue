@@ -4,6 +4,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
 const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
@@ -18,8 +19,13 @@ const goToMultiRoom = () => {
 
 <template>
   <div class="grid-container">
-    <div v-for="(room, index) in rooms" :key="index" class="grid-item card">
-      <span>{{ index + 1 }} 번방</span>
+    <!-- UI 수정 -->
+    <div class="rooms" v-for="(room, index) in rooms" :key="index">
+      <div>{{ index + 1 }} 번방</div>
+      <div class="grid-item card">
+
+
+      </div>
     </div>
   </div>
   <div class="d-flex justify-center mt">
@@ -28,6 +34,15 @@ const goToMultiRoom = () => {
 </template>
 
 <style scoped>
+div{
+  text-align: center;
+  font-weight: bold;
+} 
+
+.rooms{
+  background-color: white;
+}
+
 .mt {
   margin-top: 30px;
 }
@@ -37,7 +52,6 @@ const goToMultiRoom = () => {
   gap: 16px; /* 아이템 사이의 간격을 조절합니다 */
 }
 .grid-item {
-  background-color: teal;
   padding-top: 100%; /* 1:1 비율 유지 */
   position: relative;
 }
@@ -49,6 +63,5 @@ const goToMultiRoom = () => {
 }
 .card {
   width: 100%;
-  background-color: teal;
 }
 </style>
