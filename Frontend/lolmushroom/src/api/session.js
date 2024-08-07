@@ -29,5 +29,11 @@ export default {
       .patch(`${API_URL}/sessions/${subSessionId}`, groupName)
       .then(success)
       .catch(failure)
+  },
+  getSubSessionReady(subSessionId, success, failure) {
+    return axios.get(`${API_URL}/sessions/${subSessionId}/ready`).then(success).catch(failure)
+  },
+  getSubSessionQuit(subSessionId, success, failure) {
+    return axios.get(`${API_URL}/sessions/${subSessionId}/ready`).then(success).catch(failure)
   }
 }

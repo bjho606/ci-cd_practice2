@@ -13,14 +13,22 @@ const connect = ({
   onConnect,
   onError,
   subscriptions, // 추가된 파라미터: 구독할 리스트
-  onSubmitEvent,
+  onSubmitEvent
 }) => {
   // stompClient가 이미 존재하고 연결된 상태라면 새로운 클라이언트를 생성하지 않음
   if (stompClient && stompClient.connected) {
     console.log('Already connected, adding new subscriptions')
 
     // 기존 연결 상태에서 새 구독 추가
-    addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions, onSubmitEvent)
+    addSubscriptions(
+      sessionId,
+      contentsName,
+      onMessageReceived,
+      onEventReceived,
+      onProgressReceived,
+      subscriptions,
+      onSubmitEvent
+    )
 
     if (onConnect) {
       onConnect('Already connected')
@@ -37,21 +45,18 @@ const connect = ({
       console.log('Connected: ' + frame)
 
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
-      addSubscriptions(sessionId, contentsName, onMessageReceived, onEventReceived, subscriptions, onSubmitEvent)
+      addSubscriptions(
+        sessionId,
+        contentsName,
+        onMessageReceived,
+        onEventReceived,
+        subscriptions,
+        onSubmitEvent
+      )
 
       if (onConnect) {
         onConnect(frame)
       }
-
-      const joinMessage = {
-        sessionId: sessionId,
-        content: '',
-        timestamp: new Date().toISOString()
-      }
-      stompClient.publish({
-        destination: `/publish/chat/join`,
-        body: JSON.stringify(joinMessage)
-      })
     },
     onStompError: (frame) => {
       console.error('Broker reported error: ' + frame.headers['message'])
@@ -83,7 +88,7 @@ const addSubscriptions = (
   onEventReceived,
   subscriptions,
   onSubmitEvent,
-  onProgressReceived,
+  onProgressReceived
 ) => {
   if (!subscriptions || subscriptions.length === 0) {
     console.warn('No subscriptions provided')
@@ -105,7 +110,6 @@ const addSubscriptions = (
       case 'game':
         addGameSubscription(sessionId, contentsName, onEventReceived)
         break
-      // 이건 뭐냐?
       case 'tof':
         addtofSubscription(sessionId, onSubmitEvent)
         break
@@ -190,7 +194,6 @@ const addtofSubscription = (sessionId, onSubmitEvent) => {
     subscriptionMap.set(sessionKey, sessionSubscription)
   }
 }
-  
 
 /**
  * IMP : ContentsName을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
@@ -271,7 +274,7 @@ const sendSubmitData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
-      body: data,
+      body: data
     })
     console.log('진술서에 제출 여부', data)
   } else {
@@ -284,7 +287,7 @@ const sendChoosenData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     })
     console.log('현재 진술에 대한 정답 번호', data)
   } else {
@@ -299,5 +302,5 @@ export default {
   sendClickData,
   unsubscribe,
   sendSubmitData,
-  sendChoosenData,
+  sendChoosenData
 }
