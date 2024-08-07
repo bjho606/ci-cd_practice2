@@ -2,7 +2,6 @@ package com.ssafy.meshroom.backend.domain.contents.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
 import com.ssafy.meshroom.backend.domain.contents.dao.ContentsOrderRepository;
-import com.ssafy.meshroom.backend.domain.contents.dao.ContentsRepository;
 import com.ssafy.meshroom.backend.domain.contents.domain.ContentsOrder;
 import com.ssafy.meshroom.backend.domain.contents.dto.ContentsOrderSubscribe;
 import com.ssafy.meshroom.backend.domain.contents.dto.CurrentGroupState;
@@ -148,15 +147,18 @@ public class ContentsOrderService {
 
         booleanRedisTemplate.opsForValue().set(subSessionId, true);
 
-        Optional<List<Session>> optionalSubSessions = sessionRepository.findAllByMainSession(mainSession.getSessionId());
+        HashMap<String, Boolean> groupStates = new HashMap<>();
+        groupStates.put(subSessionId, true);
 
+        Optional<List<Session>> optionalSubSessions = sessionRepository.findAllByMainSession(mainSession.getSessionId());
         List<Session> subSessions = optionalSubSessions.get();
 
-        HashMap<String, Boolean> groupStates = new HashMap<>();
 
         for (Session subSession : subSessions) {
-            Boolean state = booleanRedisTemplate.opsForValue().get(subSession.getSessionId());
-            groupStates.put(subSession.getSessionId(), state);
+            if (!subSession.getSessionId().equals(subSessionId)) {
+                Boolean state = booleanRedisTemplate.opsForValue().get(subSession.getSessionId());
+                groupStates.put(subSession.getSessionId(), state);
+            }
         }
 
 
