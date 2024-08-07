@@ -70,11 +70,26 @@ const onProgressEventReceived = (message) => {
 }
 
 /**
- * IMP 3. Player가 Main Session에 입장했을 때, Flow를 관리하는 함수
+ * IMP 3. PlayerView에 처음 들어왔을 때, MainConnection이 연결되어 있지 않은 상태
+ * * 이와 같은 이유로, 처음 들어오면 Socket을 통한 Group 정보가 아닌, API를 통한 그룹 정보를 호출해야 한다.
+ */
+const getSessionInfo = async (sessionId) => {
+  try {
+    const response = await sessionAPI.getSessionInfo(sessionId)
+    if (response.data.isSuccess) {
+      roomStore.setSessionData(response.data.result)
+    }
+  } catch (error) {
+    console.error('Error Getting Session Information', error)
+  }
+}
+
+/**
+ * IMP 4. Player가 Main Session에 입장했을 때, Flow를 관리하는 함수
  * * getSessionConection() API를 호출한다.
- * IMP 3.1. Main Session과 Connection을 만들어 준다.
- * IMP 3.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
- * IMP 3.3  MeshRoom의 Progress에 대한 Socket 연결을 진행한다.
+ * IMP 4.1. Main Session과 Connection을 만들어 준다.
+ * IMP 4.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
+ * IMP 4.3  MeshRoom의 Progress에 대한 Socket 연결을 진행한다.
  * TODO 제대로 동작을 해야 한다.
  */
 const userFlowHandler = async () => {
@@ -84,6 +99,7 @@ const userFlowHandler = async () => {
     `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
   )
   await getSessionConnection(sessionId, { userName: userStore.userNickname })
+  await getSessionInfo(sessionId)
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
     onMessageReceived: onMainSessionMessageReceived,

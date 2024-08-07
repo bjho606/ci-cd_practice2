@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/userStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import webSocketAPI from '@/api/webSocket'
+import sessionAPI from '@/api/session'
 import RoomNameInput from '@/components/room/RoomNameInput.vue'
 
 const contentsStore = useContentsStore()
@@ -46,9 +47,19 @@ const closeDialog = () => {
 }
 
 /**
- * TODO 2. 팀장은 진행자에게 '완료' Signal을 보낸다.
- * IMP : 팀장은 Waiting이 아닌 Contents를 진행 중일 때, '완료'를 누르면, Room Waiting으로 돌아온다.
+ * TODO 2. 팀장은 진행자에게 '준비 완료' Signal을 보낸다.
+ * IMP : 팀장은 Waiting이 아닌 Contents를 진행 중일 때, '완료'를 누르면, Room Waiting으로 돌아온다. ( In Every Contents )
  */
+const sendReadyMessage = async (sessionId) => {
+  try {
+    const response = await sessionAPI.getSubSessionReady(sessionId)
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 모두 준비 완료입니다:)')
+    }
+  } catch (error) {
+    console.error('Error Ready Message to Manager')
+  }
+}
 
 /**
  * TODO 3. 모든 Player는 진행자의 Signal을 구독하고 있다가, 다음 Component로 이동할 수 있어야 함.
@@ -72,6 +83,12 @@ watch(
   }
 )
 
+// New computed property to check if the room is ready
+const isRoomReady = computed(() => {
+  const group = groupInfo.value
+  return group && group.ready
+})
+
 onMounted(() => {
   webSocketAPI.connect({
     sessionId: sessionStore.subSessionId,
@@ -84,6 +101,9 @@ onMounted(() => {
 <template>
   <div class="main">
     <v-btn v-if="isTeamLeader" @click="openDialog" color="primary">Change Room Name</v-btn>
+    <v-btn v-if="isTeamLeader" @click="sendReadyMessage(sessionStore.subSessionId)" color="primary">
+      Are We Ready?
+    </v-btn>
     <v-dialog v-model="showRoomNameInput" max-width="1000px">
       <RoomNameInput @name-registerd="closeDialog" />
     </v-dialog>
@@ -95,6 +115,14 @@ onMounted(() => {
             <v-card-subtitle class="text-h5">
               {{ groupInfo.occupants }} / {{ groupInfo.capacity }} Users
             </v-card-subtitle>
+            <v-card-text v-if="isRoomReady">
+              <v-alert type="success" border="left" colored-border> The room is ready! </v-alert>
+            </v-card-text>
+            <v-card-text v-else>
+              <v-alert type="warning" border="left" colored-border>
+                Waiting for players to be ready...
+              </v-alert>
+            </v-card-text>
           </v-card>
         </v-col>
       </v-row>
