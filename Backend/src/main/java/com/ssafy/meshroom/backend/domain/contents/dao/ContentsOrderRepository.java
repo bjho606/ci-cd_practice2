@@ -13,4 +13,5 @@ public interface ContentsOrderRepository extends MongoRepository<ContentsOrder, 
     @Query("{ '_id' : ?0 }")
     @Update(" {'$set': { 'isDone' : ?1 }} ")
     void updateById(String _id, Boolean isDone);
+
 }
