@@ -27,6 +27,25 @@ const props = defineProps({
   }
 })
 
+/**
+ * IMP 1. MainSession에 대한 Connection을 생성한다.
+ * REQ
+ * @param sessionId
+ * @param userName
+ *
+ * RES openvide_token, user_token
+ */
+const getSessionConnection = async (sessionId, userName) => {
+  try {
+    const response = await sessionAPI.getSessionConnection(sessionId, userName)
+    if (response.data.isSuccess) {
+      console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
+    }
+  } catch (error) {
+    console.error('Error Getting Session Connection', error)
+  }
+}
+
 const calculateTotalDuration = () => {
   let totalMinutes = 0
   props.selectedContents.forEach((content) => {
@@ -58,8 +77,9 @@ const createSessionHandler = async () => {
   }
 }
 
-const goToSession = () => {
+const goToSession = async () => {
   const sessionId = sessionStore.sessionId
+  await getSessionConnection(sessionId, { userName: 'Manager' })
   router.push({ name: 'managerwaiting', params: { sessionId: sessionId } })
 }
 </script>

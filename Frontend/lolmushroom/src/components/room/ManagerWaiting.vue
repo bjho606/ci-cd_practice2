@@ -1,17 +1,36 @@
 <script setup>
-import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
-import contents from '@/api/contents'
+import contentsAPI from '@/api/contents'
 
 // 상태 관리 사용
 const router = useRouter()
 const roomStore = useRoomStore()
+const sessionStore = useSessionStore()
+const rooms = computed(() => roomStore.getRooms)
 
 // RoomWatching으로 라우팅
 const goToMultiRoom = () => {
-  router.push('multiRoom')
+  // Assuming sessionId is stored in the roomStore
+  router.push({ name: 'multiroom', params: { sessionId: sessionStore.sessionId } })
+}
+
+/**
+ * IMP 1. 진행자가 게임 시작을 누르면, Session Contents가 시작하는 첫 단계이므로, isStart : true
+ * * Contents API의 callNextContetns를 호출한다.
+ */
+const callNextContents = async (isStart) => {
+  try {
+    const response = await contentsAPI.callNextContents(isStart)
+    if (response.data.isSuccess) {
+      console.log(response.data)
+    }
+  } catch (error) {
+    console.error('Error Call Next Contents', error)
+  }
 }
 
 // 게임 시작 알림
@@ -28,18 +47,13 @@ const startGame = () => {
     cancelButtonText: '취소'
   }).then((result) => {
     if (result.isConfirmed) {
-      contents.callNextContents(true)
+      callNextContents(true)
       goToMultiRoom()
     }
   })
 }
 
 /**
- * TODO : MainSession Connection
- * TODO : SessionInfo에 대한 Socket
- * TODO : Contents 진행에 대한 Socket
- * TODO : 준비 완료 불 다 들어오면 ->  게임 시작을 누를 수 있도록 도와준다.
- *
  * IMP TODO : Contents/start , next , reload API를 호출 => WS이 되면, 이거 Message만 보고싶어.. => 돌아감의 마지노선..
  * IMP 진행자에게 그에 맞는 UI 버튼 같은 것을 추가해줘야 한다. ( 각 팀의 완료 여부를 볼 수 있는 UI 추가 필수 !! )
  */
@@ -58,8 +72,11 @@ const startGame = () => {
           color="#e9ecef"
           class="mb-2"
         >
-          <b>{{ `그룹${index + 1}` }}</b>
-          <div class="mr">{{ room.occupants }}/{{ room.capacity }}</div>
+          <b>{{ room.groupName || `그룹${index + 1}` }}</b>
+          <div class="mr">
+            <span v-if="room.isReady" class="ready-status"> (준비 완료) </span
+            >{{ room.occupants }}/{{ room.capacity }}
+          </div>
           <div class="mr">
             <v-icon icon="$next"></v-icon>
           </div>
