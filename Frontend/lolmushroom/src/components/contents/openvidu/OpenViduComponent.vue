@@ -8,10 +8,10 @@ import UserVideo from './UserVideo.vue'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-  const APPLICATION_SERVER_URL = 'https://i11a401.p.ssafy.io:4443';
+  // const APPLICATION_SERVER_URL = 'https://i11a401.p.ssafy.io:4443';
   // const OPENVIDU_SERVER_SECRET = 'meshmeshroomroom';
 
-  // const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5713/';
+const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5713/';
 
 const store = useSessionStore()
 
