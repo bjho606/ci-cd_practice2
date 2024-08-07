@@ -2,9 +2,16 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+import dotenv from 'dotenv'
+dotenv.config()
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  define: {
+    'process.env': process.env,
+    global: {}
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -14,13 +21,10 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'https://i11a401.p.ssafy.io',
-        target: 'http://localhost:5000/',
+        target: process.env.VITE_API_BASE_URL,
         changeOrigin: true,
         secure: false
       }
     }
-  },
-  define: {
-    global: {}
   }
 })

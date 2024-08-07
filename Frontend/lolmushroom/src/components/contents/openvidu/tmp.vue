@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="live-container">
     <div id="session">
       <header class="session-header">
@@ -256,4 +256,4 @@ export default {
     },
   },
 };
-</script>
+</script> -->
