@@ -48,7 +48,7 @@
       false1: a4
     }
     await contentsAPI.createStatements(sessionStore.subSessionId, statesObject)
-    webSocketAPI.sendSubmitData(`/publish/game/tf/question/${store.subSessionId}`, true)
+    // webSocketAPI.sendSubmitData(`/publish/game/tf/question/${store.subSessionId}`, true)
   }
 
   // 몇 개 입력했는지 계산하는 코드
@@ -102,11 +102,11 @@
     totalUserCount.value = await getUserCount()
   })
   
-  onMounted(() => {
-    webSocketAPI.connect({
-      onSubmitEvent
-    })
-  })
+  // onMounted(() => {
+  //   webSocketAPI.connect({
+  //     onSubmitEvent
+  //   })
+  // })
 </script>
 
 <template>

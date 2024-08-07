@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useUserStore } from '@/stores/userStore';
   import { useSessionStore } from '@/stores/sessionStore';
   import sessionAPI from '@/api/session';
@@ -17,11 +17,29 @@
   const store = useUserStore()
   const sessionStore = useSessionStore()
 
-  let index = 0
+  const index = ref(0)
   const sessionUserNameList = await getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId);
-  const totalUserCount = sessionUserNameList['data']['result']['currentUserCount'];
+  // const totalUserCount = sessionUserNameList['result']['currentUserCount'];
+  // 세션 연결이 안 되는 오류가 있어 임시로 사용
+  const totalUserCount = sessionUserNameList['result']['currentUserCount'] + 8;
+  // console.log(sessionUserNameList, '인원수')
+
+  // 타겟 유저의 순서를 결정함
+  const targetUserOrder = (i) => {
+    const orderArr = Array.from({ length: i }, (_, index) => index);
+    for (let j = orderArr.length - 1; j > 0; j--) { 
+      const randomIndex = Math.floor(Math.random() * (j + 1));
+      [orderArr[j], orderArr[randomIndex]] = [orderArr[randomIndex], orderArr[j]];
+    }
+    return orderArr
+  };
+
   const orderArr = targetUserOrder(totalUserCount)
-  const targetUser = ref(allStatements[orderArr[index]].ovToken)
+  const allStatements = ref('')
+  allStatements.value = await getStatements()
+  const targetUserToken = ref(allStatements.value[orderArr[index.value]].ovToken)
+
+  console.log(allStatements.value)
   const userNames = []
   const userCards = []
   const firstHalf = ref([]);
@@ -29,13 +47,15 @@
 
   sessionUserNameList.result.username.forEach(name => {
       userNames.push(name);
+      // 여기에 ovtoken을 꼽아서 발표 진행 때 highrighted 효과 부여할 수 있게 해야 한다.
       userCards.push({
         name,
         src: '../../../public/favicon.ico',
       });
+      // 랜덤으로 배열 순서를 조작하는 로직 추가 필요 
+      firstHalf.value = userCards.slice(0, Math.ceil(userCards.length / 2))
+      secondHalf.value = userCards.slice(Math.ceil(userCards.length / 2))
     })
-
-  const allStatements = ref('')
 
   // 이것도 다른 유저의 진술 가져와서 렌더링하게 로직 수정해야 함
   const selectedAnswer = ref();
@@ -58,13 +78,16 @@
   }
 
   // 답변을 제출했다면 제출 현황을 확인
-  const submitAnswer = (i) => {
+  const submitAnswer = (selected) => {
     const data = {
       ovToken: store.userOvToken,
-      chosen: i,
+      chosen: selected - 1,
+      isCorrected: selected - 1 === allStatements.value[orderArr[index.value]].falseIndex,
     }
-    webSocketAPI.sendSubmitData(`/publish/game/tf/question/${store.subSessionId}`, data)
+    // webSocketAPI.sendSubmitData(`/publish/game/tf/question/${store.subSessionId}`, data)
     isSubmitAnswer.value = true
+    // 개발용 임시 코드
+    areSubmitAnswer.value = true
   }
 
   // 10초의 시간이 지나면 카메라와 질문이 공개됨
@@ -75,55 +98,32 @@
   const onSubmitEvent = (data, sessionId) => {
     console.log('Received message:', data, 'from session:', sessionId)
   }
-  
-  // 타겟 유저의 순서를 결정함
-  const targetUserOrder = (i) => {
-  const orderArr = Array.from({ length: i }, (_, index) => index);
-  for (let j = orderArr.length - 1; j > 0; j--) {
-    const randomIndex = Math.floor(Math.random() * (j + 1));
-    [orderArr[j], orderArr[randomIndex]] = [orderArr[randomIndex], orderArr[j]];
-  }
-  // orderArr.value = orderArr
-  return orderArr
-  // targetUser.value = allStatements[orderArr.value[index]].ovToken
-};
 
-  // 유저 정보를 가져오는 코드
-  const fetchUserData = async () => {
-    const sessionUserNameList = await getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId);
-    totalUserCount.value = sessionUserNameList['data']['result']['currentUserCount'];
-    targetUserOrder(totalUserCount)
-    sessionUserNameList.result.username.forEach(name => {
-      userNames.push(name);
-      userCards.push({
-        name,
-        src: '../../../public/favicon.ico',
-      });
-    })
+  // 선택한 버튼 시각적으로 활성화하는 함수
+  const buttonActivate = (key) => {
+  selectedAnswer.value = key;
+  };
 
-    // 랜덤으로 배열 순서를 조작하는 로직 추가 필요 
-    firstHalf.value = userCards.slice(0, Math.ceil(userCards.length / 2));
-    secondHalf.value = userCards.slice(Math.ceil(userCards.length / 2));
+  const targetUserUpdate = () => {
+    index.value++;
+    console.log(index.value)
   }
   
-  // 사람이 추가되면 유저 카드를 갱신
-  // watch(() => store.userTOFstatements.value, (newVal) => {
-  //   if (newVal) {
-  //     fetchUserData();
-  //   }
-  // });
-  
-  onMounted (async () => {
-    allStatements.value = await getStatements()
-    // fetchUserData()
-  })
+  // index 값이 증가할 때마다 관련 값 갱신
+  watch(index, (newIndex) => {
+    if (newIndex < orderArr.length) {
+      targetUserToken.value = allStatements.value[orderArr[newIndex]].ovToken;
+      selectedAnswer.value = null;
+      isSubmitAnswer.value = false;
+      areSubmitAnswer.value = false;
+    }
+  });
 
-  onMounted(() => {
-    webSocketAPI.connect({
-      onSubmitEvent
-    })
-  })
-
+  // onMounted(() => {
+  //   webSocketAPI.connect({
+  //     onSubmitEvent
+  //   })
+  // })
 </script>
 
 <template>
@@ -132,14 +132,14 @@
   <v-container v-if="isTimeUp" class="container">
     <v-row justify="space-between">
       <v-col>
-        <TOFSideUserComponent :users="firstHalf" :target="targetUser" />
+        <TOFSideUserComponent :users="firstHalf" :target="targetUserToken" />
       </v-col>
       
       <v-col md="6" style="text-align: center">
         <OpenViduComponent
           @update:myUserName="sessionStore.subSessionId"
           :session-id="getSubSessionInfo"
-          :user-name="userNames"
+          :user-name="firstHalf"
         />
         <!-- 이 버튼을 누르면 기존 발표자의 발표 종료 -->
         <!-- 처음 들어오면 바로 랜덤으로 발표자 순서를 정해놓아야 하는데  -->
@@ -149,9 +149,9 @@
         <!-- 2. ovtoken을 통해 사용자 진술 가져오기 -> 렌더링 -->
         <!-- 3. 발표자 테두리 변경 -->
         <!-- 사용자 지정은 index로 하고, 발표자 테두리만 ovtoken으로 변경 -->
-        <v-container v-if="targetUser !== store.ovToken">
-          <CountDownComponent time="30" @end-count-down="targetUserUpdate()" />
-          <ButtonComponent text="발표 종료" @click="targetUserUpdate()" />
+        <v-container v-if="targetUserToken === store.userOvToken">
+          <!-- <CountDownComponent time="30" @end-count-down="targetUserUpdate()" /> -->
+          <v-btn text="발표 종료" @click.stop="targetUserUpdate" />
         </v-container>
 
         <!-- <ResultOverlayComponent /> -->
@@ -161,11 +161,13 @@
           class="mt-5"
         >
           <v-card-title class='question-font' style="overflow: flip;">
-          <pre>{{ allStatements[index].username }}에 대한 설명이다. 다음 중 틀린 설명은?</pre>
+          <pre>{{ allStatements[orderArr[index]].userName }}에 대한 설명이다. 다음 중 틀린 설명은?</pre>
           </v-card-title>
-          {{ orderArr }}
+          <p>{{ index }}는 인덱스</p>
+          <p>{{ orderArr }}</p>
+          <!-- <p>{{ allStatements[orderArr[1]] }}</p> -->
           <div
-            v-for="(statement, i) in allStatements[0].statements"
+            v-for="(statement, i) in allStatements[orderArr[index]].statements"
             :key="i"
             @click="buttonActivate(i + 1)"
           >
@@ -177,7 +179,7 @@
               </p>
             </v-card-text>
           </div>
-          <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer, key)">
+          <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
             <ButtonComponent text="선택하기" size="large"/>
           </div>
         </v-card>
@@ -190,18 +192,18 @@
 
         <!-- 전체 제출 완료 -->
         <v-card v-else class="mt-5" width="500">
-          <!-- props 추가 -->
           <TOFResultComponent
-            target-nick-name=""
-            :statements="allStatements[orderArr[index]]"
+            :target-nick-name="allStatements[orderArr[index]].username"
+            :statements="allStatements[orderArr[index]].statements"
             choice-answer-matrix=""
+            :answer="allStatements[orderArr[index]].falseIndex"
           />
         </v-card>
       </v-col>
 
       <!-- 참여자 아이콘 닉네임 렌더링 -->
       <v-col>
-        <TOFSideUserComponent :users="secondHalf" :target="targetUser" />
+        <TOFSideUserComponent :users="secondHalf" :target="targetUserToken" />
       </v-col>
     </v-row>
   </v-container>
@@ -228,10 +230,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.highlighted {
-  border: 2px solid red;
 }
 
 .text-black {
