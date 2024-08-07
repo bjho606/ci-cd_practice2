@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/contents")
@@ -23,13 +21,25 @@ public class ContentsController {
     private final ContentsOrderService contentsOrderService;
 
     @GetMapping
-    public ResponseEntity<Response<ContentsListResponse>> getContents(){
+    public ResponseEntity<Response<ContentsListResponse>> getContents() {
         return ResponseEntity.status(HttpStatus.OK).body(contentsService.getContents());
     }
 
-    @GetMapping("/next")
-    public ResponseEntity<Response<ContentsOrderSubscribe>> nextContents(){
-        return ResponseEntity.status(HttpStatus.OK).body(contentsOrderService.nextContents());
+    @GetMapping("/next/{isStart}")
+    public ResponseEntity<Response<ContentsOrderSubscribe>> nextContents(@PathVariable boolean isStart) {
+        return ResponseEntity.status(HttpStatus.OK).body(contentsOrderService.nextContents(isStart));
+    }
+
+    @GetMapping("/reload")
+    public ResponseEntity<Response<ContentsOrderSubscribe>> reloadCurrentContent() {
+        Response<ContentsOrderSubscribe> response = contentsOrderService.reloadCurrentContent();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/finish")
+    public ResponseEntity<Response<ContentsOrderSubscribe>> finishSubSession(@RequestParam String subSessionId) {
+        Response<ContentsOrderSubscribe> response = contentsOrderService.finishSubSession(subSessionId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

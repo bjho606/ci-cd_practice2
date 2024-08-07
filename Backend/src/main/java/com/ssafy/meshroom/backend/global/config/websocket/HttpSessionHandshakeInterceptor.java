@@ -24,9 +24,10 @@ public class HttpSessionHandshakeInterceptor implements HandshakeInterceptor {
             HttpServletRequest servletRequest = servletServerRequest.getServletRequest();
             Cookie token = CookieUtil.getCookie(servletRequest, "token").orElseThrow(AuthException::new);
 
-            log.info("token:::{}",token.getValue());
-            attributes.put("token", token.getValue());
-//            attributes.put("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJtZXNocm9vbSIsImlhdCI6MTcyMjU3NjM4OCwiZXhwIjoxNzIzNDQwMzg4LCJzdWIiOiI2NmFiNGFiNzlhYWRlYzEzMGEyMTg4NmYifQ.zSu30cahYTH-1aSvvvimBBpp3UoDj7g-V2SxLyRBNY4");
+            log.info("token:::");
+//            log.info(token.getValue());
+//            attributes.put("token", token.getValue());
+            attributes.put("token", "");
         }
         return true;
     }
