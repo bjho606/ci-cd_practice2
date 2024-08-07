@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useRoomStore } from '@/stores/roomStore'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
+import contents from '@/api/contents'
 
 // 상태 관리 사용
 const router = useRouter()
@@ -28,6 +29,7 @@ const startGame = () => {
     cancelButtonText: '취소'
   }).then((result) => {
     if (result.isConfirmed) {
+      contents.callNextContents(true)
       goToMultiRoom()
     }
   })

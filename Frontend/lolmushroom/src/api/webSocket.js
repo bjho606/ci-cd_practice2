@@ -66,12 +66,6 @@ const connect = ({
         onError(error)
       }
     },
-    onWebSocketError: (error) => {
-      console.error('WebSocket error: ', error)
-      if (onError) {
-        onError(error)
-      }
-    }
   })
   stompClient.activate()
 }

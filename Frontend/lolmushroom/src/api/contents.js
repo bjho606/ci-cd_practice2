@@ -6,8 +6,8 @@ export default {
   getContents(success, failure) {
     return axios.get(`${API_URL}/contents`).then(success).catch(failure)
   },
-  callNextContents(success, failure) {
-    return axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
+  callNextContents(isStart, success, failure) {
+    return axios.get(`${API_URL}/contents/next/${isStart}`).then(success).catch(failure)
   },
   recallContents(success, failure) {
     return axios.get(`${API_URL}/contents/next`).then(success).catch(failure)
