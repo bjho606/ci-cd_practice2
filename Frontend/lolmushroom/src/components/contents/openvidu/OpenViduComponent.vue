@@ -8,10 +8,8 @@ import UserVideo from './UserVideo.vue'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-  // const APPLICATION_SERVER_URL = 'https://i11a401.p.ssafy.io:4443';
-  // const OPENVIDU_SERVER_SECRET = 'meshmeshroomroom';
-
-const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5713/';
+const { VITE_OPENVIDU_URL } = import.meta.env;
+  // const { VITE_OPENVIDU_SECRET } = import.meta.env;
 
 const store = useSessionStore()
 
@@ -187,7 +185,7 @@ const joinSession = async () => {
 
   const createSession = async (sessionId) => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + 'api/sessions',
+      VITE_OPENVIDU_URL + '/api/sessions',
       { customSessionId: sessionId },
       {
         headers: { 'Content-Type': 'application/json' }
@@ -198,7 +196,7 @@ const joinSession = async () => {
 
   const createToken = async (sessionId) => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections',
+      VITE_OPENVIDU_URL + '/api/sessions/' + sessionId + '/connections',
       {},
       {
         headers: { 'Content-Type': 'application/json' }

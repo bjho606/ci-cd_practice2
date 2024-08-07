@@ -4,11 +4,11 @@ import { useSessionStore } from '@/stores/sessionStore'
 import QrcodeVue from 'qrcode.vue'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 
-// const baseURL = 'i11a401.p.ssafy.io'
-const baseURL = 'http://localhost:5173'
+const { VITE_BASE_URL } = import.meta.env
+
 const sessionStore = useSessionStore()
 const sessionURL = computed(() => {
-  return `${baseURL}/${sessionStore.sessionId}`
+  return `${VITE_BASE_URL}/${sessionStore.sessionId}`
 })
 
 const copyToClipboard = () => {
