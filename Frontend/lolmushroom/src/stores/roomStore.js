@@ -20,7 +20,7 @@ export const useRoomStore = defineStore('room', {
     rooms: Array.from({ length: 10 }, () => ({
       sessionId: '',
       groupName: '',
-      capacity: 8,
+      capacity: 10,
       occupants: 0,
       users: [],
       isReady: false,

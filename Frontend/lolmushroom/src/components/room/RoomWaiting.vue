@@ -30,8 +30,6 @@ const onSubSessionMessageReceived = (message) => {
  * * 2. Player는 Group의 현재 정보를 실시간으로 알 수 있다.
  */
 const groupInfo = computed(() => roomStore.getGroupInfoBySessionId(sessionStore.subSessionId))
-console.log(groupInfo.value)
-
 /**
  * TODO 1. 팀장은 Room의 이름을 바꿀 수 있음
  * * 3. Team Leader는 Room의 이름을 바꿀 수 있다.
@@ -146,7 +144,7 @@ const goToGroupFightSession = () => {
       Are We Ready?
     </v-btn>
     <v-dialog v-model="showRoomNameInput" max-width="1000px">
-      <RoomNameInput @name-registerd="closeDialog" />
+      <RoomNameInput @name-registered="closeDialog" />
     </v-dialog>
     <v-container class="group-info" fluid>
       <v-row justify="center" align="center">

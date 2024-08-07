@@ -1,13 +1,16 @@
 <script setup>
 import { onMounted, computed } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
+import contentsAPI from '@/api/contents'
 import StatusBar from './StatusBar.vue'
 import MainMushroomContainer from './MainMushroomContainer.vue'
 import GroupMushroomContainer from './GroupMushroomContainer.vue'
 
 const roomStore = useRoomStore()
+const contentsStore = useContentsStore()
 const mushroomStore = useMushroomStore()
 const sessionStore = useSessionStore()
 
@@ -24,6 +27,11 @@ const groups = computed(() => {
 })
 
 /**
+ * TODO : Team Leader는 Contents가 종료되면, 종료 Signal을 진행자에게 보낸다.
+ */
+const finishContents = () => {}
+
+/**
  * TODO : MushroomGrow Contents에 대한 Socket 연결
  * IMP Socket 연결하는 중...
  */
@@ -33,26 +41,6 @@ onMounted(() => {
     sessionStore.subSessionId,
     groups.value
   )
-  // mushroomStore.initLocalData('group-session-104', groups)
-  // setInterval(() => {
-  //   groups.forEach((group) => {
-  //     const currentSize = mushroomStore.getMushroomSize(group.sessionId)
-
-  //     // 70% 확률로 크기 감소, 30% 확률로 크기 증가
-  //     const isDecreasing = Math.random() < 0.7
-  //     const changeAmount = Math.floor(Math.random() * 5) + 1 // 1~5 사이의 랜덤 크기 변화
-
-  //     let newSize
-  //     if (isDecreasing) {
-  //       newSize = currentSize - changeAmount
-  //       if (newSize < 0) newSize = 0 // 크기가 음수가 되지 않도록 방지
-  //     } else {
-  //       newSize = currentSize + changeAmount
-  //     }
-
-  //     mushroomStore.updateMushroomSize(group.sessionId, newSize)
-  //   })
-  // }, 1000)
 })
 </script>
 
