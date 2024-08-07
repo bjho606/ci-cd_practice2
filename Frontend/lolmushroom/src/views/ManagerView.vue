@@ -21,6 +21,7 @@ const roomStore = useRoomStore()
 /**
  * IMP 2. ManagerView에 처음 들어왔을 때, MainConnection이 연결되어 있지 않은 상태
  * * 이와 같은 이유로, 처음 들어오면 Socket을 통한 Group 정보가 아닌, API를 통한 그룹 정보를 호출해야 한다.
+ * * 근데 참여자들이 들어오는 것 자체가 Trigger가 되므로, 굳이 사용하지 않아도 되는 함수일 수도 있다. 
  */
 const getSessionInfo = async (sessionId) => {
   try {

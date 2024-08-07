@@ -1,14 +1,16 @@
 <script setup>
-import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { useRoomStore } from '@/stores/roomStore'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRouter } from 'vue-router'
 
-
 const router = useRouter()
 const roomStore = useRoomStore()
+const contentsStore = useContentsStore()
 const sessionStore = useSessionStore()
-const { rooms, roomCount } = storeToRefs(roomStore)
+
+const rooms = computed(() => roomStore.getRooms)
 
 // go to multi room
 const goToMultiRoom = () => {
@@ -22,10 +24,7 @@ const goToMultiRoom = () => {
     <!-- UI 수정 -->
     <div class="rooms" v-for="(room, index) in rooms" :key="index">
       <div>{{ index + 1 }} 번방</div>
-      <div class="grid-item card">
-
-
-      </div>
+      <div class="grid-item card"></div>
     </div>
   </div>
   <div class="d-flex justify-center mt">
@@ -34,12 +33,12 @@ const goToMultiRoom = () => {
 </template>
 
 <style scoped>
-div{
+div {
   text-align: center;
   font-weight: bold;
-} 
+}
 
-.rooms{
+.rooms {
   background-color: white;
 }
 
