@@ -11,6 +11,7 @@ import com.ssafy.meshroom.backend.domain.session.domain.Session;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,9 +29,9 @@ public class ContentsOrderService {
     public final ContentsOrderRepository contentsOrderRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final OVTokenService ovTokenService;
+    @Autowired
     private final RedisTemplate<String, Boolean> booleanRedisTemplate;
     private final SessionRepository sessionRepository;
-    private final ContentsRepository contentsRepository;
 
     public void saveContentsOrder(String sessionSid, List<String> contents) {
         int idx = 1;

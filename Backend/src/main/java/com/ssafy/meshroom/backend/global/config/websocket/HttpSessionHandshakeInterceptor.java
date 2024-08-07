@@ -25,9 +25,8 @@ public class HttpSessionHandshakeInterceptor implements HandshakeInterceptor {
             Cookie token = CookieUtil.getCookie(servletRequest, "token").orElseThrow(AuthException::new);
 
             log.info("token:::");
-//            log.info(token.getValue());
-//            attributes.put("token", token.getValue());
-            attributes.put("token", "");
+            log.info(token.getValue());
+            attributes.put("token", token.getValue());
         }
         return true;
     }

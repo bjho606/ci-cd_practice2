@@ -37,7 +37,7 @@ public class RedisConfig {
 
     // 각 세션에 대한 참/거짓 저장
     @Bean
-    public RedisTemplate<String, Boolean> redisBooleanTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, Boolean> booleanRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Boolean> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
