@@ -147,6 +147,7 @@ public class SessionService {
                 throw new UsernameNotFoundException("존재하지 않은 유저입니다.");
             }
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
+            userDetailService.updateUser(userId,userRole.get());
         }
 
         // 3-2. session 접속 토큰 발행
