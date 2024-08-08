@@ -2,6 +2,8 @@ package com.ssafy.meshroom.backend.domain.contents.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @ToString
 @Getter
 @Setter
@@ -14,5 +16,5 @@ public class ContentsOrderSubscribe {
     private Long totalContentsCount;
     private Long finishGroupCount;
     private Long totalGroupCount;
-    private CurrentGroupState currentGroupState;
+    private List<GroupState> currentGroupState;
 }

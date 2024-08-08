@@ -4,18 +4,19 @@ import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
 import com.ssafy.meshroom.backend.domain.contents.dao.ContentsOrderRepository;
 import com.ssafy.meshroom.backend.domain.contents.domain.ContentsOrder;
 import com.ssafy.meshroom.backend.domain.contents.dto.ContentsOrderSubscribe;
-import com.ssafy.meshroom.backend.domain.contents.dto.CurrentGroupState;
+import com.ssafy.meshroom.backend.domain.contents.dto.GroupState;
+import com.ssafy.meshroom.backend.domain.session.application.SessionService;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.domain.Session;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,6 @@ public class ContentsOrderService {
     public final ContentsOrderRepository contentsOrderRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final OVTokenService ovTokenService;
-    @Autowired
     private final RedisTemplate<String, Boolean> booleanRedisTemplate;
     private final SessionRepository sessionRepository;
 
@@ -81,21 +81,26 @@ public class ContentsOrderService {
         log.info("contentsId {} , sequence {}   ", contentsId, sequence);
 
         // 모든 세션에 대한 status를 false로 갱신해주는 작업
-        HashMap<String, Boolean> groupStates = new HashMap<>();
-        for (ContentsOrder con : li) {
-            groupStates.put(con.getSessionId(), false);
-            booleanRedisTemplate.opsForValue().set(con.getSessionId(), false);
+        List<GroupState> groupStates = new ArrayList<>();
+        List<Session> subsessions = sessionRepository.findAllByMainSession(session.getSessionId()).orElseThrow();
+
+        for (Session sub : subsessions) {
+            groupStates.add(GroupState.builder()
+                    .sessionId(sub.getSessionId())
+                    .isFinish(false)
+                    .build()
+            );
+            booleanRedisTemplate.opsForValue().set(sub.getSessionId(), false);
         }
-
-        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
-
 
         // 수정해야함
         ContentsOrderSubscribe ret = ContentsOrderSubscribe.builder()
                 .totalContentsCount(total)
                 .contentsId(contentsId)
                 .contentsSequence(sequence)
-                .currentGroupState(currentGroupState)
+                .currentGroupState(groupStates)
+                .finishGroupCount(0L)
+                .totalGroupCount((long)subsessions.size())
                 .build();
 
         simpMessagingTemplate.convertAndSend("/subscribe/contents/" + session.getSessionId(), ret);
@@ -125,14 +130,14 @@ public class ContentsOrderService {
             booleanRedisTemplate.opsForValue().set(con.getSessionId(), false);
         }
 
-        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
+//        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
 
 
         ContentsOrderSubscribe ret = ContentsOrderSubscribe.builder()
                 .contentsId(currentContent.getContentsId())
                 .contentsSequence(currentContent.getSequence())
                 .totalContentsCount((long) contentsOrders.size())
-                .currentGroupState(currentGroupState)
+//                .currentGroupState(currentGroupState)
                 .build();
 
 
@@ -171,14 +176,14 @@ public class ContentsOrderService {
             }
 
         }
-        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
+//        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
 
 
         ContentsOrderSubscribe ret = ContentsOrderSubscribe.builder()
                 .contentsId(currentContent.getContentsId())
                 .contentsSequence(currentContent.getSequence())
                 .totalContentsCount((long) subSessions.size())
-                .currentGroupState(currentGroupState)
+//                .currentGroupState(currentGroupState)
                 .build();
 
         simpMessagingTemplate.convertAndSend("/subscribe/contents/" + mainSession.getMainSession(), ret);
