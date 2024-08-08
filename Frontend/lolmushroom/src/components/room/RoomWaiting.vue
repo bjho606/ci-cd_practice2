@@ -16,6 +16,7 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const router = useRouter()
+const isUserStarted = computed(() => userStore.isStarted)
 
 /**
  * * 1. Player가 Sub Session Message에 대한 메시지를 구독한다.
@@ -61,6 +62,8 @@ const sendReadyMessage = async (sessionId) => {
 
 /**
  * TODO 3. 모든 Player는 진행자의 Signal을 구독하고 있다가, 다음 Component로 이동할 수 있어야 함.
+ * TODO 3.1 모든 Player는 1번째 Contents를 진행하고 나서, isStart 속성을 가지게 됨.
+ * TODO 3.2 isStart 속성을 가진다면, 다음 RoomWaiting부터는 보이는 View가 달라짐.
  * ! Watch를 통해, currentContentsId만 Watch하면, reload가 어려울 수 있음 -> 전체를 watch할까?
  * IMP : 다음 Component로 Routing이 이루어져야 한다.
  */
@@ -70,6 +73,7 @@ watch(
   () => contentsStore.currentContentsId,
   (newContentsId) => {
     if (newContentsId && routeMapping[newContentsId]) {
+      userStore.setIsStarted()
       router.push({
         name: routeMapping[newContentsId],
         params: {
@@ -126,21 +130,17 @@ const handlePopState = (event) => {
     router.push(router.currentRoute.value.fullPath)
   }
 }
-
-const goToGroupFightSession = () => {
-  router.push({
-    name: 'GroupFightSessionView',
-    params: { subSessionId: sessionStore.subSessionId }
-  })
-}
 </script>
 
 <template>
   <div class="main">
-    <v-btn @click="goToGroupFightSession" color="primary">Go to Group Fight Session</v-btn>
-    <v-btn @click="handleLeaveSession" color="primary">나가기</v-btn>
+    <v-btn v-if="!isUserStarted" @click="handleLeaveSession" color="primary">나가기</v-btn>
     <v-btn v-if="isTeamLeader" @click="openDialog" color="primary">Change Room Name</v-btn>
-    <v-btn v-if="isTeamLeader" @click="sendReadyMessage(sessionStore.subSessionId)" color="primary">
+    <v-btn
+      v-if="isTeamLeader && !isUserStarted"
+      @click="sendReadyMessage(sessionStore.subSessionId)"
+      color="primary"
+    >
       Are We Ready?
     </v-btn>
     <v-dialog v-model="showRoomNameInput" max-width="1000px">
@@ -155,12 +155,10 @@ const goToGroupFightSession = () => {
               {{ groupInfo.occupants }} / {{ groupInfo.capacity }} Users
             </v-card-subtitle>
             <v-card-text v-if="isRoomReady">
-              <v-alert type="success" border="left" colored-border> The room is ready! </v-alert>
+              <v-alert type="success" colored-border> The room is ready! </v-alert>
             </v-card-text>
             <v-card-text v-else>
-              <v-alert type="warning" border="left" colored-border>
-                Waiting for players to be ready...
-              </v-alert>
+              <v-alert type="warning" colored-border> Waiting for players to be ready... </v-alert>
             </v-card-text>
           </v-card>
         </v-col>

@@ -128,7 +128,10 @@ onMounted(async () => {})
             class="mb-2"
           >
             <b>{{ room.groupName || `그룹${index + 1}` }}</b>
-            <div class="mr">{{ room.occupants }}/{{ room.capacity }}</div>
+            <div class="mr">
+              <span v-if="room.isReady" class="ready-status"> (준비 완료) </span
+              >{{ room.occupants }}/{{ room.capacity }}
+            </div>
             <div class="mr">
               <v-icon icon="$next"></v-icon>
             </div>

@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user', {
     userOvToken: ref('undefined'),
     userNickname: '닉네임을 설정해주세요',
     isTeamLeader: false,
+    isStarted: false
   }),
   actions: {
     setNickname(nickname) {
@@ -14,11 +15,14 @@ export const useUserStore = defineStore('user', {
     },
     setTeamLeader(isTeamLeader) {
       this.isTeamLeader = isTeamLeader
+    },
+    setIsStarted() {
+      this.isStarted = true
     }
   },
   persist: {
     key: 'user-store',
     storage: sessionStorage,
-    paths: ['userNickname', 'userOvToken', 'isTeamLeader']
+    paths: ['userNickname', 'userOvToken', 'isTeamLeader', 'isStarted']
   }
 })

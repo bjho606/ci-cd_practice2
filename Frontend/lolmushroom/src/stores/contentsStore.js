@@ -11,7 +11,8 @@ export const useContentsStore = defineStore('contents', {
       5: null,
       6: null,
       7: null,
-      8: null
+      8: null,
+      null: 'EndingPage'
     },
     currentContentsId: null,
     contentsSequence: null,
@@ -30,7 +31,7 @@ export const useContentsStore = defineStore('contents', {
       this.totalContentsCount = contentState.totalContentsCount
       this.finishGroupCount = contentState.finishGroupCount
       this.totalGroupCount = contentState.totalGroupCount
-      this.currentGroupState = contentState.currentGroupState
+      this.currentGroupState = [...contentState.currentGroupState]
     }
   },
   getters: {
