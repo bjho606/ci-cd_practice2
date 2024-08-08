@@ -36,8 +36,8 @@ public class ContentsController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/finish")
-    public ResponseEntity<Response<ContentsOrderSubscribe>> finishSubSession(@RequestParam String subSessionId) {
+    @PostMapping("/finish/{subSessionId}")
+    public ResponseEntity<Response<ContentsOrderSubscribe>> finishSubSession(@PathVariable String subSessionId) {
         Response<ContentsOrderSubscribe> response = contentsOrderService.finishSubSession(subSessionId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

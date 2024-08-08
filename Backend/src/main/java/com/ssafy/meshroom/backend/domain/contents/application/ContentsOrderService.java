@@ -89,7 +89,7 @@ public class ContentsOrderService {
                     .isFinish(false)
                     .build()
             );
-            booleanRedisTemplate.opsForValue().set("contents:" + sub.getSessionId(), false);
+            booleanRedisTemplate.opsForValue().set("contents:" + sub.getSessionId(), Boolean.FALSE);
         }
 
         // 수정해야함
@@ -151,6 +151,7 @@ public class ContentsOrderService {
 
     // 팀장이 본인 해당하는 세션 완료 누르기
     public Response<ContentsOrderSubscribe> finishSubSession(String subSessionId) {
+
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         Session mainSession = ovTokenService.getMainSessionFromUserId(userId);
 
@@ -165,7 +166,7 @@ public class ContentsOrderService {
             Boolean state = booleanRedisTemplate.opsForValue().get("contents:" + subSession.getSessionId());
             if (state == null) {
                 state = Boolean.FALSE;
-            } else if (state = Boolean.TRUE) {
+            } else if (state) {
                 cnt++;
             }
             groupStates.add(GroupState.builder()
@@ -173,7 +174,6 @@ public class ContentsOrderService {
                     .isFinish(state)
                     .build()
             );
-
         }
 
 
