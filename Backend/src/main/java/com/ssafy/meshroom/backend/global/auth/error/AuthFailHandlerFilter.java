@@ -60,7 +60,7 @@ public class AuthFailHandlerFilter extends OncePerRequestFilter {
                                     .message(e.getMessage())
                                     .build()
                     ));
-            log.error("Auth Error");
+            log.error("Auth Error :: \n {}", e.getMessage());
         }
     }
 }
