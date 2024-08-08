@@ -26,5 +26,9 @@ public class UserDetailService implements UserDetailsService {
         return userRepository.save(new User(username, userRole)).get_id();
     }
 
+    public void updateUser(String userId, UserRole userRole){
+        userRepository.updateById(userId, userRole);
+    }
+
 
 }

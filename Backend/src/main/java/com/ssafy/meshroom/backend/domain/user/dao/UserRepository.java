@@ -3,13 +3,17 @@ package com.ssafy.meshroom.backend.domain.user.dao;
 import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.List;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-
+    @Query("{ '_id' : ?0 }")
+    @Update(" {'$set': { 'role' : ?1 }} ")
+    void updateById(String _id, UserRole role);
 //    // username으로 사용자 찾기
 //    Optional<User> findByUsername(String username);
 //
