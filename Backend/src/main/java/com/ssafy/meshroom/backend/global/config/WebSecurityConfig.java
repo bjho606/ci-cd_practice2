@@ -56,7 +56,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
                 .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/*/group-name").hasAnyAuthority(
+                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/{subsessionId}/group-name").hasAnyAuthority(
                                 UserRole.TEAM_LEADER.getAuthority()
                                 ,UserRole.FACILITATOR.getAuthority()
                         )

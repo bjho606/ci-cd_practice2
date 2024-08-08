@@ -50,15 +50,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return ("test-token".equals(request.getHeader("X-Test-Token")))
-                // 아래 조건을 만족하면 필터링을 해야만 함!
-                || !(
-                (request.getMethod().equals("PATCH") && path.startsWith(("/api/v1/sessions")))
-                        || CookieUtil.getCookie(request, "token").isPresent()
-        )
 
-//                || path.startsWith(("/swagger-ui"))
-//                || path.startsWith(("/api-docs"))
-                ;
+        // 1번 조건: "test-token" equals the value of "X-Test-Token" header
+        if ("test-token".equals(request.getHeader("X-Test-Token"))) {
+            return true; // 필터링 하지 않음
+        }
+
+        // 2번 조건: 요청이 PATCH 메서드이고 경로가 /api/v1/sessions로 시작
+        if (request.getMethod().equals("PATCH") && path.startsWith("/api/v1/sessions")) {
+            return false; // 필터링 함
+        }
+
+        // 3번 조건: 쿠키에 token이 있는 경우
+        if (CookieUtil.getCookie(request, "token").isPresent()) {
+            return false; // 필터링 함
+        }
+
+        // 기본적으로 필터링 하지 않음
+        return true;
     }
 }
