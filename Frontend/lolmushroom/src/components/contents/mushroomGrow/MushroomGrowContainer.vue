@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
+import { useRouter } from 'vue-router'
 import contentsAPI from '@/api/contents'
 import StatusBar from './StatusBar.vue'
 import MainMushroomContainer from './MainMushroomContainer.vue'
@@ -13,6 +14,7 @@ const roomStore = useRoomStore()
 const contentsStore = useContentsStore()
 const mushroomStore = useMushroomStore()
 const sessionStore = useSessionStore()
+const router = useRouter()
 
 /**
  * * TEST GROUP DATA
@@ -29,7 +31,32 @@ const groups = computed(() => {
 /**
  * TODO : Team Leader는 Contents가 종료되면, 종료 Signal을 진행자에게 보낸다.
  */
-const finishContents = () => {}
+const finishContents = async (sessionId) => {
+  try {
+    const response = await contentsAPI.finishContents(sessionId)
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 Contents를 종료했어요!')
+      console.log(response.data)
+    }
+  } catch (error) {
+    console.error('Error Finishing Contents', error)
+  }
+}
+
+watch(
+  () => contentsStore.currentGroupState,
+  (newState) => {
+    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
+
+    if (group && group.isFinish) {
+      router.push({
+        name: 'roomwaiting',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
+    }
+  },
+  { deep: true } // Ensure the watcher detects nested changes within the array
+)
 
 /**
  * TODO : MushroomGrow Contents에 대한 Socket 연결
@@ -49,7 +76,10 @@ onMounted(() => {
 <template>
   <v-container fluid class="main-container">
     <!-- * Top Side : 현재 Game의 진행에 대한 정보를 나타내는 Status Bar -->
-    <StatusBar class="top-container" title="Game Info" status="In Progress" />
+    <div class="top-container d-flex align-center justify-space-between">
+      <StatusBar class="status-bar" title="Game Info" status="In Progress" />
+      <v-btn color="red" @click="finishContents(sessionStore.subSessionId)"> Finish </v-btn>
+    </div>
 
     <!-- * Bottom Size : Left -> MainMushroom , Right -> GroupMushrooms -->
     <v-row class="bottom-container">

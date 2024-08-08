@@ -24,6 +24,9 @@ export default {
       .then(success)
       .catch(failure)
   },
+  changeUserName(userName, success, failure) {
+    return axios.patch(`${API_URL}/users/usernmae`, userName).then(success).catch(failure)
+  },
   changeSubSessionName(subSessionId, groupName, success, failure) {
     return axios
       .patch(`${API_URL}/sessions/${subSessionId}/group-name`, groupName)
