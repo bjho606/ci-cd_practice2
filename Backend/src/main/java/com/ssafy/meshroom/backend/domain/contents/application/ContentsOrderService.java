@@ -89,7 +89,7 @@ public class ContentsOrderService {
                     .isFinish(false)
                     .build()
             );
-            booleanRedisTemplate.opsForValue().set(sub.getSessionId(), false);
+            booleanRedisTemplate.opsForValue().set("contents:" + sub.getSessionId(), false);
         }
 
         // 수정해야함
@@ -131,7 +131,7 @@ public class ContentsOrderService {
                     .sessionId(sub.getSessionId())
                     .isFinish(false)
                     .build());
-            booleanRedisTemplate.opsForValue().set(sub.getSessionId(), false);
+            booleanRedisTemplate.opsForValue().set("contents:" + sub.getSessionId(), false);
         }
 
 
@@ -154,7 +154,7 @@ public class ContentsOrderService {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         Session mainSession = ovTokenService.getMainSessionFromUserId(userId);
 
-        booleanRedisTemplate.opsForValue().set(subSessionId, true);
+        booleanRedisTemplate.opsForValue().set("contents:" + subSessionId, true);
 
         List<GroupState> groupStates = new ArrayList<>();
         List<Session> subSessions = sessionRepository.findAllByMainSession(mainSession.getSessionId()).orElseThrow();
@@ -162,7 +162,7 @@ public class ContentsOrderService {
         long cnt = 0;
 
         for (Session subSession : subSessions) {
-            Boolean state = booleanRedisTemplate.opsForValue().get(subSession.getSessionId());
+            Boolean state = booleanRedisTemplate.opsForValue().get("contents:" + subSession.getSessionId());
             if (state == null) {
                 state = Boolean.FALSE;
             } else if (state = Boolean.TRUE) {
