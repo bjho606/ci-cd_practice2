@@ -57,7 +57,7 @@ export const useMushroomStore = defineStore('mushroomStore', {
     fetchMushroomData(event) {
       console.log(event)
       const { sessionId, size } = event
-      this.mushroomMap.set(sessionId, size)
+      this.mushroomMap.set(sessionId, size / 5)
     },
 
     /**
