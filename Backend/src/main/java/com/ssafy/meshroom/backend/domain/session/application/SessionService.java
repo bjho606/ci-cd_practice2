@@ -308,11 +308,13 @@ public class SessionService {
     public Response<?> subSessionReady(String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         // session정보에 대한 수정을 한다.
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subSessionId).orElseThrow(SessionNotExistException::new);
-        session.setIsReady(true);
+        session.setIsReady(!session.getIsReady());
+
         sessionRepository.save(session);
         simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
         return new Response<>(true, 2000L, "준비 완료 되었습니다.", null);
     }
+
 
     public Response<?> subSessionQuit(String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         // ov token에서 해당 세션의 사용자를 삭제한다.
