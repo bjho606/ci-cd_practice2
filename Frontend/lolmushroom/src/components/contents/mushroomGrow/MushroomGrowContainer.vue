@@ -2,6 +2,7 @@
 import { onMounted, computed, watch } from 'vue'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import { useContentsStore } from '@/stores/contentsStore'
+import { useUserStore } from '@/stores/userStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useRouter } from 'vue-router'
@@ -11,6 +12,7 @@ import MainMushroomContainer from './MainMushroomContainer.vue'
 import GroupMushroomContainer from './GroupMushroomContainer.vue'
 
 const roomStore = useRoomStore()
+const userStore = useUserStore() // 팀장으로 임명한다.
 const contentsStore = useContentsStore()
 const mushroomStore = useMushroomStore()
 const sessionStore = useSessionStore()
@@ -78,7 +80,13 @@ onMounted(() => {
     <!-- * Top Side : 현재 Game의 진행에 대한 정보를 나타내는 Status Bar -->
     <div class="top-container d-flex align-center justify-space-between">
       <StatusBar class="status-bar" title="Game Info" status="In Progress" />
-      <v-btn color="red" @click="finishContents(sessionStore.subSessionId)"> Finish </v-btn>
+      <v-btn
+        v-if="userStore.isTeamLeader"
+        color="red"
+        @click="finishContents(sessionStore.subSessionId)"
+      >
+        Finish
+      </v-btn>
     </div>
 
     <!-- * Bottom Size : Left -> MainMushroom , Right -> GroupMushrooms -->
