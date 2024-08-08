@@ -195,7 +195,7 @@ public class ContentsOrderService {
                 .currentGroupState(groupStates)
                 .build();
 
-        simpMessagingTemplate.convertAndSend("/subscribe/contents/" + mainSession.getMainSession(), ret);
+        simpMessagingTemplate.convertAndSend("/subscribe/contents/" + mainSession.getSessionId(), ret);
         return new Response<>(true, 200L, "ok", ret);
     }
 
