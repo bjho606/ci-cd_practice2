@@ -5,21 +5,19 @@ import com.ssafy.meshroom.backend.domain.contents.dao.ContentsOrderRepository;
 import com.ssafy.meshroom.backend.domain.contents.domain.ContentsOrder;
 import com.ssafy.meshroom.backend.domain.contents.dto.ContentsOrderSubscribe;
 import com.ssafy.meshroom.backend.domain.contents.dto.GroupState;
-import com.ssafy.meshroom.backend.domain.session.application.SessionService;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.domain.Session;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,6 +27,7 @@ public class ContentsOrderService {
     public final ContentsOrderRepository contentsOrderRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final OVTokenService ovTokenService;
+    @Autowired
     private final RedisTemplate<String, Boolean> booleanRedisTemplate;
     private final SessionRepository sessionRepository;
 
@@ -100,7 +99,7 @@ public class ContentsOrderService {
                 .contentsSequence(sequence)
                 .currentGroupState(groupStates)
                 .finishGroupCount(0L)
-                .totalGroupCount((long)subsessions.size())
+                .totalGroupCount((long) subsessions.size())
                 .build();
 
         simpMessagingTemplate.convertAndSend("/subscribe/contents/" + session.getSessionId(), ret);
@@ -113,6 +112,7 @@ public class ContentsOrderService {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         Session session = ovTokenService.getMainSessionFromUserId(userId);
         List<ContentsOrder> contentsOrders = contentsOrderRepository.findAllBySessionId(session.get_id());
+        List<Session> subsessions = sessionRepository.findAllByMainSession(session.getSessionId()).orElseThrow();
 
         ContentsOrder currentContent = null;
 
@@ -124,20 +124,24 @@ public class ContentsOrderService {
         }
 
         //모든 세션에 대한 status를 false로 갱신해주는 작업
-        HashMap<String, Boolean> groupStates = new HashMap<>();
-        for (ContentsOrder con : contentsOrders) {
-            groupStates.put(con.getSessionId(), false);
-            booleanRedisTemplate.opsForValue().set(con.getSessionId(), false);
-        }
+        List<GroupState> groupStates = new ArrayList<>();
 
-//        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
+        for (Session sub : subsessions) {
+            groupStates.add(GroupState.builder()
+                    .sessionId(sub.getSessionId())
+                    .isFinish(false)
+                    .build());
+            booleanRedisTemplate.opsForValue().set(sub.getSessionId(), false);
+        }
 
 
         ContentsOrderSubscribe ret = ContentsOrderSubscribe.builder()
                 .contentsId(currentContent.getContentsId())
                 .contentsSequence(currentContent.getSequence())
                 .totalContentsCount((long) contentsOrders.size())
-//                .currentGroupState(currentGroupState)
+                .finishGroupCount(0L)
+                .totalGroupCount((long) subsessions.size())
+                .currentGroupState(groupStates)
                 .build();
 
 
@@ -152,18 +156,24 @@ public class ContentsOrderService {
 
         booleanRedisTemplate.opsForValue().set(subSessionId, true);
 
-        HashMap<String, Boolean> groupStates = new HashMap<>();
-        groupStates.put(subSessionId, true);
+        List<GroupState> groupStates = new ArrayList<>();
+        List<Session> subSessions = sessionRepository.findAllByMainSession(mainSession.getSessionId()).orElseThrow();
 
-        Optional<List<Session>> optionalSubSessions = sessionRepository.findAllByMainSession(mainSession.getSessionId());
-        List<Session> subSessions = optionalSubSessions.get();
-
+        long cnt = 0;
 
         for (Session subSession : subSessions) {
-            if (!subSession.getSessionId().equals(subSessionId)) {
-                Boolean state = booleanRedisTemplate.opsForValue().get(subSession.getSessionId());
-                groupStates.put(subSession.getSessionId(), state);
+            Boolean state = booleanRedisTemplate.opsForValue().get(subSession.getSessionId());
+            if (state == null) {
+                state = Boolean.FALSE;
+            } else if (state = Boolean.TRUE) {
+                cnt++;
             }
+            groupStates.add(GroupState.builder()
+                    .sessionId(subSession.getSessionId())
+                    .isFinish(state)
+                    .build()
+            );
+
         }
 
 
@@ -176,14 +186,13 @@ public class ContentsOrderService {
             }
 
         }
-//        CurrentGroupState currentGroupState = new CurrentGroupState(groupStates);
-
-
         ContentsOrderSubscribe ret = ContentsOrderSubscribe.builder()
                 .contentsId(currentContent.getContentsId())
                 .contentsSequence(currentContent.getSequence())
-                .totalContentsCount((long) subSessions.size())
-//                .currentGroupState(currentGroupState)
+                .totalContentsCount((long) li.size())
+                .finishGroupCount(cnt)
+                .totalGroupCount((long) subSessions.size())
+                .currentGroupState(groupStates)
                 .build();
 
         simpMessagingTemplate.convertAndSend("/subscribe/contents/" + mainSession.getMainSession(), ret);

@@ -42,7 +42,6 @@ public class KafkaAdminClient {
             properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
             client = AdminClient.create(properties);
         }
-
         createAllTopics();
     }
 
@@ -97,7 +96,7 @@ public class KafkaAdminClient {
         Collection<TopicListing> topicListings = client.listTopics().listings().get();
         if (topicListings == null || topicListings.isEmpty()) {
             log.info("No topics found");
-        }else {
+        } else {
             for (TopicListing topicListing : topicListings) {
                 log.info(String.valueOf(topicListing));
             }
