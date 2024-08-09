@@ -1,7 +1,7 @@
 # Stage 1: Build the Vue.js app
 FROM node:20 AS build-stage
 WORKDIR /app
-COPY /home/ubuntu/meshroom/S11P12A401/Frontend/lolmushroom/.env /app/.env
+COPY /.env /app/.env
 COPY package*.json ./
 RUN npm install
 COPY . .
