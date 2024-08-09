@@ -1,7 +1,7 @@
 # Stage 1: Build the Vue.js app
 FROM node:20 AS build-stage
 WORKDIR /app
-COPY ./.env /app/.env
+COPY /home/ubuntu/meshroom/S11P12A401/Frontend/lolmushroom/.env /app/.env
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -14,7 +14,7 @@ FROM nginx:alpine
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # Copy SSL certificates
-COPY ./ssl /etc/letsencrypt
+COPY /home/ubuntu/meshroom/S11P12A401/Frontend/lolmushroom/ssl /etc/letsencrypt
 
 # Copy Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
