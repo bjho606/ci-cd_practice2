@@ -1,22 +1,17 @@
-# Stage 1: Build the Vue.js app
 FROM node:20 AS build-stage
+
 WORKDIR /app
-COPY /.env /app/.env
 COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve the app with Nginx
 FROM nginx:alpine
 
-# Copy the built app from the build stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-# Copy SSL certificates
-COPY /home/ubuntu/meshroom/S11P12A401/Frontend/lolmushroom/ssl /etc/letsencrypt
-
-# Copy Nginx configuration
+# SSL 인증서와 Nginx 설정 파일은 Docker build context에서 복사합니다.
+COPY ./ssl /etc/letsencrypt
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
