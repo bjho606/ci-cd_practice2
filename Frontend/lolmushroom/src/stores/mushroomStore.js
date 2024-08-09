@@ -4,6 +4,11 @@ import bigNormal from '@/assets/mushroomGrow/BigNormal.svg'
 import midNormal from '@/assets/mushroomGrow/MidNormal.svg'
 import smallNormal from '@/assets/mushroomGrow/SmallNormal.svg'
 
+/**
+ * IMP : MushroomGrow Store
+ * * MushroomGrow Contents에 대한 전반적인 정보를 저장하고 있다.
+ * * Mushroom에 대한 정보는 Session Storage에 저장되지 않는다.
+ */
 export const useMushroomStore = defineStore('mushroomStore', {
   state: () => ({
     // IMP : Mushroom Size BreakPoints
@@ -32,16 +37,15 @@ export const useMushroomStore = defineStore('mushroomStore', {
      * RES fetchMushroomData()에서 설명
      */
     initSocketConnection(sessionId, subSessionId, groups) {
-      // groups는 초기 데이터를 가져와 Map에 설정
       groups.forEach((group) => {
         this.groupNameMap.set(group.sessionId, group.groupName)
-        this.mushroomMap.set(group.sessionId, 20) // 초기 사이즈 설정
+        this.mushroomMap.set(group.sessionId, 20)
       })
-      this.userGroup = this.currentGroup = subSessionId // UserGroup 설정
+      this.userGroup = this.currentGroup = subSessionId
       console.log('Connect 시도중')
       webSocketAPI.connect({
         sessionId: sessionId,
-        contentsName: 'touch',
+        contentsId: 'touch',
         onEventReceived: this.fetchMushroomData,
         subscriptions: ['game']
       })
@@ -53,7 +57,6 @@ export const useMushroomStore = defineStore('mushroomStore', {
      * @param {*} event
      * RES mainSessionId ( Main Session ), sessionId ( Sub Session ), size
      */
-    // 소켓으로부터 데이터를 수신하여 버섯 정보를 업데이트
     fetchMushroomData(event) {
       console.log(event)
       const { sessionId, size } = event
@@ -79,6 +82,7 @@ export const useMushroomStore = defineStore('mushroomStore', {
 
     /**
      * IMP 4. Other Group의 Mushroom 을 Click하면 CurrentGroup으로 전환된다.
+     * IMP 4.1 'Other Group'에서 UserGroup으로 전환할 수 있다.
      * REQ sessionId ( subSession ID )
      * @param {*} sessionId
      */
@@ -87,59 +91,28 @@ export const useMushroomStore = defineStore('mushroomStore', {
     },
     onReturnClick() {
       this.currentGroup = this.userGroup
-    },
-
-    /**
-     * ! Initialize mushroom data locally for testing purposes
-     */
-    initLocalData(subSessionId, groups) {
-      groups.forEach((group) => {
-        this.groupNameMap.set(group.sessionId, group.groupName)
-        this.mushroomMap.set(group.sessionId, 30) // Initial size set to 20
-      })
-      this.userGroup = this.currentGroup = subSessionId // Set the first group as the user's group
-    },
-    updateMushroomSize(sessionId, size) {
-      this.mushroomMap.set(sessionId, size)
-    },
-    onMushroomClickLocal(sessionId) {
-      const currentSize = this.mushroomMap.get(sessionId)
-      if (this.currentGroup === this.userGroup) {
-        this.mushroomMap.set(sessionId, currentSize + 1) // Increase size
-      } else {
-        this.mushroomMap.set(sessionId, currentSize - 1) // Decrease size
-      }
     }
   },
   getters: {
-    // Getter Of Current Group Id
     getCurrentGroup: (state) => {
       return state.currentGroup
     },
-    // Specific Group Id에 따른 Group Name
     getMushroomName: (state) => (groupId) => {
       return state.groupNameMap.get(groupId)
     },
-
-    // Specific Group Id에 따른 Group Size
     getMushroomSize: (state) => (groupId) => {
       return state.mushroomMap.get(groupId)
     },
-    // Mushroom Size에 따른 Mushroom Image 반환
     getMushroomImage: (state) => (size) => {
       if (size < state.midSize) return smallNormal
       if (size < state.finalSize) return midNormal
       return bigNormal
     },
-
-    // Mushroom Size에 따른 Mushroom Lv 반환
     getMushroomLevel: (state) => (size) => {
       if (size < state.midSize) return 1 // Small Level
       if (size < state.finalSize) return 2 // Mid Level
       return 3 // Final Level
     },
-
-    // 현재 그룹이 아닌 다른 그룹의 버섯 정보를 반환
     getOtherMushrooms: (state) => {
       const otherMushrooms = []
       state.mushroomMap.forEach((size, sessionId) => {
@@ -152,6 +125,17 @@ export const useMushroomStore = defineStore('mushroomStore', {
         }
       })
       return otherMushrooms
+    },
+    getAllMushrooms: (state) => {
+      const allMushrooms = []
+      state.mushroomMap.forEach((size, sessionId) => {
+        allMushrooms.push({
+          sessionId,
+          groupName: state.groupNameMap.get(sessionId),
+          size
+        })
+      })
+      return allMushrooms
     }
   }
 })

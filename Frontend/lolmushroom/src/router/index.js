@@ -14,7 +14,6 @@ import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
 import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
 
 const routes = [
-  // Home Route -> Session을 만드는 사람은 Manager가 된다.
   { path: '/', name: 'home', component: MakeSessionView },
 
   {

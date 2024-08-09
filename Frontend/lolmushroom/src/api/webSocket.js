@@ -1,12 +1,12 @@
 import { Client } from '@stomp/stompjs'
 const { VITE_API_WEBSOCKET_URL } = import.meta.env
 
-let stompClient = null
+let stompClient = null // IMP StompClient는 Singleton으로 관리한다.
 let subscriptionMap = new Map() // 구독을 관리할 Map 객체
 
 const connect = ({
   sessionId,
-  contentsName,
+  contentsId,
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
@@ -22,7 +22,7 @@ const connect = ({
     // 기존 연결 상태에서 새 구독 추가
     addSubscriptions(
       sessionId,
-      contentsName,
+      contentsId,
       onMessageReceived,
       onEventReceived,
       onProgressReceived,
@@ -47,7 +47,7 @@ const connect = ({
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
       addSubscriptions(
         sessionId,
-        contentsName,
+        contentsId,
         onMessageReceived,
         onEventReceived,
         onProgressReceived,
@@ -84,7 +84,7 @@ const connect = ({
 
 const addSubscriptions = (
   sessionId,
-  contentsName,
+  contentsId,
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
@@ -109,7 +109,7 @@ const addSubscriptions = (
         addProgressSubscription(sessionId, onProgressReceived)
         break
       case 'game':
-        addGameSubscription(sessionId, contentsName, onEventReceived)
+        addGameSubscription(sessionId, contentsId, onEventReceived)
         break
       case 'tof':
         addtofSubscription(sessionId, onSubmitEvent)
@@ -197,23 +197,23 @@ const addtofSubscription = (sessionId, onSubmitEvent) => {
 }
 
 /**
- * IMP : ContentsName을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
+ * IMP : ContentsId을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
  * @param {*} sessionId
- * @param {*} contentsName
+ * @param {*} contentsId
  * @param {*} onEventReceived
  */
-const addGameSubscription = (sessionId, contentsName, onEventReceived) => {
-  const gameKey = `game-${contentsName}`
+const addGameSubscription = (sessionId, contentsId, onEventReceived) => {
+  const gameKey = `game-${contentsId}`
   console.log('Mushroom Grow Game에 입장했습니다.')
 
   if (!subscriptionMap.has(gameKey)) {
     console.log(stompClient)
     console.log(sessionId)
-    console.log(contentsName)
+    console.log(contentsId)
     const gameSubscription = stompClient.subscribe(
-      `/subscribe/game/${contentsName}/${sessionId}`,
+      `/subscribe/game/${contentsId}/${sessionId}`,
       (event) => {
-        console.log(`Received event from ${contentsName} Subscribe`)
+        console.log(`Received event from ${contentsId} Subscribe`)
         if (onEventReceived) {
           onEventReceived(JSON.parse(event.body))
         }

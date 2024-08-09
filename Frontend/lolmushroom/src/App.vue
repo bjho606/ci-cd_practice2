@@ -1,7 +1,7 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
 import './assets/fonts.css'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
 import GlobalHeader from '@/components/common/GlobalHeader.vue'
@@ -9,6 +9,7 @@ import GlobalFooter from '@/components/common/GlobalFooter.vue'
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
+ * IMP : ContentsAPI.getContents()를 호출하는 fetchContents를 통해 Pinia에 저장
  */
 
 const contentsStore = useContentsStore()
@@ -17,7 +18,6 @@ const fetchContents = async () => {
     const response = await contentsAPI.getContents()
     console.log(response.data)
     if (response.data.isSuccess) {
-      console.log('Meshroom의 모든 Contents를 가져왔습니다:)')
       contentsStore.setContents(response.data.result.contents)
     }
   } catch (error) {
@@ -25,6 +25,9 @@ const fetchContents = async () => {
   }
 }
 
+/**
+ * * 2. 모든 사용자는 Meshroom이 OnMount될 때, Contents List를 내려받는다.
+ */
 onMounted(() => {
   fetchContents()
 })
@@ -32,7 +35,7 @@ onMounted(() => {
 
 <template>
   <v-app id="v-app">
-    <!-- Navigation Drawer는 그룹 컨텐츠 / 그룹 대항전 컨텐츠 여부에 따라 달라져야 함-->
+    <!-- IMP : 현재 의도는 Navigation Drawer가 Group / GroupFight 여부에 따라 달라지는 것 -->
     <v-navigation-drawer :width="10" permanent> </v-navigation-drawer>
     <v-navigation-drawer :width="10" location="right" permanent></v-navigation-drawer>
     <GlobalHeader />
@@ -60,7 +63,7 @@ onMounted(() => {
 }
 
 .container {
-  max-width: calc(100% - 20vw); /* => 그룹 세션 / 그룹 대항전 여부에 따라 달라져야함 */
+  max-width: calc(100% - 20vw); /* => Group / Group Fight 여부에 따라 달라져야함 */
   height: 100%; /* Ensure the container takes full height */
   position: relative;
   overflow: visible;

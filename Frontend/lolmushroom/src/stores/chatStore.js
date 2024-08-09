@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
 
+/**
+ * IMP : 채팅에 대한 정보를 저장하는 Store
+ * IMP mainSessionMessages : 전체 Group의 Messages
+ * IMP subSessionMessages : 각 Group의 Messages
+ * * currentMode : 현재 Chatting의 Mode ( 'All' / 'Group' )
+ * * Chatting 정보는 Session Storage에 저장된다.
+ */
+
 export const useChatStore = defineStore('chat', {
   state: () => ({
     mainSessionMessages: [],
