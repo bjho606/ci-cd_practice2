@@ -17,4 +17,5 @@ public class SubSessionInfoResponse {
     private Long currentUserCount;
     private List<String> username;
     private Boolean isReady;
+    private String teamLeaderId;
 }
