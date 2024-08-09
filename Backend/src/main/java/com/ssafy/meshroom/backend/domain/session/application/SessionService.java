@@ -18,7 +18,7 @@ import io.openvidu.java.client.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +43,9 @@ public class SessionService {
     private final OpenViduService openViduService;
     private final TokenProvider tokenProvider;
     private final OVTokenService ovTokenService;
+    private final OVTokenRepository ovTokenRepository;
     private final User user;
+    private final DelegatingFilterProxyRegistrationBean securityFilterChainRegistration;
 
     @Transactional
     public Response<SessionCreateResponse> createSession(List<String> contents) throws OpenViduJavaClientException, OpenViduHttpException {
@@ -102,6 +104,7 @@ public class SessionService {
         Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         com.ssafy.meshroom.backend.domain.session.domain.Session meshSession = sessionRepository.findBySessionId(sessionId).orElseThrow(SessionNotExistException::new);
         long curCount = ovTokenService.getUserCountInSession(meshSession.get_id());
+        long currCount = ovTokenService.setUserCurCount(meshSession.get_id());
 
         AtomicReference<Boolean> isMain = new AtomicReference<>();
         AtomicReference<UserRole> userRole = new AtomicReference<>(UserRole.PARTICIPANT);
@@ -141,13 +144,13 @@ public class SessionService {
             String jwtToken = tokenProvider.generateToken(userId, Duration.ofDays(10L));
             CookieUtil.addCookie(response, "token", jwtToken);
             log.info("토큰 새로 발급합니다잇!");
-        }else{
+        } else {
             // 메인이 아닌데 하부세션에 들어간다? => 예외 발생
-            if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken){
+            if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
                 throw new UsernameNotFoundException("존재하지 않은 유저입니다.");
             }
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
-            userDetailService.updateUser(userId,userRole.get());
+            userDetailService.updateUser(userId, userRole.get());
         }
 
         // 3-2. session 접속 토큰 발행
@@ -160,19 +163,19 @@ public class SessionService {
         String token = connection.getToken(); // Send this string to the client side
 
         // 4. user 컬렉션과 token 컬렉션에 관계 추가
-        if(!ovTokenService.checkIfTokenExists(userId, sessionAtomicReference.get().get_id())){
-            ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
+        if (!ovTokenService.checkIfTokenExists(userId, sessionAtomicReference.get().get_id())) {
+            ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token, currCount);
         }
 
-        if(isMain.get()){
+        if (isMain.get()) {
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
-        }else{
+        } else {
             String mainSessionId = sessionAtomicReference.get().getMainSession();
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + mainSessionId, getSessionInfo(mainSessionId).getResult());
         }
 
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
-                , new ConnectionCreateResponse(token));
+                , new ConnectionCreateResponse(token, userId));
     }
 
     @Transactional
@@ -226,6 +229,9 @@ public class SessionService {
                             .isReady(session.getIsReady())
                             .username(
                                     ovTokenService.getUsersInSession(session.get_id())
+                            )
+                            .teamLeaderId(
+                                    ovTokenService.findTeamLeader(session.get_id())
                             )
                             .build()
                     );

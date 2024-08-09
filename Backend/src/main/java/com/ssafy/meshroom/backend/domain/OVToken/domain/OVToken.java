@@ -10,10 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @Builder
-@Document(collection="ovTokens")
+@Document(collection = "ovTokens")
 public class OVToken {
     @Id
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String _id;
 
     private String userSid;
@@ -21,4 +21,6 @@ public class OVToken {
     private String sessionSid;
 
     private String ovToken;
+
+    private Long currCount;
 }
