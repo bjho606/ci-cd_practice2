@@ -37,18 +37,20 @@ export const useRoomStore = defineStore('room', {
       this.setRooms(sessionData.groups)
     },
     setRooms(groups) {
-      groups.forEach((group, index) => {
-        this.rooms[index] = {
-          sessionId: group.sessionId,
-          groupName: group.groupName,
-          capacity: group.maxUserCount,
-          occupants: group.currentUserCount,
-          users: group.users,
-          isReady: group.isReady,
-          buttonClicked: true
-        }
-        this.activeButtonIndex = index + 1
-      })
+      this.rooms = groups
+      this.activeButtonIndex = groups.length + 1
+      // groups.forEach((group, index) => {
+      //   this.rooms[index] = {
+      //     sessionId: group.sessionId,
+      //     groupName: group.groupName,
+      //     capacity: group.maxUserCount,
+      //     occupants: group.currentUserCount,
+      //     users: group.users,
+      //     isReady: group.isReady,
+      //     buttonClicked: true
+      //   }
+      //   this.activeButtonIndex = index + 1
+      // })
     }
   },
   getters: {

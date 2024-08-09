@@ -5,7 +5,6 @@ import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
 import GlobalHeader from '@/components/common/GlobalHeader.vue'
-import GlobalFooter from '@/components/common/GlobalFooter.vue'
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
@@ -36,42 +35,42 @@ onMounted(() => {
 <template>
   <v-app id="v-app">
     <!-- IMP : 현재 의도는 Navigation Drawer가 Group / GroupFight 여부에 따라 달라지는 것 -->
-    <v-navigation-drawer :width="10" permanent> </v-navigation-drawer>
-    <v-navigation-drawer :width="10" location="right" permanent></v-navigation-drawer>
+    <v-navigation-drawer :width="20" permanent> </v-navigation-drawer>
+    <v-navigation-drawer :width="20" location="right" permanent></v-navigation-drawer>
     <GlobalHeader />
-    <v-main class="d-flex align-center justify-center background">
-      <v-container class="container">
+    <v-main class="d-flex align-center justify-center">
+      <v-container>
         <RouterView></RouterView>
       </v-container>
       <div class="mushroomGreen mushroom-1"></div>
       <div class="mushroomOrange mushroom-2"></div>
       <div class="mushroomRed mushroom-3"></div>
     </v-main>
-    <!-- <GlobalFooter /> -->
   </v-app>
 </template>
 
 <style scoped>
-.background {
-  background-image: url('@/assets/origbig.png');
-  background-size: cover; /* Cover the entire background */
-  background-position: center; /* Center the background image */
-  background-attachment: fixed; /* Fix the background image */
-  background-repeat: no-repeat; /* Ensure the background does not repeat */
-  min-height: 100vh; /* Ensure the background covers the viewport height */
-  position: relative;
-}
-
-.container {
-  max-width: calc(100% - 20vw); /* => Group / Group Fight 여부에 따라 달라져야함 */
-  height: 100%; /* Ensure the container takes full height */
+/* .container {
+  max-width: calc(100%);
+  height: 100%;
   position: relative;
   overflow: visible;
-}
+} */
+
+/* .background {
+  background-image: url('@/assets/origbig.png');
+  background-size: cover; 
+  background-position: center; 
+  background-attachment: fixed; 
+  background-repeat: no-repeat; 
+  min-height: 100vh; 
+  position: relative;
+} */
+/* Mushroom Moving CSS
 .mushroomGreen {
   width: 50px;
   height: 43px;
-  background-image: url('@/assets/mushroom1.svg'); /* Replace with the actual path to mushroom image */
+  background-image: url('@/assets/mushroom1.svg'); 
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
@@ -80,7 +79,7 @@ onMounted(() => {
 .mushroomOrange {
   width: 50px;
   height: 43px;
-  background-image: url('@/assets/mushroom2.svg'); /* Replace with the actual path to mushroom image */
+  background-image: url('@/assets/mushroom2.svg'); 
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
@@ -89,7 +88,7 @@ onMounted(() => {
 .mushroomRed {
   width: 50px;
   height: 43px;
-  background-image: url('@/assets/mushroom3.svg'); /* Replace with the actual path to mushroom image */
+  background-image: url('@/assets/mushroom3.svg'); 
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
@@ -165,5 +164,5 @@ onMounted(() => {
   100% {
     left: 20%;
   }
-}
+} */
 </style>

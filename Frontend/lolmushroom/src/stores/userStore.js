@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', {
     userNickname: '닉네임을 설정해주세요',
     isTeamLeader: false,
     isStarted: false,
-    userOvToken: ref('undefined')
+    userOvToken: null
   }),
   actions: {
     setUserId(userId) {
@@ -27,11 +27,14 @@ export const useUserStore = defineStore('user', {
     },
     setIsStarted() {
       this.isStarted = true
+    },
+    setOvToken(userOvToken) {
+      this.userOvToken = userOvToken
     }
   },
   persist: {
     key: 'user-store',
     storage: sessionStorage,
-    paths: ['userNickname', 'isTeamLeader', 'isStarted', 'userOvToken']
+    paths: ['userId', 'userNickname', 'isTeamLeader', 'isStarted', 'userOvToken']
   }
 })
