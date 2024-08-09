@@ -1,5 +1,17 @@
 import { defineStore } from 'pinia'
 
+/**
+ * IMP : Contents Store
+ * * Meshroom의 Contents Progress에 대한 전반적인 진행 상태를 저장한다.
+ * * contents : Meshroom의 Contents List를 가져온다.
+ * IMP routeMapping : CurrentContentsId에 따라, Mapping해야 하는 Component Name에 대한 Map
+ * IMP currentContentsId : currentContents의 ID Value
+ * * contentsSequence : 지금 Contents는 선택된 Contents Curation에서 몇번째 인가?
+ * * totalContentsCount : Contents Curation에서 선택된 Contents는 몇 개인가?
+ * IMP finishGroupCount : 현재 Contents를 마친, Group은 몇 개인가?
+ * * totalGroupCount : 현재 Contents를 진행하고 있는 Group은 몇개인가?
+ * IMP currentGroupState : 모든 Group들의 상태에 대한 Information Array => ( subSessionId, isFinish )
+ */
 export const useContentsStore = defineStore('contents', {
   state: () => ({
     contents: [],

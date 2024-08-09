@@ -80,7 +80,7 @@ const createSessionHandler = async () => {
 const goToSession = async () => {
   const sessionId = sessionStore.sessionId
   await getSessionConnection(sessionId, { userName: 'Manager' })
-  router.push({ name: 'managerwaiting', params: { sessionId: sessionId } })
+  router.push({ name: 'roomwatching', params: { sessionId: sessionId } })
 }
 </script>
 

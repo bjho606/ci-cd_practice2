@@ -1,15 +1,17 @@
 import { defineStore } from 'pinia'
 
 /**
- * Progress Socket Subscribe -> Session에 대한 종합적인 정보
- * RES maxUserCount, currentUserCount, URL, GroupsArray
- * IMP : GroupsArray : ( sessionId, groupName, maxUserCount, currentUserCount, UsersArray)
+ * IMP RoomStore
+ * * Progress Socket Subscribe -> Main Session의 현재 상황에 대한 종합적인 정보를 가져온다.
+ * * 1. activeButtonIndex : 활성화된 Room의 Index를 표시한다. (=> 활성화 Group + 1)
+ * * 2. maxUserCount : 현재 Main Session가 수용할 수 있는 최대 참여자를 체크한다.
+ * * 3. currentUserCount : 현재 Main Session에 참여자가 몇명 있는 지 체크한다.
+ * * 4. url : 현재 Main Session에 대한 URL을 가져온다.
+ * IMP roomCount : 전체 Room의 개수를 나타낸다.
+ * IMP rooms : Main Session의 정보를 바탕으로 갱신한 Room에 대한 정보
+ * ! sessionId, groupName, capacity, occupants, users, isReady, buttonClicked
+ * * Room Store에 대한 정보는 Session Storage에 저장된다.
  */
-
-/**
- * TODO : roomStore을 SubScribe된 Data로 받아내야 한다.
- */
-
 export const useRoomStore = defineStore('room', {
   state: () => ({
     activeButtonIndex: 0,
