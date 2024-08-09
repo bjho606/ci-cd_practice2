@@ -22,6 +22,8 @@ public class TFInfo {
     private String userName;
     private String ovToken;
     private String sessionId;
-    private ArrayList<String> truths;
-    private String false1;
+//    private ArrayList<String> truths;
+//    private String false1;
+    private ArrayList<String> statements;
+    private int falseIndex;
 }

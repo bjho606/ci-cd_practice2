@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,19 +28,23 @@ public class TrueOrFalseService {
                 .orElseThrow(() -> new RuntimeException("유저 없음"))
                 .getUsername();
 
+        ArrayList<String> mixedStatements = new ArrayList<>(tfInfoCreateRequest.getTruths());
+        int falseIndex = (int)(Math.random()*10) % tfInfoCreateRequest.getTruths().size();
+        mixedStatements.add(falseIndex, tfInfoCreateRequest.getFalse1());
+
         TFInfo newTFInfo = TFInfo.builder()
                             .userName(userName)
                             .ovToken(tfInfoCreateRequest.getOvToken())
                             .sessionId(sessionId)
-                            .truths(tfInfoCreateRequest.getTruths())
-                            .false1(tfInfoCreateRequest.getFalse1())
+                            .statements(mixedStatements)
+                            .falseIndex(falseIndex)
                         .build();
 
         if (trueOrFalseRepository.existsByOvTokenAndSessionId(tfInfoCreateRequest.getOvToken(), sessionId)) {
             TFInfo foundTFInfo = trueOrFalseRepository.findByOvTokenAndSessionId(tfInfoCreateRequest.getOvToken(), sessionId)
                             .orElseThrow(() -> new RuntimeException("정보가 존재하지 않음"));
-            foundTFInfo.setTruths(tfInfoCreateRequest.getTruths());
-            foundTFInfo.setFalse1(tfInfoCreateRequest.getFalse1());
+            foundTFInfo.setStatements(mixedStatements);
+            foundTFInfo.setFalseIndex(falseIndex);
             trueOrFalseRepository.save(foundTFInfo);
         } else {
             trueOrFalseRepository.save(newTFInfo);
