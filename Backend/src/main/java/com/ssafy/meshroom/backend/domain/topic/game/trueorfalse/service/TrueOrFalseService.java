@@ -1,13 +1,9 @@
 package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.service;
 
-import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
-import com.ssafy.meshroom.backend.domain.OVToken.domain.OVToken;
-import com.ssafy.meshroom.backend.domain.session.dto.SessionCreateResponse;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dao.TrueOrFalseRepository;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.domain.TFInfo;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.*;
 import com.ssafy.meshroom.backend.domain.user.dao.UserRepository;
-import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +56,7 @@ public class TrueOrFalseService {
     public Response<AllTFInfosResponse> getAllTFInfo(String sessionId) {
         List<TFInfo> tfInfoList = trueOrFalseRepository.findAllBySessionId(sessionId)
                 .orElseThrow(() -> new RuntimeException("해당 세션ID이 없습니다."));
-        System.out.println(tfInfoList.stream().toString());
+        log.info("true or false info : " + tfInfoList.stream().toString());
 
         List<TFInfoResponse> allTFInfos = tfInfoList.stream()
                 .map(TFInfoResponse::from)
