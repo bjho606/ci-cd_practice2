@@ -1,5 +1,6 @@
 package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.service;
 
+import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dao.TrueOrFalseRepository;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.domain.TFInfo;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.*;
@@ -7,6 +8,8 @@ import com.ssafy.meshroom.backend.domain.user.dao.UserRepository;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +21,9 @@ import java.util.List;
 public class TrueOrFalseService {
     private final TrueOrFalseRepository trueOrFalseRepository;
     private final UserRepository userRepository;
+
+    private final RedisTemplate<String, Integer> redisTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public Response<TFInfoCreateResponse> createTFInfo(String sessionId, String userSid, TFInfoCreateRequest tfInfoCreateRequest) {
         String userName = userRepository.findById(userSid)
@@ -65,5 +71,37 @@ public class TrueOrFalseService {
         return new Response<AllTFInfosResponse>(true, 2000L, "SUCCESS",
                 new AllTFInfosResponse(allTFInfos)
         );
+    }
+
+    public void sendSignalToAdministrator(String sessionId, int curStep, Boolean isDone) {
+        String redisKey = "tf-" + sessionId + "-" + curStep;
+
+        Integer curCount = redisTemplate.opsForValue().get(redisKey);
+
+        if (curCount == null) {
+            curCount = 1;
+        } else {
+            curCount += 1;
+        }
+        redisTemplate.opsForValue().set(redisKey, curCount);
+
+        TFAdministratorSignal signalForAdministrator = new TFAdministratorSignal();
+        signalForAdministrator.setSessionId(sessionId);
+        signalForAdministrator.setCurStep(curStep);
+        switch (curStep) {
+            case 1:
+                signalForAdministrator.setSubmitCount(curCount);
+                signalForAdministrator.setFinishCount(0);
+                break;
+            case 2:
+                signalForAdministrator.setSubmitCount(0);
+                signalForAdministrator.setFinishCount(curCount);
+                break;
+            default:
+                signalForAdministrator.setSubmitCount(0);
+                signalForAdministrator.setFinishCount(0);
+        }
+
+        messagingTemplate.convertAndSend("/subscribe/manage/game/tf", signalForAdministrator);
     }
 }

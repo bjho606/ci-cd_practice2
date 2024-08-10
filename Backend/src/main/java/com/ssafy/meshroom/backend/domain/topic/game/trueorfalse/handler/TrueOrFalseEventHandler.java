@@ -31,7 +31,6 @@ import java.security.Principal;
 public class TrueOrFalseEventHandler {
     private final TrueOrFalseService trueOrFalseService;
     private final UserDetailService userDetailService;
-//    private final SimpMessagingTemplate messagingTemplate;
 
     @Operation(
             summary = "진실or거짓 진술서 생성",
@@ -98,7 +97,8 @@ public class TrueOrFalseEventHandler {
     public Boolean handleSubmitTF(@DestinationVariable String sessionId, Boolean isDone) {
         log.info("submit signal recieved : " + sessionId + " - " + isDone);
 
-//        messagingTemplate.convertAndSend("/subscribe/game/tf/question", isDone);
+        sendToAdministrator(sessionId, 1, isDone);
+
         return isDone;
     }
 
@@ -122,13 +122,21 @@ public class TrueOrFalseEventHandler {
     @SendTo("/subscribe/game/tf/next/{sessionId}")
     public Boolean handleNextTF(@DestinationVariable String sessionId, Boolean isDone) {
         log.info("presentation finished signal recieved : " + sessionId + " - " + isDone);
+
+        sendToAdministrator(sessionId, 2, isDone);
+
         return isDone;
     }
 
-    @MessageMapping("/game/tf/finish")
-    @SendTo("/subscribe/game/tf/finish")
-    public String handleFinishTF(String sessionId) {
-        log.info("finished signal recieved : " + sessionId);
-        return sessionId;
+    // (DEPRECATED) 팀장이 진행자에게 자기 세션의 컨텐츠 진행이 끝났음을 알림
+//    @MessageMapping("/game/tf/finish")
+//    @SendTo("/subscribe/game/tf/finish")
+//    public String handleFinishTF(String sessionId) {
+//        log.info("finished signal recieved : " + sessionId);
+//        return sessionId;
+//    }
+
+    public void sendToAdministrator(String sessionId, int curStep, Boolean isDone) {
+        trueOrFalseService.sendSignalToAdministrator(sessionId, curStep, isDone);
     }
 }
