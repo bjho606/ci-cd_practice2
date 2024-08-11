@@ -12,9 +12,13 @@ import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGrowContainer.vue'
 import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
 import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
+import StartPage from '@/components/setting/_0StartPage.vue'
+import CurationPage from '@/components/setting/_1CurationPage.vue'
+import SessionCode from '@/components/setting/_2SessionCode.vue'
 
 const routes = [
-  { path: '/', name: 'home', component: MakeSessionView },
+  // { path: '/', name: 'home', component: MakeSessionView },
+  { path: '/', name: 'home', component: CurationPage },
 
   {
     path: '/admin/:sessionId',

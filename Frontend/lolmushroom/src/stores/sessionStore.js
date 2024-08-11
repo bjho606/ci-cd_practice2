@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+const { VITE_BASE_URL } = import.meta.env
 
 /**
  * IMP : SessionStore 정의
@@ -8,7 +9,8 @@ import { defineStore } from 'pinia'
 export const useSessionStore = defineStore('sessionInfo', {
   state: () => ({
     sessionId: null,
-    subSessionId: null
+    subSessionId: null,
+    sessionUrl: null
   }),
   actions: {
     setSessionId(sessionId) {
@@ -16,10 +18,15 @@ export const useSessionStore = defineStore('sessionInfo', {
     },
     setSubSessionId(subSessionId) {
       this.subSessionId = subSessionId
+    },
+    setSessionUrl(sessionId) {
+      this.sessionUrl = `${VITE_BASE_URL}/${sessionId}`
     }
   },
   getters: {
-    getSubSessionId: (state) => state.subSessionId
+    getSessionId: (state) => state.sessionId,
+    getSubSessionId: (state) => state.subSessionId,
+    getSessionUrl: (state) => state.sessionUrl
   },
   persist: {
     key: 'session-info-store',
