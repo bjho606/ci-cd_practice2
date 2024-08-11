@@ -63,7 +63,8 @@ onMounted(() => {
 }
 
 .container {
-  max-width: calc(100% - 20vw); /* => Group / Group Fight 여부에 따라 달라져야함 */
+  /* max-width: calc(100% - 20vw); => Group / Group Fight 여부에 따라 달라져야함 */
+  max-width: 100%; /* => Group / Group Fight 여부에 따라 달라져야함 */
   height: 100%; /* Ensure the container takes full height */
   position: relative;
   overflow: visible;
