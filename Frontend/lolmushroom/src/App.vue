@@ -4,8 +4,7 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
-import GlobalHeader from '@/components/common/GlobalHeader.vue'
-
+import PlayerWatingGround from './components/room/playerWating/PlayerWatingGround.vue'
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
  * IMP : ContentsAPI.getContents()를 호출하는 fetchContents를 통해 Pinia에 저장
@@ -40,7 +39,8 @@ onMounted(() => {
     <GlobalHeader />
     <v-main class="d-flex align-center justify-center">
       <v-container>
-        <RouterView></RouterView>
+        <!--<RouterView></RouterView>-->
+        <PlayerWatingGround />
       </v-container>
       <div class="mushroomGreen mushroom-1"></div>
       <div class="mushroomOrange mushroom-2"></div>

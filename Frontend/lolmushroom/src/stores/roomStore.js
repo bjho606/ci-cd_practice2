@@ -18,8 +18,8 @@ export const useRoomStore = defineStore('room', {
     maxUserCount: 0,
     currentUserCount: 0,
     url: '',
-    roomCount: 10,
-    rooms: Array.from({ length: 10 }, () => ({
+    roomCount: 0,
+    rooms: Array.from({ length: 0 }, () => ({
       sessionId: '',
       groupName: '',
       capacity: 10,
