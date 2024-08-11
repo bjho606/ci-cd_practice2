@@ -3,27 +3,27 @@
 const users = [
   {
     name: '나이스한 강아지',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
   {
     name: '재빠른 날다람쥐',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
   {
     name: '영민한 뱅갈호랑이',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
   {
     name: '얍삽한 치타',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
   {
     name: '여유로운 오징어',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
   {
     name: '거대한 사막여우',
-    src: '../../public/favicon.ico',
+    src: 'public/favicon.ico',
   },
 ]
 </script>

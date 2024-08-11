@@ -51,7 +51,8 @@ const getSessionConnection = async (sessionId, userName) => {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      userStore.userOvToken = response.data.result['ovToken'].slice(-16)
+      // userStore.userOvToken = response.data.result['ovToken'].slice(-20)
+      userStore.userOvToken = response.data.result['ovToken']
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -166,7 +167,8 @@ onMounted(async () => {
   display: flex; /* Use Flexbox for layout */
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
-  background-color: rgba(224, 224, 224, 0.6);
+  background: #E7FFDE;
+  /* background-color: rgba(224, 224, 224, 0.6); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
   position: absolute; /* Position absolutely within parent */
   overflow: hidden;

@@ -13,6 +13,7 @@
 
 
 <template>
+  <!-- 컨텐츠 진행 중 다른 사용자를 기다리는 컴포넌트 -->
   <img src="../../assets/joker.gif" alt="joker" style="display: block;">
   <v-progress-linear
   color="black"

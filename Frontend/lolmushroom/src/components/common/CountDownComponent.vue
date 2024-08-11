@@ -50,5 +50,6 @@
   .countdown-tooltip h1 {
     font-size: 40px;
     margin: 10px 0;
+    color: '#FFFFFF';
   }
 </style>
