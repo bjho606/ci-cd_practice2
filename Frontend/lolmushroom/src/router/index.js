@@ -10,8 +10,8 @@ import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGrowContainer.vue'
-import TOFInputsComponent from '@/components/contents/TOFInputsComponent.vue'
-import TOFMainComponent from '@/components/contents/TOFMainComponent.vue'
+import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
+import TOFMainComponent from '@/components/contents/tof/TOFMainComponent.vue'
 
 const routes = [
   { path: '/', name: 'home', component: MakeSessionView },
@@ -36,7 +36,7 @@ const routes = [
         path: ':subSessionId/GroupSessionView',
         component: GroupSessionView,
         children: [
-          { path: 'TOF', name: 'TOF', component: TOFInputsComponent },
+          { path: 'TOF', name: 'TOF', component: TOFInputComponent },
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent }
         ]
       },
