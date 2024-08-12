@@ -55,9 +55,12 @@ const startSession = async () => {
   // 두 번째 라우트로 라우팅하며 새로운 창 열기
   sessionStore.setSessionUrl(sessionStore.getSessionId)
   const sessioncodeUrl = router.resolve({
-    name: 'sessioncode'
+    name: 'sessioncode',
+    query: {
+      sessionUrl: sessionStore.getSessionUrl
+    }
   }).href
-  window.open(sessioncodeUrl, '_blank', 'width=800,height=600')
+  window.open(sessioncodeUrl, '_blank', 'width=1200,height=800')
 }
 
 const formattedDuration = computed(() => {

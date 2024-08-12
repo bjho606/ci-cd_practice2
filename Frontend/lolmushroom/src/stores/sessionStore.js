@@ -10,11 +10,12 @@ export const useSessionStore = defineStore('sessionInfo', {
   state: () => ({
     sessionId: null,
     subSessionId: null,
-    sessionUrl: VITE_BASE_URL
+    sessionUrl: ''
   }),
   actions: {
     setSessionId(sessionId) {
       this.sessionId = sessionId
+      this.setSessionUrl(sessionId)
     },
     setSubSessionId(subSessionId) {
       this.subSessionId = subSessionId
