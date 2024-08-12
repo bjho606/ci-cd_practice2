@@ -4,6 +4,7 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
+import watingHeader from './components/room/playerWating/watingHeader.vue'
 import PlayerNicknameSetting from './components/room/playerWating/PlayerNicknameSetting.vue'
 
 /**

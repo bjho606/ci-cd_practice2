@@ -10,7 +10,7 @@ const props = defineProps({
 })
 
 const mushroomStore = useMushroomStore()
-const mushroomImage = computed(() => mushroomStore.getMushroomImage(props.group.size))
+const mushroomImage = computed(() => mushroomStore.getMushroomImage(props.group.sessionId))
 const mushroomSize = computed(() => `${props.group.size / 4}vw`) // MainMushroom과 비율을 고려하여 크기 조정
 
 const onChangeClick = () => {

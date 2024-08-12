@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import webSocketAPI from '@/api/webSocket'
+import blueBall from '@/assets/ballGrow/BlueBall.svg'
+import greenBall from '@/assets/ballGrow/GreenBall.svg'
 /**
  * IMP : MushroomGrow Store
  * * MushroomGrow Contents에 대한 전반적인 정보를 저장하고 있다.
@@ -99,15 +101,13 @@ export const useMushroomStore = defineStore('mushroomStore', {
     getMushroomSize: (state) => (groupId) => {
       return state.mushroomMap.get(groupId)
     },
-    getMushroomImage: (state) => (size) => {
-      if (size < state.midSize) return smallNormal
-      if (size < state.finalSize) return midNormal
-      return bigNormal
-    },
-    getMushroomLevel: (state) => (size) => {
-      if (size < state.midSize) return 1 // Small Level
-      if (size < state.finalSize) return 2 // Mid Level
-      return 3 // Final Level
+    getMushroomImage: (state) => (groupId) => {
+      // groupId가 userGroup과 같으면 green ball 이미지를 반환
+      if (groupId === state.userGroup) {
+        return greenBall
+      }
+      // groupId가 userGroup과 다르면 blue ball 이미지를 반환
+      return blueBall
     },
     getOtherMushrooms: (state) => {
       const otherMushrooms = []

@@ -162,8 +162,4 @@ onMounted(async () => {
   />
 </template>
 
-<style scoped>
-.main {
-  padding: 2%;
-}
-</style>
+<style scoped></style>
