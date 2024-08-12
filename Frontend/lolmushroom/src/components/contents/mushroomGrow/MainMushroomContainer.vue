@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useMushroomStore } from '@/stores/mushroomStore'
-import StatusBar from './StatusBar.vue'
 
 const sessionStore = useSessionStore()
 const mushroomStore = useMushroomStore()
@@ -11,11 +10,6 @@ const currentGroupName = computed(() => mushroomStore.getMushroomName(currentGro
 const currentGroupSize = computed(() => mushroomStore.getMushroomSize(currentGroup.value))
 const currentGroupImage = computed(() => mushroomStore.getMushroomImage(currentGroupSize.value))
 
-/**
- * IMP 1. User의 Main Mushroom을 Click에 대한 EventHandler
- * * 1. Click에 대한 Effect를 정의
- * * 2. Click 정보를 Publish하는 mushroomStore의 onMushroomClick()
- */
 const clickEffect = ref(false)
 const clickPosition = ref({ x: 0, y: 0 })
 const onMushroomClick = (event) => {
@@ -28,74 +22,91 @@ const onMushroomClick = (event) => {
   setTimeout(() => (clickEffect.value = false), 200)
   mushroomStore.onMushroomClick(sessionStore.sessionId, currentGroup.value)
 }
-/**
- * TODO StatusBar
- * TODO onReturnClick
- */
 </script>
 
 <template>
-  <v-card class="solo-mushroom-card">
-    <!-- 상단에 현재 그룹 정보를 표시 -->
-    <v-card-title>{{ currentGroupName }}</v-card-title>
-    <v-card-text>Size: {{ currentGroupSize }}</v-card-text>
+  <div class="game-container">
+    <!-- 맨 위: 타이머 -->
+    <div class="timer-container">
+      <p>남은 시간: 00:59</p> <!-- 타이머 자리 -->
+    </div>
 
-    <!-- 버섯 이미지 클릭 -->
-    <div class="mushroom-container" @click="onMushroomClick">
-      <v-img
-        :src="currentGroupImage"
-        :style="{ width: currentGroupSize + 'vw', height: currentGroupSize + 'vw' }"
-        class="mushroom-image"
-      />
-      <!-- 클릭 효과 -->
-      <div
-        v-if="clickEffect"
-        class="click-effect"
-        :style="{ top: clickPosition.y + 'px', left: clickPosition.x + 'px' }"
-      >
-        {{ currentGroup === mushroomStore.userGroup ? '❤️' : '💥' }}
+    <!-- 가운데: 메인 버섯 카드 -->
+    <div class="solo-mushroom-card">
+      <!-- 버섯 이미지 클릭 -->
+      <div class="mushroom-container" @click="onMushroomClick">
+        <!-- 이미지 넣어야 할 자리 -->
+        <!-- 클릭 효과 -->
+        <div
+          v-if="clickEffect"
+          class="click-effect"
+          :style="{ top: clickPosition.y + 'px', left: clickPosition.x + 'px' }"
+        >
+          {{ currentGroup === mushroomStore.userGroup ? '❤️' : '💥' }}
+        </div>
       </div>
     </div>
 
-    <!-- 돌아가기 버튼 -->
-    <v-card-actions>
-      <v-btn
+    <!-- 맨 아래: 돌아가기 버튼 -->
+    <div class="card-actions">
+      <p>내 그룹으로 돌아가기</p>
+      <button
         v-if="currentGroup !== mushroomStore.userGroup"
         @click="mushroomStore.onReturnClick"
-        class="mx-auto"
+        class="return-button"
       >
-        돌아가기
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+        그룹으로 돌아가기
+      </button>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh; /* 화면 전체 높이 사용 */
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+.timer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 10%; /* 화면 높이의 10% 할당 */
+  background-color: #90FF77;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
 .solo-mushroom-card {
-  height: 100%;
+  width: 90%;
+  flex-grow: 1; /* 나머지 공간을 모두 차지하도록 */
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto;
-  padding: 20px;
   position: relative;
+  background-color: white;
+  margin-bottom: 16px;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .mushroom-container {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   width: 100%;
-  height: auto;
-  margin: 20px 0;
-}
-
-.mushroom-image {
-  cursor: pointer;
+  height: 100%;
 }
 
 .click-effect {
@@ -103,5 +114,23 @@ const onMushroomClick = (event) => {
   font-size: 48px;
   pointer-events: none;
   transform: translate(-50%, -50%);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: center;
+  width: 40%;
+  height: 10%; /* 화면 높이의 10% 할당 */
+  background-color: #24A319;
+}
+
+.return-button {
+  background-color: #1976d2;
+  color: #24A319;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
 }
 </style>

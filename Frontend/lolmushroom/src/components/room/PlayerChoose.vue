@@ -68,6 +68,7 @@ const createSubSessionHandler = async (sessionId) => {
  */
 const handleRoomClick = async (index) => {
   const room = rooms.value[index]
+  console.log(room)
   if (!room.buttonClicked) {
     await createSubSessionHandler(sessionStore.sessionId)
     sessionStore.setSessionId(sessionStore.sessionId)
@@ -95,51 +96,37 @@ onMounted(async () => {})
 </script>
 
 <template>
-  <div>
-    <v-row>
-      <v-col v-for="(room, index) in rooms" :key="index" cols="12" md="6">
-        <template v-if="!room.buttonClicked">
-          <v-btn
-            :disabled="index > activeButtonIndex"
-            @click="handleRoomClick(index)"
-            size="x-large"
-            width="300"
-            height="100"
-            rounded="lg"
-            block
-            color="#e9ecef"
-            class="mb-2"
-            style="opacity: 0.7"
-          >
-            <div class="mr">
-              <v-icon icon="$plus"></v-icon>
-            </div>
-          </v-btn>
-        </template>
-        <template v-else>
-          <v-btn
-            @click="handleRoomClick(index)"
-            size="x-large"
-            width="300"
-            height="100"
-            rounded="lg"
-            block
-            color="#e9ecef"
-            class="mb-2"
-          >
-            <b>{{ room.groupName || `그룹${index + 1}` }}</b>
-            <div class="mr">
-              <span v-if="room.isReady" class="ready-status"> (준비 완료) </span
-              >{{ room.occupants }}/{{ room.capacity }}
-            </div>
-            <div class="mr">
-              <v-icon icon="$next"></v-icon>
-            </div>
-          </v-btn>
-        </template>
-      </v-col>
-    </v-row>
-  </div>
+  <v-container>
+    <v-slide-group show-arrows>
+      <v-slide-item v-for="(room, index) in rooms" :key="index">
+        <v-card class="mx-4" color="grey lighten-4" width="250" height="200">
+          <v-card-title>{{ room.isReady ? '준비' : '미준비' }}</v-card-title>
+          <v-card-subtitle>{{ room.groupName }}</v-card-subtitle>
+          <v-card-actions>
+            <v-btn @click="handleRoomClick(index)" text>입장</v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-list v-for="user in room.users" :key="user" dense>
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>{{ user }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-slide-item>
+      <v-slide-item>
+        <v-card
+          class="mx-4"
+          color="grey lighten-2"
+          width="250"
+          height="200"
+          @click="handleRoomClick(index)"
+        >
+          <v-card-title class="d-flex justify-center align-center">+</v-card-title>
+        </v-card>
+      </v-slide-item>
+    </v-slide-group>
+  </v-container>
 </template>
 
 <style scoped>

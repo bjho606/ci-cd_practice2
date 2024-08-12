@@ -1,9 +1,5 @@
 import { defineStore } from 'pinia'
 import webSocketAPI from '@/api/webSocket'
-import bigNormal from '@/assets/mushroomGrow/BigNormal.svg'
-import midNormal from '@/assets/mushroomGrow/MidNormal.svg'
-import smallNormal from '@/assets/mushroomGrow/SmallNormal.svg'
-
 /**
  * IMP : MushroomGrow Store
  * * MushroomGrow Contents에 대한 전반적인 정보를 저장하고 있다.

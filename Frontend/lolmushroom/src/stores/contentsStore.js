@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
  * IMP : Contents Store
  * * Meshroom의 Contents Progress에 대한 전반적인 진행 상태를 저장한다.
  * * contents : Meshroom의 Contents List를 가져온다.
+ * ! selectedContents : Contents List에서 선택한 Contents를 저장한다.
  * IMP routeMapping : CurrentContentsId에 따라, Mapping해야 하는 Component Name에 대한 Map
  * IMP currentContentsId : currentContents의 ID Value
  * * contentsSequence : 지금 Contents는 선택된 Contents Curation에서 몇번째 인가?
@@ -15,6 +16,10 @@ import { defineStore } from 'pinia'
 export const useContentsStore = defineStore('contents', {
   state: () => ({
     contents: [],
+    pickedContents: {},
+    selectedContents: [],
+    totalDuration: 0,
+
     routeMapping: {
       1: 'TOF',
       2: null,
@@ -26,6 +31,7 @@ export const useContentsStore = defineStore('contents', {
       8: null,
       null: 'EndingPage'
     },
+
     currentContentsId: null,
     contentsSequence: null,
     totalContentsCount: null,
@@ -35,8 +41,45 @@ export const useContentsStore = defineStore('contents', {
   }),
   actions: {
     setContents(contents) {
-      this.contents = contents
+      this.contents = contents.map((content, index) => {
+        let category
+        if (index < 2) {
+          category = '자기소개'
+        } else if (index < 5) {
+          category = '협동'
+        } else if (index < 8) {
+          category = '경쟁'
+        }
+        return {
+          ...content,
+          category,
+          icon: 'mdi-account',
+          isPlayable: true
+        }
+      })
     },
+    setPickedContents(pickedContent) {
+      this.pickedContents = pickedContent
+    },
+    setSelectedContents(newOrder) {
+      this.selectedContents = newOrder
+    },
+    removeContent(content) {
+      const index = this.selectedContents.findIndex((c) => c._id === content._id)
+      if (index !== -1) {
+        this.selectedContents.splice(index, 1) // Remove the content from the array
+        this.totalDuration -= content.duration // Decrease the total duration
+      }
+    },
+
+    addContent(content) {
+      const index = this.selectedContents.findIndex((c) => c._id === content._id)
+      if (index === -1) {
+        this.selectedContents.push(content)
+        this.totalDuration += content.duration
+      }
+    },
+
     setCurrentContentsState(contentState) {
       this.currentContentsId = contentState.contentsId
       this.contentsSequence = contentState.contentsSequence
@@ -48,8 +91,30 @@ export const useContentsStore = defineStore('contents', {
   },
   getters: {
     getContents: (state) => state.contents,
+    getGroupedContents(state) {
+      const grouped = {}
+      state.contents.forEach((content) => {
+        if (!grouped[content.category]) {
+          grouped[content.category] = []
+        }
+        grouped[content.category].push(content)
+      })
+
+      return Object.keys(grouped).map((category) => ({
+        category,
+        items: grouped[category]
+      }))
+    },
+    getPickedContents: (state) => state.pickedContents,
+    getSelectedContents: (state) => state.selectedContents,
+    getTotalDuration: (state) => state.totalDuration,
     getCurrentContentsId: (state) => state.currentContentsId,
     getContentsSequence: (state) => state.contentsSequence,
     getRouteMapping: (state) => state.routeMapping
+  },
+  persist: {
+    key: 'contents-store',
+    storage: sessionStorage, // 세션 스토리지에 저장
+    paths: ['contents', 'pickedContents', 'selectedContents', 'totalDuration'] // 저장할 상태의 경로
   }
 })

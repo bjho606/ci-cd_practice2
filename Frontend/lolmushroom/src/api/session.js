@@ -32,10 +32,10 @@ export default {
     // * All : userName을 변경한다.
     return axios.patch(`${API_URL}/users/usernmae`, userName).then(success).catch(failure)
   },
-  changeSubSessionName(subSessionId, groupName, success, failure) {
-    // IMP Team Leader : Team의 이름을 변경할 수 있다.
+  changeSubSessionName(subSessionId, success, failure) {
+    // IMP Team Leader : Team의 이름을 변경할 수 있다. 
     return axios
-      .patch(`${API_URL}/sessions/${subSessionId}/group-name`, groupName)
+      .get(`${API_URL}/sessions/${subSessionId}/group-name`)
       .then(success)
       .catch(failure)
   },
