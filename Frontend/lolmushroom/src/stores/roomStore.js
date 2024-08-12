@@ -19,7 +19,7 @@ export const useRoomStore = defineStore('room', {
     currentUserCount: 0,
     url: '',
     roomCount: 0,
-    rooms: Array.from({ length: 0 }, () => ({
+    rooms: Array.from({ length: 10 }, () => ({
       sessionId: '',
       groupName: '',
       capacity: 10,
@@ -37,7 +37,6 @@ export const useRoomStore = defineStore('room', {
       this.setRooms(sessionData.groups)
     },
     setRooms(groups) {
-      this.rooms = groups
       groups.forEach((group, index) => {
         this.rooms[index] = {
           sessionId: group.sessionId,

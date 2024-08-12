@@ -34,9 +34,6 @@ onMounted(() => {
 
 <template>
   <v-app id="v-app">
-    <!-- <GlobalHeader /> -->
     <RouterView />
   </v-app>
 </template>
-
-<style scoped></style>
