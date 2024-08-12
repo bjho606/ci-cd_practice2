@@ -4,7 +4,7 @@
   import { useUserStore } from '@/stores/userStore';
   import { useTOFStore } from '@/stores/tofStore'
   import { useSessionStore } from '@/stores/sessionStore';
-  import otherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue';
+  import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue';
   import contentsAPI from '@/api/contents'
   import sessionAPI from '@/api/session'
   import webSocketAPI from '@/api/webSocket';
@@ -67,15 +67,6 @@
     )
   })
 
-  // 텍스트가 입력되지 않으면 자동으로 발동
-  const NotNullRules = (value) => {
-    if (value.length > 0) {
-      return true
-    } else {
-      return '입력해 주시기 바랍니다.'
-    }
-  }
-
   // subscribe하면 받는다.
   const onSubmitEvent = (_data, _sessionId) => {
     console.log('이벤트 수신')
@@ -131,93 +122,99 @@
 
 <template>
   <!-- 진술을 제출했을 때 -->
-  <v-container fluid v-if="!isSubmit">
+  <v-container fluid v-if="!isSubmit" style="width: 70%;" class="my-5">
 
-    <v-progress-linear
-    bg-color="#FFFFFF"
-    color="#24A319"
-    height="30"
-    max="4"
-    min="0"
-    :model-value="statementsCount"
-    rounded
-    style="border: #000000 2px solid"
-    >
+    <div class="progress-linear-container">
+      <v-progress-linear
+        bg-color="#FFFFFF"
+        color="#24A319"
+        height="30"
+        max="4"
+        min="0"
+        :model-value="statementsCount"
+        rounded
+        style="border: #000000 2px solid; width:50%"
+      >
         <strong style="color: #000000;">{{ statementsCount }} / 4</strong>
-    </v-progress-linear>
-  
-  <br>
-  
-  <v-sheet class="mx-auto" width="300">
-      <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter"/>
-      <v-form ref="form" fast-fail @submit.prevent>
-        <v-container>
-          
-          <div class="flex justify-center">
-            <v-avatar image="../../../../src/assets/image/smile_face.svg"></v-avatar>
-            <v-text-field
-            v-model="statements.firstTrue"
-            :rules="[NotNullRules]"
-            color="blue"
-            placeholder="나의 정보 중 진실을 알려주세요."
-            />
-          </div>
-          
-          <v-text-field
-          v-model="statements.secondTrue"
-          prepend-icon="../../../../src/assets/image/smile_face.svg"
-          :rules="[NotNullRules]"
-          color="blue"
-          placeholder="나의 정보 중 진실을 알려주세요."
-          />
-          
-          <v-text-field
-          v-model="statements.thirdTrue"
-          prepend-icon="../../../../src/assets/image/smile_face.svg"
-          :rules="[NotNullRules]"
-          color="blue"
-          placeholder="나의 정보 중 진실을 알려주세요."
-          />
-          
-          <v-text-field
-          v-model="statements.firstFalse"
-          prepend-icon="../../../../src/assets/image/wink_face.svg"
-          :rules="[NotNullRules]"
-          color="black"
-          placeholder="나의 정보 중 거짓을 알려주세요."
-          />
-          
-          <v-btn
-          text="제출하기"
-          size="large"
-          color="#43A047"
-          @click="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
-          />
-        </v-container>
+      </v-progress-linear>
+    </div>
 
-          <!-- <v-btn
-          class="mt-2"
-          variant="tonal"
-          rounded="lg"
-          type="submit"
-          block
-          color="#3ABF38"
-          @click="
-            tofAnswerSubmit(
-              statements.firstTrue,
-              statements.secondTrue,
-              statements.thirdTrue,
-              statements.firstFalse
-            )
-          "/>제출하기
-        </v-btn> -->
-      </v-form>
-    </v-sheet>
+    <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter" class="warning-alert"/>
+    <v-form ref="form" fast-fail @submit.prevent class="mt-5">
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="1">
+            <v-chip variant="elevated" color="#00FF00">
+              진실
+            </v-chip>
+          </v-col>
+          <v-col cols="12" md="5">
+            <v-text-field
+              v-model="statements.firstTrue"
+              color="blue"
+              placeholder="나의 정보 중 진실을 알려주세요."
+              variant="solo"
+              @keyup.enter="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+            />
+              <template v-slot:prepend-inner>
+                <img src="../../../../src/assets/image/smile_face.svg" alt="custom icon" class="input-icon" />
+              </template> 
+          </v-col>
+
+          <v-col cols="12" md="5">
+            <v-text-field
+              v-model="statements.secondTrue"
+              placeholder="나의 정보 중 진실을 알려주세요."
+              variant="solo"
+              @keyup.enter="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+            />
+          </v-col>
+          
+          
+          <v-col cols="5" offset="1">
+            <v-text-field
+              v-model="statements.thirdTrue"
+              placeholder="나의 정보 중 진실을 알려주세요."
+              variant="solo"
+              @keyup.enter="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+            />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12" md="1">
+            <v-chip variant="elevated" color="#247719">
+              거짓
+            </v-chip>
+          </v-col>    
+          <v-col cols="5">
+            <v-text-field
+              v-model="statements.firstFalse"
+              placeholder="나의 정보 중 거짓을 알려주세요."
+              variant="solo"
+              @keyup.enter="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+            />
+          </v-col>
+        </v-row>
+        
+        <div style="text-align: center;">
+          <v-btn
+            class="mt-2"
+            text="제출하기"
+            size="large"
+            width="500"
+            color="#43A047"
+            rounded
+            @click="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+          />
+        </div>
+      </v-container>
+    </v-form>
   </v-container>
 
   <!-- 진술을 제출했다면 -->
   <v-container v-else class="waiting-container">
-    <otherUserWaitingComponent
+    <OtherUserWaitingComponent
       :current=store.submitUserCount
       :total="store.totalUserCount"
     />
@@ -229,5 +226,26 @@
   text-align: center;
   background: #247719;
   opacity: 0.7;
+  margin-top: 10%;
+}
+
+v-text-field {
+  border: 1px solid black
+}
+
+.input-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.progress-linear-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.warning-alert {
+  display: flex;
+  justify-content: center;
 }
 </style>

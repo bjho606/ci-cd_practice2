@@ -152,6 +152,7 @@ onMounted(async () => {
   </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
   <div class="main">
+    <TOFAppBar />
     <RouterView />
   </div>
   <!-- IMP : NickName Modal -->
