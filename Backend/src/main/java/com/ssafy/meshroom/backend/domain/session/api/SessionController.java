@@ -225,13 +225,6 @@ public class SessionController {
             parameters = {
                     @Parameter(name = "subsessionId", description = "수정할 하위 세션의 ID", required = true)
             },
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "하위 세션의 그룹 이름을 수정하기 위한 요청 본문",
-                    required = true,
-                    content = @Content(
-                            schema = @Schema(implementation = UpdateGroupNameRequest.class)
-                    )
-            ),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -245,12 +238,11 @@ public class SessionController {
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             }
     )
-    @PatchMapping("/{subsessionId}/group-name")
+    @GetMapping("/{subsessionId}/group-name")
     public ResponseEntity<Response<?>> updateSubSessionGroupName(
-            @PathVariable String subsessionId,
-            @RequestBody UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+            @PathVariable String subsessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session updateSubSessionGroupName API");
-        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId));
     }
 
     @GetMapping("{subSessionId}/ready")
