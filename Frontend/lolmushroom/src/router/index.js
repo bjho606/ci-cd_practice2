@@ -9,7 +9,6 @@ import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
-import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGrowContainer.vue'
 import TOFMainComponent from '@/components/contents/tof/TOFMainComponent.vue'
 import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
 import AlphabetSubmitComponent from '@/components/contents/alphabet/AlphabetSubmitComponent.vue'
@@ -19,10 +18,16 @@ import SessionCode from '@/components/setting/_2SessionCode.vue'
 import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
 
 const routes = [
-  // { path: '/', name: 'home', component: MakeSessionView },
-  { path: '/', name: 'home', component: StartPage },
-  { path: '/curation', name: 'curation', component: CurationPage },
-  { path: '/sessioncode', name: 'sessioncode', component: SessionCode },
+  {
+    path: '/',
+    name: 'home',
+    component: MakeSessionView,
+    children: [
+      { path: '', name: 'startpage', component: StartPage },
+      { path: '/curation', name: 'curation', component: CurationPage },
+      { path: '/sessioncode', name: 'sessioncode', component: SessionCode }
+    ]
+  },
 
   {
     path: '/admin/:sessionId',

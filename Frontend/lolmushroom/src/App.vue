@@ -4,8 +4,6 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
-import watingHeader from './components/room/playerWating/watingHeader.vue'
-import PlayerNicknameSetting from './components/room/playerWating/PlayerNicknameSetting.vue'
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
@@ -16,7 +14,6 @@ const contentsStore = useContentsStore()
 const fetchContents = async () => {
   try {
     const response = await contentsAPI.getContents()
-    console.log(response.data.result)
     if (response.data.isSuccess) {
       contentsStore.setContents(response.data.result.contents)
     }
