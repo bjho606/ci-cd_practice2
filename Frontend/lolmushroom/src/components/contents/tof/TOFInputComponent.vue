@@ -9,6 +9,7 @@
   import sessionAPI from '@/api/session'
   import webSocketAPI from '@/api/webSocket';
   import ButtonComponent from '@/components/common/ButtonComponent.vue';
+  import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue';
   
   const router = useRouter()
   const userStore = useUserStore()
@@ -50,6 +51,7 @@
       truths: [t1, t2, t3],
       false1: f1
     }
+    console.log(statesObject)
     await contentsAPI.createStatements(sessionStore.subSessionId, statesObject)
     webSocketAPI.sendSubmitData(`/publish/game/tf/question/${sessionStore.subSessionId}`, true)
   }
@@ -130,72 +132,70 @@
 <template>
   <!-- 진술을 제출했을 때 -->
   <v-container fluid v-if="!isSubmit">
-    <div class="text-h4 font-weight-medium">진실! 혹은 거짓?</div>
-    
-    <div class="text-body-1 text-medium-emphasis my-5">
-      입력하신 정보를 바탕으로 퀴즈를 생성합니다. ༼ つ ◕_◕ ༽つ
-    </div>
-    <!-- <v-sheet
-    class="d-flex align-center px-4 py-8 mx-auto"
-    color="#3ABF38"
-    max-width="250"
-    rounded="lg"
-    > -->
-      <v-progress-linear
-      bg-color="#FFFFFF"
-      color="#24A319"
-      height="30"
-      max="4"
-      min="0"
-      :model-value="statementsCount"
-      rounded
-      style="border: #000000 2px solid"
-      >
-          <strong style="color: #000000;">{{ statementsCount }} / 4</strong>
-      </v-progress-linear>
-    <!-- <div class="ms-4 text-h6">{{ answerCount }} / 4</div> -->
-  <!-- </v-sheet> -->
+
+    <v-progress-linear
+    bg-color="#FFFFFF"
+    color="#24A319"
+    height="30"
+    max="4"
+    min="0"
+    :model-value="statementsCount"
+    rounded
+    style="border: #000000 2px solid"
+    >
+        <strong style="color: #000000;">{{ statementsCount }} / 4</strong>
+    </v-progress-linear>
   
   <br>
   
   <v-sheet class="mx-auto" width="300">
       <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter"/>
       <v-form ref="form" fast-fail @submit.prevent>
-        <v-text-field
-          v-model="statements.firstTrue"
-          label="첫 번째 사실"
-          :rules="[NotNullRules]"
-          color="blue"
-        />
-
-        <v-text-field
+        <v-container>
+          
+          <div class="flex justify-center">
+            <v-avatar image="../../../../src/assets/image/smile_face.svg"></v-avatar>
+            <v-text-field
+            v-model="statements.firstTrue"
+            :rules="[NotNullRules]"
+            color="blue"
+            placeholder="나의 정보 중 진실을 알려주세요."
+            />
+          </div>
+          
+          <v-text-field
           v-model="statements.secondTrue"
-          label="두 번째 사실"
+          prepend-icon="../../../../src/assets/image/smile_face.svg"
           :rules="[NotNullRules]"
           color="blue"
-        />
-
-        <v-text-field
+          placeholder="나의 정보 중 진실을 알려주세요."
+          />
+          
+          <v-text-field
           v-model="statements.thirdTrue"
-          label="세 번째 사실"
+          prepend-icon="../../../../src/assets/image/smile_face.svg"
           :rules="[NotNullRules]"
           color="blue"
-        />
-
-        <v-text-field
+          placeholder="나의 정보 중 진실을 알려주세요."
+          />
+          
+          <v-text-field
           v-model="statements.firstFalse"
-          label="첫 번째 거짓"
+          prepend-icon="../../../../src/assets/image/wink_face.svg"
           :rules="[NotNullRules]"
           color="black"
-        />
-
-        <ButtonComponent
+          placeholder="나의 정보 중 거짓을 알려주세요."
+          />
+          
+          <v-btn
           text="제출하기"
           size="large"
           color="#43A047"
-          @click="submitStatements()"
-        />
-        <!-- <v-btn
+          @click="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
+          />
+        </v-container>
+
+          <!-- <v-btn
           class="mt-2"
           variant="tonal"
           rounded="lg"
@@ -217,27 +217,16 @@
 
   <!-- 진술을 제출했다면 -->
   <v-container v-else class="waiting-container">
-    <v-progress-linear
-      bg-color="#FFFFFF"
-      color="#24A319"
-      height="30"
-      :max="store.totalUserCount"
-      min="0"
-      :model-value="store.submitUserCount"
-      rounded
-      style="border: #000000 2px solid"
-      >
-          <strong style="color: #000000;">{{ store.submitUserCount  }} / {{ store.totalUserCount }}</strong>
-      </v-progress-linear>
-    <!-- <otherUserWaitingComponent
+    <otherUserWaitingComponent
       :current=store.submitUserCount
       :total="store.totalUserCount"
-    /> -->
+    />
   </v-container>
 </template>
 
 <style scoped>
 .waiting-container {
+  text-align: center;
   background: #247719;
   opacity: 0.7;
 }

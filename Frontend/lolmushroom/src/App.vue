@@ -53,7 +53,7 @@ onMounted(() => {
 
 <style scoped>
 .background {
-  /* background-color: '#E7FFDE'; */
+  background: #E7FFDE;
   /* background-image: url('@/assets/origbig.png'); */
   background-size: cover; /* Cover the entire background */
   background-position: center; /* Center the background image */

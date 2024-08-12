@@ -11,6 +11,7 @@
   import ProgressBar from '@/components/common/OtherUserWaitingComponent.vue';
   import OpenViduComponent from '@/components/contents/tof/openvidu/OpenViduComponent.vue';
   import CountDownComponent from '@/components/common/CountDownComponent.vue';
+  import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue';
   import TOFResultComponent from '@/components/contents/tof/TOFResultComponent.vue'
   import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue';
   // import ResultOverlayComponent from '@/components/common/ResultOverlayComponent.vue';
@@ -134,6 +135,15 @@
     // router.push({ name: 'roomwaiting', params: { sessionId } });
   }
 
+  const getCardColor = (key, isHovering) => {
+    if (selectedAnswer.value === key) {
+      return '#24A319';
+    } else if (isHovering) {
+      return '#66FF4F';
+    } else {
+      return undefined;
+    }
+  };
 
   // index 값이 증가할 때마다 관련 값 갱신
   watch(index, (newIndex, oldIndex) => {
@@ -163,85 +173,56 @@
 </script>
 
 <template>
-  <!-- 진실과 거짓을 가려내는 토론 화면 컴포넌트 -->
-  <!-- countdown이 마무리 되면 -->
   <v-container v-show="isTimeUp" class="container">
-    <v-row justify="space-between">
-      <v-col>
-        <TOFSideUserComponent :users="firstHalf" :target="store.targetUserToken" />
-      </v-col>
-      
-      <v-col md="6" style="text-align: center">
-        <OpenViduComponent />
-        <v-container v-if="store.targetUserToken === userStore.userOvToken">
-          <v-btn text="발표 종료" @click.stop="targetUserUpdate()" />
+    <div class="video-container">
+      <OpenViduComponent />
+    </div>
+    <div v-if="store.targetUserToken === userStore.userOvToken" class="next-button">
+      <v-btn text="발표 종료" @click.stop="targetUserUpdate()" color="#24A319"/>
+    </div>
+    <div v-if="store.targetUserToken !== userStore.userOvToken">
+      <div v-if="!isSubmitAnswer" class="mt-5">
+        <!-- 카드 컨테이너 -->
+        <v-container>
+          <v-row>
+            <v-col v-for="(statement, i) in allStatements[index].statements" :key="i" @click="buttonActivate(i + 1)" cols="6">
+              <v-hover>
+                <template v-slot:default="{ isHovering, props }">
+                  <v-card
+                  class="mx-5 card-border"
+                  v-bind="props"
+                  prepend-avatar="../../../../src/assets/image/thinking_face.svg"
+                  :title="statement"
+                  :color="getCardColor(i + 1, isHovering)"
+                  hover
+                  />
+                </template>
+              </v-hover>
+            </v-col>
+          </v-row>
         </v-container>
+        
+        <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
+          <ButtonComponent text="선택하기" size="large"/>
+        </div>
+      </div>
+      
+        <div v-else-if="isSubmitAnswer && !areSubmitAnswer" class="mt-5" width="500">
+          <ProgressBar :current="store.submitUserCount" :total="store.totalUserCount - 1"/>
+        </div>
 
-        <!-- <ResultOverlayComponent /> -->
-        <!-- 답안 제출 전 -->
-        <v-card
-          v-if="!isSubmitAnswer && store.targetUserToken !== userStore.userOvToken"
-          class="mt-5"
-        >
-          <v-card-title class='question-font' style="overflow: flip;">
-          <pre>{{ allStatements[index].userName }}에 대한 설명이다. 다음 중 틀린 설명은?</pre>
-          </v-card-title>
-          <div
-            v-for="(statement, i) in allStatements[index].statements"
-            :key="i"
-            @click="buttonActivate(i + 1)"
-          >
-            <v-card-text>
-              <p>
-                <v-icon v-show="selectedAnswer != i + 1" :icon="`mdi-numeric-${i + 1}-circle-outline`" />
-                <v-icon v-show="selectedAnswer === i + 1" :icon="`mdi-numeric-${i + 1}-circle`" color="red"/>
-                {{ statement }}
-              </p>
-            </v-card-text>
-          </div>
-          <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
-            <ButtonComponent text="선택하기" size="large"/>
-          </div>
-        </v-card>
-
-        <!-- 답안 제출 완료 -->
-        <v-card
-          v-else-if="isSubmitAnswer && !areSubmitAnswer && store.targetUserToken !== userStore.userOvToken"
-          class="mt-5"
-          width="500"
-        >
-          <ProgressBar
-            :current="store.submitUserCount" 
-            :total="store.totalUserCount - 1"
-          />
-          <!-- <RoomWaiting /> -->
-        </v-card>
-
-        <!-- 전체 제출 완료 -->
-        <v-card v-else class="mt-5" width="500">
-          <TOFResultComponent
-            :target-nick-name="allStatements[index].username"
-            :answer="answer"
-          />
-        </v-card>
-      </v-col>
-
-      <!-- 참여자 아이콘 닉네임 렌더링 -->
-      <v-col>
-        <TOFSideUserComponent :users="secondHalf" :target="store.targetUserToken" />
-      </v-col>
-    </v-row>
+        <div v-else>
+          <TOFResultComponent :target-nick-name="allStatements[index].username" :answer="answer" class="mt-5" width="500"/>
+        </div>
+      </div>
+    <div v-else>
+      <TOFResultComponent :target-nick-name="allStatements[index].username" :answer="answer" class="mt-5" width="500"/>
+    </div>
   </v-container>
 
-  <!-- 카운트 다운 컴포넌트 -->
   <v-container class="countdown-container" v-show="!isTimeUp">
     <div class="countdown-timer">
-      <CountDownComponent
-        v-if="counting"
-        time="10"
-        text="발표자는 누가 될까요? 두근두근."
-        @end-count-down="timeUp(true)"
-      />
+      <CountDownComponent v-if="counting" time="2.5" text="발표자는 누가 될까요? 두근두근." @end-count-down="timeUp(true)"/>
     </div>
   </v-container>
 </template>
@@ -253,6 +234,12 @@
 }
 
 .card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -273,11 +260,19 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  width: 100%;
   text-align: center;
 }
 
 .countdown-timer {
   margin-bottom: 20px;
+}
+
+.card-border {
+  border: solid black 0.5px;
+}
+
+.next-button {
+  text-align: end;
 }
 </style>

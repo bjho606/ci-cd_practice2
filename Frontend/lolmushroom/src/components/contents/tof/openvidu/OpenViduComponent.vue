@@ -137,7 +137,6 @@
 <template>
   <div id="session">
     <div id="session-header">
-      <h1 id="session-title">{{ mySessionId }}</h1>
       <!-- <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession"
         value="Leave session" /> -->
     </div>

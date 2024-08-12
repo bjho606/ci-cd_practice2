@@ -13,6 +13,7 @@ import webSocketAPI from '@/api/webSocket'
 import NicknameModal from '@/components/common/NicknameModal.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 import AudioPlayer from '@/components/common/AudioPlayer.vue'
+import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const route = useRoute()
 const contentsStore = useContentsStore()
@@ -151,6 +152,7 @@ onMounted(async () => {
 
   <!-- IMP : PlayerView의 RouterView 요소들 -->
   <v-container fluid class="contents-container">
+    <TOFAppBar />
     <RouterView />
   </v-container>
 
@@ -164,10 +166,9 @@ onMounted(async () => {
 
 <style scoped>
 .contents-container {
-  display: flex; /* Use Flexbox for layout */
+  /* display: flex; Use Flexbox for layout */
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
-  background: #E7FFDE;
   /* background-color: rgba(224, 224, 224, 0.6); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
   position: absolute; /* Position absolutely within parent */
