@@ -14,7 +14,7 @@ const userInput = ref('asd');
   <div class="progress-bar">
     공통 컴포넌트인 프로그래스바 넣어야됨 feat. 규석
   </div>
-  <div class="inputContainer">
+  <div class="playContainer">
     <div class="info">
       <div class="info-category">카테고리</div>
       <div class="info-text">{{ category_name }}</div>
@@ -49,14 +49,14 @@ const userInput = ref('asd');
   background-color: yellow;
 }
 
-.inputContainer {
+.playContainer {
   margin-top: 10px;
   height: 650px;
   display: flex;
   flex-direction: column;
   align-items: center; /* 수직으로 가운데 정렬 */
   /* flex: 1; */
-  justify-content: space-between; /* 수평으로 가운데 정렬 */
+  justify-content: space-around; /* 수평으로 가운데 정렬 */
 }
 
 .info{
@@ -64,6 +64,7 @@ const userInput = ref('asd');
   width: 600px;
   height: 60px;
   border-radius: 5px;
+  margin-bottom: 100px;
 }
 .info-category{
   margin: 0;
