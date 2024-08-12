@@ -16,6 +16,7 @@ const fetchContents = async () => {
     const response = await contentsAPI.getContents()
     if (response.data.isSuccess) {
       contentsStore.setContents(response.data.result.contents)
+
     }
   } catch (error) {
     console.log('Error Getting Meshroom Contents', error)

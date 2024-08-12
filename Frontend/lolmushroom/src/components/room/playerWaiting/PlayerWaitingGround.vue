@@ -3,17 +3,18 @@ import {ref, onMounted, computed} from 'vue';
 import { useRoomStore } from '@/stores/roomStore';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useUserStore } from '@/stores/userStore';
-import {useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import sessionAPI from '@/api/session';
 
 const router = useRouter();
 const roomStore = useRoomStore();
 const sessionStore = useSessionStore();
 const userStore = useUserStore();
-const rooms = computed(() => roomStore.getRooms)
+const rooms = computed(() => roomStore.getActiveRooms)
 
 
 // 세션 연결 
+
 const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
@@ -57,13 +58,17 @@ const toggleReady = (index) =>{
 
 // IMPL2 참가하기 버튼 누르면 밑으로 닉네임 이동
 const joinSubsession = async (index) =>{
-    const room = roomStore.rooms[index];
+    const room =  rooms.value[index]
     // 닉네임이 없을 시 
     if (!room.users.includes(userStore.userNickname)) { 
+        // 만약 room에 사람이 없으면 true
         const isFirstUserInGroup = room.occupants === 0
+
         await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
-        if (isFirstUserInGroup) userStore.setTeamLeader(true)
-        else userStore.setTeamLeader(false)
+
+        if (isFirstUserInGroup) userStore.setTeamLeader(true);
+        else userStore.setTeamLeader(false);
+
         sessionStore.setSubSessionId(room.sessionId)
         room.users.push(userStore.userNickname);
     } 
@@ -72,20 +77,16 @@ const joinSubsession = async (index) =>{
 
 // IMPL3 그룹 새로 만들기 클릭하면 새로운 그룹 생성
 const addGroup = async () =>{
-    if(roomStore.rooms.length < 10){
-        roomStore.rooms.push({
-            sessionId: `session-${roomStore.rooms.length +1 }`,
-            groupName: `그룹 ${roomStore.rooms.length +1}`,
-            capacity: 10,
-            occupants: 1,
-            users: [],
-            isReady: false,
-            buttonClicked: false
-        })
-        await createSubSessionHandler(sessionStore.sessionId)
-        sessionStore.setSessionId(sessionStore.sessionId)
-    }
+    const newIndex = rooms.value.length;   
+    // roomStore.setCurrentContentsState
+    await createSubSessionHandler(sessionStore.sessionId)
+    await getSessionConnection(sessionStore.sessionId, { userName: userStore.userNickname })
+
+    roomStore.setButtonClicked(newIndex);
+    sessionStore.setSessionId(sessionStore.sessionId)
 }
+
+
 // IMPL 4 이름 버튼 누르면 그룹명 바꾸기 
 const changeRoomName = async () => {
     const response = await sessionAPI.changeSubSessionName(sessionStore.subSessionId);
@@ -97,7 +98,7 @@ const changeRoomName = async () => {
 <template>
     <div class="room-list-container">
         <div class="room-list">
-        <v-container v-for="(group, index) in roomStore.getRooms" :key="group.sessionId" class="group-container">
+        <v-container v-for="(group, index) in rooms.filter(room => room.buttonClicked)" :key="group.sessionId" class="group-container">
         <v-card class="group-card">
             <v-btn
             :style="{ backgroundColor: group.isReady ? '#000000' : '#D9D9D9', color: group.isReady ? '#FFFFFF' : '#000000' }"
@@ -150,6 +151,7 @@ v-container{
 /* 전체 컨테이너 이동 */
 .room-list-container {
 width: 100%;
+height: 90%;
 overflow-x: auto;
 }
 

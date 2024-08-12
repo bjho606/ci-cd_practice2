@@ -4,6 +4,7 @@ import RoomWatching from '@/components/room/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
 import ManagerWaiting from '@/components/room/ManagerWaiting.vue'
 import PlayerChoose from '@/components/room/PlayerChoose.vue'
+import PlayerSetting from '@/components/room/playerWaiting/PlayerSetting.vue'
 import RoomWaiting from '@/components/room/RoomWaiting.vue'
 import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
@@ -43,7 +44,7 @@ const routes = [
     path: '/:sessionId',
     component: PlayerView,
     children: [
-      { path: '', name: 'mainSession', component: PlayerChoose },
+      { path: '', name: 'mainSession', component: PlayerSetting },
       { path: ':subSessionId/roomwaiting', name: 'roomwaiting', component: RoomWaiting },
       {
         path: ':subSessionId/GroupSessionView',

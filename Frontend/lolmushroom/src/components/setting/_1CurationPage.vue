@@ -23,6 +23,8 @@ import SelectedList from './_1SelectedList.vue'
 </template>
 
 <style scoped>
+
+
 .main-container {
   display: flex;
   flex-direction: column;
@@ -38,6 +40,7 @@ import SelectedList from './_1SelectedList.vue'
 
 .card-section {
   flex: 1.8;
+  background-color: #FFF2F7;
 }
 
 .list-section {
