@@ -174,12 +174,15 @@
 
 <template>
   <v-container v-show="isTimeUp" class="container">
-    <div class="video-container">
-      <OpenViduComponent />
+    <div class="keynote-speecher">
+      <div class="video-container">
+        <OpenViduComponent />
+      </div>
+      <div v-if="store.targetUserToken === userStore.userOvToken" class="next-button">
+        <v-btn text="발표 종료" @click.stop="targetUserUpdate()" color="#24A319"/>
+      </div>
     </div>
-    <div v-if="store.targetUserToken === userStore.userOvToken" class="next-button">
-      <v-btn text="발표 종료" @click.stop="targetUserUpdate()" color="#24A319"/>
-    </div>
+
     <div v-if="store.targetUserToken !== userStore.userOvToken">
       <div v-if="!isSubmitAnswer" class="mt-5">
         <!-- 카드 컨테이너 -->
@@ -228,51 +231,61 @@
 </template>
 
 <style scoped>
-.button-container {
-  display: flex;
-  justify-content: flex-end;
-}
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+  }
 
-.card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-.video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 4;
+  }
 
-.text-black {
-  font-size: xx-small;
-}
+  .text-black {
+    font-size: xx-small;
+  }
 
-.container {
-  max-height: 80%;
-}
+  .container {
+    max-height: 80%;
+  }
 
-.countdown-container {
-  background: #247719;
-  opacity: 0.7;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  text-align: center;
-}
+  .countdown-container {
+    margin-top: 10%;
+    background: #247719;
+    opacity: 0.7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+  }
 
-.countdown-timer {
-  margin-bottom: 20px;
-}
+  .countdown-timer {
+    margin-bottom: 20px;
+  }
 
-.card-border {
-  border: solid black 0.5px;
-}
+  .card-border {
+    border: solid black 0.5px;
+  }
 
-.next-button {
-  text-align: end;
-}
+  .next-button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .keynote-speecher {
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+  }
 </style>

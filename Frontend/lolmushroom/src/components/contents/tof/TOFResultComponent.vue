@@ -20,6 +20,27 @@
 </script>
 
 <template>
+  <!-- 투표 결과 컴포넌트 -->
+  <!-- 카드 컨테이너 -->
+  <v-container>
+    <v-row>
+      <v-col v-for="i in 4" :key="i" cols="6">
+        <v-card
+          class="mx-5 card-border"
+          prepend-avatar="../../../../src/assets/image/thinking_face.svg"
+          :title="`${store.statements[i-1]}-${store.chosenArray[i].length}명`"
+        />
+      </v-col>
+    </v-row>
+  </v-container>
+
+
+
+
+
+
+
+<!-- 
   <v-container>
     <h1>총 참여자 수: {{ store.submitUserCount }}명</h1>
     <h2>정답률: {{ correctRate * 100 }}%</h2>
@@ -43,7 +64,7 @@
       </v-expand-transition>
       <v-divider class="border-opacity-55"></v-divider>
     </v-card>
-  </v-container>
+  </v-container> -->
 </template>
 
 <style scoped>
