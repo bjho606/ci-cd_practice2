@@ -4,7 +4,7 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
-import GlobalHeader from '@/components/common/GlobalHeader.vue'
+import PlayerNicknameSetting from './components/room/playerWating/PlayerNicknameSetting.vue'
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.

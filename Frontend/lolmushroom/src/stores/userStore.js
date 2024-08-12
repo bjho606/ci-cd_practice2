@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 /**
  * IMP : UserStore 정의
@@ -17,24 +16,31 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     setUserId(userId) {
-      this.userId = userId
+      this.userId = userId;
     },
     setNickname(nickname) {
-      this.userNickname = nickname
+      this.userNickname = nickname;
     },
     setTeamLeader(isTeamLeader) {
-      this.isTeamLeader = isTeamLeader
+      this.isTeamLeader = isTeamLeader;
     },
     setIsStarted() {
-      this.isStarted = true
+      this.isStarted = true;
     },
     setOvToken(userOvToken) {
-      this.userOvToken = userOvToken
+      this.userOvToken = userOvToken;
     }
+  },
+  getters: {
+    getUserId: (state) => state.userId,
+    getNickname: (state) => state.userNickname,
+    getIsTeamLeader: (state) => state.isTeamLeader,
+    getIsStarted: (state) => state.isStarted,
+    getUserOvToken: (state) => state.userOvToken,
   },
   persist: {
     key: 'user-store',
     storage: sessionStorage,
     paths: ['userId', 'userNickname', 'isTeamLeader', 'isStarted', 'userOvToken']
   }
-})
+});
