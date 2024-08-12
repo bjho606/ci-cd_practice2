@@ -3,7 +3,7 @@ import { onMounted, computed } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import watingHeader from '@/components/room/playerWating/watingHeader.vue'
+import watingHeader from '@/components/room/playerWaiting/waitingHeader.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 

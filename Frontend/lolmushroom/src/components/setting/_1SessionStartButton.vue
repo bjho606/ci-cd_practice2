@@ -23,7 +23,7 @@ const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
-      console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
+      console.log('Connection을 성공적으로 만들어 냈습니다:)')
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -36,8 +36,7 @@ const createSessionHandler = async () => {
     const response = await sessionAPI.createSession({ contentsOrder: order })
     if (response.data.isSuccess) {
       const { sessionId } = response.data.result
-      sessionStore.setSessionId(sessionId) // Store sessionId in Pinia
-      console.log('진행자님! SessionID가 생성되었습니다. => ', sessionId)
+      sessionStore.setSessionId(sessionId)
     }
   } catch (error) {
     console.error('진행자님! SessionID 생성을 실패했습니다. ', error)
@@ -49,10 +48,8 @@ const startSession = async () => {
   console.log('세션 시작하기 버튼 클릭됨')
   await createSessionHandler()
   await getSessionConnection(sessionStore.getSessionId, { userName: 'Manager' })
-  // 첫 번째 라우트로 라우팅하며 새로운 창 열기
   router.replace({ name: 'roomwatching', params: { sessionId: sessionStore.getSessionId } })
 
-  // 두 번째 라우트로 라우팅하며 새로운 창 열기
   sessionStore.setSessionUrl(sessionStore.getSessionId)
   const sessioncodeUrl = router.resolve({
     name: 'sessioncode',

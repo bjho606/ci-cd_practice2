@@ -52,7 +52,7 @@ const onAddClick = () => {
   justify-content: center;
   width: 24px;
   height: 24px;
-  background-color: white; /* 초록색 배경 */
+  background-color: white;
   border-radius: 50%;
   cursor: pointer;
   color: #247719;
@@ -61,7 +61,7 @@ const onAddClick = () => {
 }
 
 .item-add:hover {
-  background-color: #247719; /* hover 시 조금 더 어두운 초록색 */
-  color: white; /* hover 시 조금 더 어두운 초록색 */
+  background-color: #247719;
+  color: white;
 }
 </style>

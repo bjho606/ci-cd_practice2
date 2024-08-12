@@ -8,11 +8,8 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-
-import setNickname from '@/components/room/playerWaiting/setNickname.vue'
+import setName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
-import AudioPlayer from '@/components/common/AudioPlayer.vue'
-import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const route = useRoute()
 const contentsStore = useContentsStore()
@@ -20,20 +17,7 @@ const chatStore = useChatStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
-
-const showNicknameModal = ref(false)
-const cameraIcon = ref('custom:cameraOn')
-const micIcon = ref('custom:micOn')
-
-/**
- * * Camera, Mic Icon을 Toggle할 수 있는 CallBack()
- */
-const toggleCameraIcon = () => {
-  cameraIcon.value = cameraIcon.value === 'custom:cameraOn' ? 'custom:cameraOff' : 'custom:cameraOn'
-}
-const toggleMicIcon = () => {
-  micIcon.value = micIcon.value === 'custom:micOn' ? 'custom:micOff' : 'custom:micOn'
-}
+const showNameModal = ref(false)
 
 /**
  * IMP 1. MainSession에 대한 Connection을 생성하는 CallBack()
@@ -50,10 +34,7 @@ const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
-      console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data)
       userStore.setUserId(response.data.result.userId)
-      // userStore.userOvToken = response.data.result['ovToken'].slice(-20)
       userStore.userOvToken = response.data.result['ovToken']
     }
   } catch (error) {
@@ -73,7 +54,7 @@ const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
 const onSessionEventReceived = (message) => {
-  roomStore.setSessionData(message) // 방 정보를 업데이트
+  roomStore.setSessionData(message)
 }
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
@@ -81,7 +62,6 @@ const onProgressEventReceived = (message) => {
 
 /**
  * IMP 3. PlayerView에 처음 들어왔을 때, Session의 상태를 가져오는 getSessionInfo API 호출
- * ! MainConnection과 연결되고 Socket 연결이 되기 때문에, API를 통해 Group 정보를 호출해야 함.
  */
 const getSessionInfo = async (sessionId) => {
   try {
@@ -100,16 +80,11 @@ const getSessionInfo = async (sessionId) => {
  * * 4.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
  * * 4.3. Connection을 바탕으로 Session Info에 대한 Socket 연결을 진행한다.
  * * 4.4  Connection을 바탕으로 MeshRoom의 Contents Progress에 대한 Socket 연결을 진행한다.
- * TODO : 추가적으로 더 많은 Socket에 연결해야 할 수도 있다. ( Group Chat, Other Game에 대한 Socket )
  */
 const userFlowHandler = async () => {
   const sessionId = route.params.sessionId
   sessionStore.setSessionId(sessionId)
-  console.log(
-    `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
-  )
-
-  await getSessionConnection(sessionId, { userName: userStore.userNickname })
+  await getSessionConnection(sessionId, { userName: userStore.userName })
   await getSessionInfo(sessionId)
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
@@ -126,57 +101,55 @@ const userFlowHandler = async () => {
  * * 5.2 : 닉네임 설정 O => webSocketAPI를 통한 Socket 재연결
  */
 onMounted(() => {
-  if (userStore.userNickname === '닉네임을 설정해주세요') {
-    showNicknameModal.value = true
+  if (!userStore.userName) {
+    showNameModal.value = true
   } else {
-    userFlowHandler()
+    webSocketAPI.connect({
+      sessionId: sessionStore.sessionId,
+      onMessageReceived: onMainSessionMessageReceived,
+      onEventReceived: onSessionEventReceived,
+      onProgressReceived: onProgressEventReceived,
+      subscriptions: ['chat', 'session', 'progress']
+    })
   }
 })
-
-// onMounted(async () => {
-//   await userFlowHandler();
-// })
 </script>
 
 <template>
   <!-- IMP : ChatScreen Component -->
-  <!-- <ChatScreen /> -->
-  <!-- IMP : Camera, Mic, Audio Player Icon -->
-  <!-- <v-container>
-    <v-icon :icon="cameraIcon" @click="toggleCameraIcon"></v-icon>
-    <v-icon :icon="micIcon" @click="toggleMicIcon"></v-icon>
-    <AudioPlayer />
-  </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
-  <v-container fluid class="contents-container">
-    <RouterView />
-  </v-container>
-
+  <div class="contents-container">
+    <div class="main-content">
+      <RouterView />
+    </div>
+    <div class="sub-content">
+      <ChatScreen />
+    </div>
+  </div>
   <!-- IMP : NickName Modal -->
-  <setNickname
-    :show="showNicknameModal"
-    @update:show="showNicknameModal = $event"
-    @nickname-saved="userFlowHandler"
+  <setName
+    :show="showNameModal"
+    @update:show="showNameModal = $event"
+    @name-saved="userFlowHandler"
   />
 </template>
 
 <style scoped>
 .contents-container {
-  display: flex; /* Use Flexbox for layout */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  background: #e7ffde;
-  /* background-color: rgba(224, 224, 224, 0.6); */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-  position: absolute; /* Position absolutely within parent */
-  overflow: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  background-color: #fff2f7;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.main {
-  padding: 2%;
+.main-content {
+  height: 93%;
+}
+
+.sub-content {
+  height: 5%;
+  display: flex;
+  flex-direction: flext-start;
+  margin-left: 0.5%;
 }
 </style>
