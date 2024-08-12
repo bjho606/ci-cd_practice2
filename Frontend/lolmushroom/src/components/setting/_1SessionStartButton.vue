@@ -50,7 +50,7 @@ const startSession = async () => {
   await createSessionHandler()
   await getSessionConnection(sessionStore.getSessionId, { userName: 'Manager' })
   // 첫 번째 라우트로 라우팅하며 새로운 창 열기
-  router.push({ name: 'roomwatching', params: { sessionId: sessionStore.getSessionId } })
+  router.replace({ name: 'roomwatching', params: { sessionId: sessionStore.getSessionId } })
 
   // 두 번째 라우트로 라우팅하며 새로운 창 열기
   sessionStore.setSessionUrl(sessionStore.getSessionId)

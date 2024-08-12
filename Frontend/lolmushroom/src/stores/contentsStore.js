@@ -115,6 +115,6 @@ export const useContentsStore = defineStore('contents', {
   persist: {
     key: 'contents-store',
     storage: sessionStorage, // 세션 스토리지에 저장
-    paths: ['contents', 'pickedContents', 'selectedContents'] // 저장할 상태의 경로
+    paths: ['contents', 'pickedContents', 'selectedContents', 'totalDuration'] // 저장할 상태의 경로
   }
 })

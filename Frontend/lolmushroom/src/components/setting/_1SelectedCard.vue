@@ -24,7 +24,7 @@ const onRemoveClick = () => {
 <style scoped>
 .content-card {
   position: relative;
-  width: 130px;
+  width: 120px;
   background-color: #f5f5f5;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -35,7 +35,7 @@ const onRemoveClick = () => {
 }
 
 .content-card:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .thumbnail {
@@ -46,7 +46,7 @@ const onRemoveClick = () => {
 
 .content-info {
   display: flex;
-  font-size: 12px;
+  font-size: 11px;
   margin-top: 5px;
   justify-content: center;
 }

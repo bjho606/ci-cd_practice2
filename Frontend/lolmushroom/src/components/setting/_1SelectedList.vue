@@ -50,18 +50,27 @@ const onEnd = () => {
 .bottom-list {
   display: flex;
   justify-content: space-between;
-  gap: 40px;
   width: 100%;
+  height: 100%;
   padding: 40px;
 }
 
 .draggable-container {
   display: flex;
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.draggable-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .draggable-item-container {
   display: flex;
   align-items: center;
+  padding-top: 5px;
 }
 
 .arrow-container {

@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/sessionStore'
 import QrcodeVue from 'qrcode.vue'
 
@@ -12,11 +11,8 @@ const copyToClipboard = () => {
   navigator.clipboard.writeText(sessionURL.value)
   alert('링크가 복사되었습니다!')
 }
-
-// 라우터 사용하여 창 닫기 버튼 클릭 시 페이지 이동
-const router = useRouter()
 const closeWindow = () => {
-  router.push('/') // 홈 또는 원하는 페이지로 이동
+  window.close() // 창 닫기
 }
 </script>
 

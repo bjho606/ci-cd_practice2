@@ -47,9 +47,10 @@ import SelectedList from './_1SelectedList.vue'
 
 .bottom-list {
   width: 100%;
-  height: 25%;
+  height: 100%;
   display: flex;
   align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive design */
