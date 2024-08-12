@@ -41,6 +41,6 @@ onMounted(() => {
 
 <style scoped>
 #v-app {
-  background-color: #E7FFDE;
+  background-color: #e7ffde;
 }
 </style>

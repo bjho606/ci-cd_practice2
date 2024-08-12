@@ -3,6 +3,7 @@ package com.ssafy.meshroom.backend.domain.user.application;
 import com.ssafy.meshroom.backend.domain.user.dao.UserRepository;
 import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
+import com.ssafy.meshroom.backend.domain.user.dto.UserNameInfo;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,5 +31,7 @@ public class UserDetailService implements UserDetailsService {
         userRepository.updateById(userId, userRole);
     }
 
-
+    public UserNameInfo getUserName(String userId) {
+        return userRepository.findBy_id(userId);
+    }
 }

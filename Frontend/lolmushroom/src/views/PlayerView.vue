@@ -13,6 +13,7 @@ import webSocketAPI from '@/api/webSocket'
 import NicknameModal from '@/components/common/NicknameModal.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 import AudioPlayer from '@/components/common/AudioPlayer.vue'
+import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const route = useRoute()
 const contentsStore = useContentsStore()
@@ -53,7 +54,8 @@ const getSessionConnection = async (sessionId, userName) => {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
       console.log(response.data)
       userStore.setUserId(response.data.result.userId)
-      userStore.userOvToken = response.data.result['ovToken'].slice(-16)
+      // userStore.userOvToken = response.data.result['ovToken'].slice(-20)
+      userStore.userOvToken = response.data.result['ovToken']
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -162,8 +164,6 @@ onMounted(async () => {
 
 <style scoped>
 .main {
-  padding: 2%
+  padding: 2%;
 }
-
-
 </style>

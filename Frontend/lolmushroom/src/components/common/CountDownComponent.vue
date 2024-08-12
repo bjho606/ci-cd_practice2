@@ -23,8 +23,10 @@
       {{ seconds }}
     </h1>
   </vue-countdown>
+  <br>
+  <br>
   <div class="countdown-tooltip">
-    <h1>{{ props.text }}</h1>
+    <h2 style="color: white;">{{ props.text }}</h2>
   </div>
 </template>
 
@@ -50,5 +52,6 @@
   .countdown-tooltip h1 {
     font-size: 40px;
     margin: 10px 0;
+    color: '#FFFFFF';
   }
 </style>

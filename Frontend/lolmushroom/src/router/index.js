@@ -42,7 +42,7 @@ const routes = [
         path: ':subSessionId/GroupSessionView',
         component: GroupSessionView,
         children: [
-          { path: 'TOF', name: 'TOF', component: TOFInputsComponent },
+          { path: 'TOF', name: 'TOF', component: TOFInputComponent },
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent }
         ]
       },

@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TFAnswerSignal {
+public class TFAnswerRequestSignal {
     private String ovToken;
     private int chosen;
 }
