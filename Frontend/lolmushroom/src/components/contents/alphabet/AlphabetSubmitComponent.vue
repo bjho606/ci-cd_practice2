@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 
 const category_name = ref('동물');
-const userInput = ref('ㅎ ㄹ ㅇ');
+const userInput = ref('asd');
 
 </script>
 
@@ -12,6 +12,9 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   </div>
 <div class="container">
   <div class="statusContainer">
+    <div class="progress-bar">
+      공통 컴포넌트인 프로그래스바 넣어야됨 feat. 규석
+    </div>
     <div class="info">
       <div class="info-category">카테고리</div>
       <div class="info-text">{{ category_name }}</div>
@@ -19,13 +22,10 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   </div>
   <div class="playContainer">
     <div class="userInput">
-      <div class="emojiField"></div><div :userInput class="initialBox">{{ userInput }}</div>
-    </div>
-    <div class="userInput">
       <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
     </div>
     <button class="submit">
-          정답 맞추기
+          제출하기
     </button>
   </div>
 </div>
@@ -64,7 +64,7 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   width: 600px;
   height: 60px;
   border-radius: 5px;
-  margin-top: 80px;
+  margin-top: 20px;
 }
 .info-category{
   margin: 0;
@@ -114,17 +114,6 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   height: 60px;
   background-color: #1F4F16;
 }
-.initialBox {
-  flex: 1;
-  height: 120px;
-  outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
-  border: none; /* 기본 테두리 제거 */
-  background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 64px; /* 원하는 폰트 크기로 조정 */
-  font-weight: bold;
-  padding: 10px; /* 내부 여백 추가 */
-  text-align: center;
-}
 .inputText {
   flex: 1;
   height: 60px;
@@ -145,10 +134,9 @@ const userInput = ref('ㅎ ㄹ ㅇ');
 }
 
 .submit{
-  font-size: 32px;
-  width: 292px;
+  width: 682px;
   height: 94px;
-  background-color: #24A319;
+  background-color: #1F4F16;
   border-radius: 20px;
   color: #fff;
   display: flex;

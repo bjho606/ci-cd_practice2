@@ -10,9 +10,9 @@ import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
 import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGrowContainer.vue'
-import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
 import TOFMainComponent from '@/components/contents/tof/TOFMainComponent.vue'
-import AlphabetMainComponent from '@/components/contents/alphabet/AlphabetMainComponent.vue'
+import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
+import AlphabetSubmitComponent from '@/components/contents/alphabet/AlphabetSubmitComponent.vue'
 import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
@@ -48,8 +48,8 @@ const routes = [
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent },
           {
             path: 'alphabet',
-            name: 'AlphabetMainComponent',
-            component: AlphabetMainComponent
+            name: 'AlphabetSubmitComponent',
+            component: AlphabetSubmitComponent
           }
         ]
       },
