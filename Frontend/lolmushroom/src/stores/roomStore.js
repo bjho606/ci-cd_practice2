@@ -43,7 +43,7 @@ export const useRoomStore = defineStore('room', {
           groupName: group.groupName,
           capacity: group.maxUserCount,
           occupants: group.currentUserCount,
-          users: group.users,
+          users: group.username,
           isReady: group.isReady,
           buttonClicked: true
         }

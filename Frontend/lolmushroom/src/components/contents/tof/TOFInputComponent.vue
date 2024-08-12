@@ -147,72 +147,80 @@
     </v-progress-linear>
   
   <br>
-  
-  <v-sheet class="mx-auto" width="300">
-      <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter"/>
-      <v-form ref="form" fast-fail @submit.prevent>
-        <v-container>
-          
-          <div class="flex justify-center">
-            <v-avatar image="../../../../src/assets/image/smile_face.svg"></v-avatar>
+    <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter" />
+    <v-form ref="form" fast-fail @submit.prevent>
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="6">
             <v-text-field
-            v-model="statements.firstTrue"
+              v-model="statements.firstTrue"
+              :rules="[NotNullRules]"
+              color="blue"
+              placeholder="나의 정보 중 진실을 알려주세요."
+              variant="solo"
+            />
+              <template v-slot:prepend-inner>
+                <img src="../../../../src/assets/image/smile_face.svg" alt="custom icon" class="input-icon" />
+              </template> 
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <v-text-field
+             v-model="statements.secondTrue"
             :rules="[NotNullRules]"
             color="blue"
             placeholder="나의 정보 중 진실을 알려주세요."
+            variant="solo"
             />
-          </div>
+          </v-col>
+        </v-row>        
+        
+        <v-row>
+          <v-col>
+            <v-text-field
+              v-model="statements.thirdTrue"
+              :rules="[NotNullRules]"
+              color="blue"
+              placeholder="나의 정보 중 진실을 알려주세요."
+              variant="solo"
+            />
+          </v-col>
+          <v-col>
+            <v-text-field
+            v-model="statements.firstFalse"
+            :rules="[NotNullRules]"
+            color="black"
+            placeholder="나의 정보 중 거짓을 알려주세요."
+            variant="solo"
+            />
+          </v-col>
+        </v-row>
           
-          <v-text-field
-          v-model="statements.secondTrue"
-          prepend-icon="../../../../src/assets/image/smile_face.svg"
-          :rules="[NotNullRules]"
-          color="blue"
-          placeholder="나의 정보 중 진실을 알려주세요."
-          />
-          
-          <v-text-field
-          v-model="statements.thirdTrue"
-          prepend-icon="../../../../src/assets/image/smile_face.svg"
-          :rules="[NotNullRules]"
-          color="blue"
-          placeholder="나의 정보 중 진실을 알려주세요."
-          />
-          
-          <v-text-field
-          v-model="statements.firstFalse"
-          prepend-icon="../../../../src/assets/image/wink_face.svg"
-          :rules="[NotNullRules]"
-          color="black"
-          placeholder="나의 정보 중 거짓을 알려주세요."
-          />
-          
-          <v-btn
+        <v-btn
           text="제출하기"
           size="large"
           color="#43A047"
           @click="submitStatements(statements.firstTrue, statements.secondTrue, statements.thirdTrue, statements.firstFalse)"
-          />
-        </v-container>
+        />
+      </v-container>
 
-          <!-- <v-btn
-          class="mt-2"
-          variant="tonal"
-          rounded="lg"
-          type="submit"
-          block
-          color="#3ABF38"
-          @click="
-            tofAnswerSubmit(
-              statements.firstTrue,
-              statements.secondTrue,
-              statements.thirdTrue,
-              statements.firstFalse
-            )
-          "/>제출하기
-        </v-btn> -->
-      </v-form>
-    </v-sheet>
+        <!-- <v-btn
+        class="mt-2"
+        variant="tonal"
+        rounded="lg"
+        type="submit"
+        block
+        color="#3ABF38"
+        @click="
+          tofAnswerSubmit(
+            statements.firstTrue,
+            statements.secondTrue,
+            statements.thirdTrue,
+            statements.firstFalse
+          )
+        "/>제출하기
+      </v-btn> -->
+    </v-form>
   </v-container>
 
   <!-- 진술을 제출했다면 -->
@@ -230,4 +238,14 @@
   background: #247719;
   opacity: 0.7;
 }
+
+v-text-field {
+  border: 1px solid black
+}
+
+.input-icon {
+  width: 24px;
+  height: 24px;
+}
+
 </style>
