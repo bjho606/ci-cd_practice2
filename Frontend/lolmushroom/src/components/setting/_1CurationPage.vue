@@ -1,7 +1,7 @@
 <script setup>
 import ContentsList from './_1ContentsList.vue'
 import ContentsCard from './_1ContentsCard.vue'
-import BottomList from './_1BottomList.vue'
+import SelectedList from './_1SelectedList.vue'
 </script>
 
 <template>
@@ -17,7 +17,7 @@ import BottomList from './_1BottomList.vue'
     </div>
     <!-- 하단 섹션 -->
     <div class="bottom-list">
-      <BottomList />
+      <SelectedList />
     </div>
   </div>
 </template>
@@ -46,12 +46,10 @@ import BottomList from './_1BottomList.vue'
 }
 
 .bottom-list {
-  height: 25%;
   width: 100%;
-  height: 100%;
+  height: 25%;
   display: flex;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
-  overflow: hidden;
+  align-items: center;
 }
 
 /* Responsive design */

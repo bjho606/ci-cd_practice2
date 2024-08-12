@@ -1,27 +1,35 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import TitleComponent from './_0TitleComponent.vue'
 import SessionStartCard from './_0SessionStartCard.vue'
+
+const router = useRouter()
+const onNextClick = () => {
+  router.push('curation')
+}
 </script>
 
 <template>
-  <v-container fluid class="start-page">
+  <div class="start-page">
     <!-- Pink Top Half -->
-    <v-row class="pink-section">
-      <v-col>
+    <div class="pink-section">
+      <div class="title-container">
         <TitleComponent />
-      </v-col>
-    </v-row>
-    <div class="card-container">
+      </div>
+    </div>
+    <div class="card-container" @click="onNextClick">
       <SessionStartCard />
     </div>
     <!-- White Bottom Half -->
-    <v-row class="white-section"> </v-row>
-  </v-container>
+    <div class="white-section"></div>
+  </div>
 </template>
 
 <style scoped>
 .start-page {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .pink-section {
@@ -32,15 +40,22 @@ import SessionStartCard from './_0SessionStartCard.vue'
   justify-content: center;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .white-section {
-  background-color: #ffffff;
   height: 50%;
 }
 
 .card-container {
   position: absolute;
-  top: 47%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  cursor: pointer; /* Add cursor pointer to indicate the card is clickable */
 }
 </style>

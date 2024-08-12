@@ -21,76 +21,134 @@ const closeWindow = () => {
 </script>
 
 <template>
-  <v-container fluid class="code-page">
+  <div class="code-page">
     <!-- Pink Top Half -->
-    <v-row class="pink-section">
-      <v-col class="text-center">
-        <qrcode-vue :value="sessionURL" :size="300" level="H" />
+    <div class="pink-section">
+      <div class="qrcode-container">
         <h3 class="title">QR코드를 공유하세요</h3>
-      </v-col>
-    </v-row>
-
-    <!-- White Bottom Half -->
-    <v-row class="white-section">
-      <v-col class="text-center">
-        <p class="subtext">방링크도 공유할 수 있어요</p>
-        <v-text-field
-          v-model="roomLink"
-          label="방링크"
-          readonly
-          append-icon="mdi-content-copy"
-          @click:append="copyToClipboard"
-          dense
-        ></v-text-field>
-
-        <v-btn color="green" @click="closeWindow" block small> 코드 창 닫기 </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+        <qrcode-vue :value="sessionURL" :size="150" level="H" />
+        <div class="text-over-line">
+          <p class="subtext">방링크도 공유할 수 있어요</p>
+        </div>
+        <div class="link-container">
+          <input v-model="sessionURL" class="link-input" readonly />
+          <button class="copy-button" @click="copyToClipboard">
+            <v-icon>mdi-content-copy</v-icon>
+          </button>
+        </div>
+        <div class="white-section">
+          <button class="close-button" @click="closeWindow">
+            코드 창 닫기
+            <v-icon class="close-icon">mdi-close</v-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .code-page {
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  background-color: #fff2f7;
 }
 
 .pink-section {
-  background-color: #fff2f7;
-  height: 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
-.white-section {
+.qrcode-container {
   background-color: #ffffff;
-  height: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  width: 40%;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .title {
-  font-size: 1em; /* 제목의 크기를 작게 설정 */
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+.text-over-line {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.text-over-line:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  z-index: 1;
 }
 
 .subtext {
-  font-size: 0.8em; /* 서브 텍스트의 크기를 작게 설정 */
-  margin-bottom: 5px;
+  font-size: 0.9em;
+  color: #666;
+  background-color: #fff;
+  padding: 0 10px;
+  position: relative;
+  z-index: 2;
+  display: inline-block;
 }
 
-.v-text-field {
-  max-width: 200px; /* 텍스트 필드의 크기를 작게 설정 */
-  margin-bottom: 5px;
+.link-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.v-btn {
+.link-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.copy-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.white-section {
   width: 100%;
-  max-width: 200px; /* 버튼의 크기를 작게 설정 */
-  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.close-button {
+  background-color: #8bff89;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  width: 80%;
+  position: relative;
+}
+
+.close-icon {
+  position: absolute;
+  right: 10px;
 }
 </style>

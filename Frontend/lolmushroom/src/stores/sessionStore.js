@@ -10,7 +10,7 @@ export const useSessionStore = defineStore('sessionInfo', {
   state: () => ({
     sessionId: null,
     subSessionId: null,
-    sessionUrl: null
+    sessionUrl: VITE_BASE_URL
   }),
   actions: {
     setSessionId(sessionId) {
@@ -31,6 +31,6 @@ export const useSessionStore = defineStore('sessionInfo', {
   persist: {
     key: 'session-info-store',
     storage: sessionStorage, // 세션 스토리지에 저장
-    paths: ['sessionId', 'subSessionId'] // 저장할 상태의 경로
+    paths: ['sessionId', 'subSessionId', 'sessionUrl'] // 저장할 상태의 경로
   }
 })

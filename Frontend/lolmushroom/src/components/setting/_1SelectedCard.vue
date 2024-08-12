@@ -6,15 +6,15 @@ const props = defineProps({
 
 const emit = defineEmits(['remove'])
 
-const removeCard = () => {
-  emit('remove')
+const onRemoveClick = () => {
+  emit('remove', props.item)
 }
 </script>
 
 <template>
   <div class="content-card">
     <img :src="item.imgUrl" alt="Content Thumbnail" class="thumbnail" />
-    <button class="delete-btn" @click="removeCard">✖</button>
+    <button class="delete-btn" @click="onRemoveClick">✖</button>
     <div class="content-info">
       <div>{{ item.contentTitle }}</div>
     </div>

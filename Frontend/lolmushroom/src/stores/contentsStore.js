@@ -18,6 +18,7 @@ export const useContentsStore = defineStore('contents', {
     contents: [],
     pickedContents: {},
     selectedContents: [],
+    totalDuration: 0,
 
     routeMapping: {
       1: 'TOF',
@@ -61,14 +62,22 @@ export const useContentsStore = defineStore('contents', {
       this.pickedContents = pickedContent
     },
     setSelectedContents(newOrder) {
-      this.selectContents = newOrder
+      this.selectedContents = newOrder
     },
-    removeSelectedContent(id) {
-      this.selectedContents = this.selectedContents.filter((content) => content._id !== id)
+    removeContent(content) {
+      const index = this.selectedContents.findIndex((c) => c._id === content._id)
+      if (index !== -1) {
+        this.selectedContents.splice(index, 1) // Remove the content from the array
+        this.totalDuration -= content.duration // Decrease the total duration
+      }
     },
+
     addContent(content) {
       const index = this.selectedContents.findIndex((c) => c._id === content._id)
-      if (index === -1) this.selectedContents.push(content)
+      if (index === -1) {
+        this.selectedContents.push(content)
+        this.totalDuration += content.duration
+      }
     },
 
     setCurrentContentsState(contentState) {
@@ -84,7 +93,6 @@ export const useContentsStore = defineStore('contents', {
     getContents: (state) => state.contents,
     getGroupedContents(state) {
       const grouped = {}
-
       state.contents.forEach((content) => {
         if (!grouped[content.category]) {
           grouped[content.category] = []
@@ -99,6 +107,7 @@ export const useContentsStore = defineStore('contents', {
     },
     getPickedContents: (state) => state.pickedContents,
     getSelectedContents: (state) => state.selectedContents,
+    getTotalDuration: (state) => state.totalDuration,
     getCurrentContentsId: (state) => state.currentContentsId,
     getContentsSequence: (state) => state.contentsSequence,
     getRouteMapping: (state) => state.routeMapping

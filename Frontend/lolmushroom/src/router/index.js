@@ -18,7 +18,9 @@ import SessionCode from '@/components/setting/_2SessionCode.vue'
 
 const routes = [
   // { path: '/', name: 'home', component: MakeSessionView },
-  { path: '/', name: 'home', component: CurationPage },
+  { path: '/', name: 'home', component: StartPage },
+  { path: '/curation', name: 'curation', component: CurationPage },
+  { path: '/sessioncode', name: 'sessioncode', component: SessionCode },
 
   {
     path: '/admin/:sessionId',
