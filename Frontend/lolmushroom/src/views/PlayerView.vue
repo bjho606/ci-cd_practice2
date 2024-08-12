@@ -141,17 +141,17 @@ onMounted(async () => {
 
 <template>
   <!-- IMP : ChatScreen Component -->
-  <ChatScreen />
+  <!-- <ChatScreen /> -->
   <!-- IMP : Camera, Mic, Audio Player Icon -->
-  <v-container>
+  <!-- <v-container>
     <v-icon :icon="cameraIcon" @click="toggleCameraIcon"></v-icon>
     <v-icon :icon="micIcon" @click="toggleMicIcon"></v-icon>
     <AudioPlayer />
-  </v-container>
+  </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
-  <v-container>
+  <div class="main">
     <RouterView />
-  </v-container>
+  </div>
   <!-- IMP : NickName Modal -->
   <NicknameModal
     :show="showNicknameModal"
@@ -160,4 +160,10 @@ onMounted(async () => {
   />
 </template>
 
-<style scoped></style>
+<style scoped>
+.main {
+  padding: 2%
+}
+
+
+</style>
