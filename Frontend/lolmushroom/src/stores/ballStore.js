@@ -24,6 +24,7 @@ export const useBallStore = defineStore('ballStore', {
         this.ballMap.set(group.sessionId, 20)
       })
       this.userGroup = this.currentGroup = subSessionId
+      console.log(this.currentGroup)
       webSocketAPI.connect({
         sessionId: sessionId,
         contentsId: 'touch',
@@ -54,23 +55,33 @@ export const useBallStore = defineStore('ballStore', {
     }
   },
   getters: {
-    getCurrentGroup: (state) => state.currentGroup,
-    getGroupName: (state) => (groupId) => state.groupNameMap.get(groupId),
-    getBallSize: (state) => (groupId) => state.ballMap.get(groupId),
-    getBallImage: (state) => (groupId) => {
-      if (groupId === state.userGroup) return greenBall
+    getCurrentGroup: (state) => {
+      return state.currentGroup
+    },
+    getCurrentGroupName: (state) => (groupId) => {
+      return state.groupNameMap.get(groupId)
+    },
+    getBallSize: (state) => (groupId) => {
+      return state.mushroomMap.get(groupId)
+    },
+    getBallSize: (state) => (groupId) => {
+      // groupId가 userGroup과 같으면 green ball 이미지를 반환
+      if (groupId === state.userGroup) {
+        return greenBall
+      }
+      // groupId가 userGroup과 다르면 blue ball 이미지를 반환
       return blueBall
     },
     getTotalBalls: (state) => {
-      const totalBall = []
-      state.ballMap.forEach((size, sessionId) => {
-        totalBall.push({
+      const totalBalls = []
+      state.mushroomMap.forEach((size, sessionId) => {
+        allMushrooms.push({
           sessionId,
           groupName: state.groupNameMap.get(sessionId),
           size
         })
       })
-      return totalBall
+      return allMushrooms
     }
   }
 })

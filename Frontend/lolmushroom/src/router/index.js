@@ -16,6 +16,7 @@ import AlphabetMainComponent from '@/components/contents/alphabet/AlphabetMainCo
 import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
+import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
 
 const routes = [
   // { path: '/', name: 'home', component: MakeSessionView },
@@ -60,7 +61,7 @@ const routes = [
           {
             path: '',
             name: 'MushroomGrowContainer',
-            component: MushroomGrowContainer
+            component: BallGrowContainer
           }
         ]
       }

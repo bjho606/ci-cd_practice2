@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
 import webSocketAPI from '@/api/webSocket'
-import blueBall from '@/assets/ballGrow/BlueBall.svg'
-import greenBall from '@/assets/ballGrow/GreenBall.svg'
 /**
  * IMP : MushroomGrow Store
  * * MushroomGrow Contents에 대한 전반적인 정보를 저장하고 있다.
