@@ -68,6 +68,7 @@ const createSubSessionHandler = async (sessionId) => {
  */
 const handleRoomClick = async (index) => {
   const room = rooms.value[index]
+  console.log(room)
   if (!room.buttonClicked) {
     await createSubSessionHandler(sessionStore.sessionId)
     sessionStore.setSessionId(sessionStore.sessionId)
