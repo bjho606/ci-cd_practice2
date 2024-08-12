@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-
 import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useUserStore } from '@/stores/userStore'
@@ -10,10 +9,11 @@ import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
 
-import NicknameModal from '@/components/common/NicknameModal.vue'
+import setNickname from '@/components/room/playerWaiting/setNickname.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 import AudioPlayer from '@/components/common/AudioPlayer.vue'
 import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
+
 
 const route = useRoute()
 const contentsStore = useContentsStore()
@@ -39,7 +39,7 @@ const toggleMicIcon = () => {
 /**
  * IMP 1. MainSession에 대한 Connection을 생성하는 CallBack()
  * REQ
- * @param sessionId
+ * @param `sessionId`
  * @param userName
  *
  * RES openvide_token, user_token
@@ -109,6 +109,7 @@ const userFlowHandler = async () => {
   console.log(
     `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
   )
+
   await getSessionConnection(sessionId, { userName: userStore.userNickname })
   await getSessionInfo(sessionId)
   webSocketAPI.connect({
@@ -125,20 +126,18 @@ const userFlowHandler = async () => {
  * * 5.1 : 닉네임 설정 X => showNicknameModal -> userFlowHandler()
  * * 5.2 : 닉네임 설정 O => webSocketAPI를 통한 Socket 재연결
  */
-onMounted(async () => {
+ onMounted(() => {
   if (userStore.userNickname === '닉네임을 설정해주세요') {
-    showNicknameModal.value = true
-    // await userFlowHandler()
+    showNicknameModal.value = true;
   } else {
-    webSocketAPI.connect({
-      sessionId: sessionStore.sessionId,
-      onMessageReceived: onMainSessionMessageReceived,
-      onEventReceived: onSessionEventReceived,
-      onProgressReceived: onProgressEventReceived,
-      subscriptions: ['chat', 'session', 'progress']
-    })
+    userFlowHandler();
   }
-})
+});
+
+// onMounted(async () => {
+//   await userFlowHandler();
+// })
+
 </script>
 
 <template>
@@ -151,18 +150,37 @@ onMounted(async () => {
     <AudioPlayer />
   </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
-  <div class="main">
+  <v-container fluid class="contents-container">
     <RouterView />
-  </div>
+  </v-container>
+
   <!-- IMP : NickName Modal -->
-  <NicknameModal
+<setNickname
     :show="showNicknameModal"
     @update:show="showNicknameModal = $event"
     @nickname-saved="userFlowHandler"
-  />
+  /> 
 </template>
 
+
 <style scoped>
+
+
+.contents-container {
+  display: flex; /* Use Flexbox for layout */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  background: #E7FFDE;
+  /* background-color: rgba(224, 224, 224, 0.6); */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  position: absolute; /* Position absolutely within parent */
+  overflow: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 .main {
   padding: 2%;
 }
