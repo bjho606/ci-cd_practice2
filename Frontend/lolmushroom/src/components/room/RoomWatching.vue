@@ -6,6 +6,7 @@ import { useSessionStore } from '@/stores/sessionStore'
 import { useMushroomStore } from '@/stores/mushroomStore'
 import { useRoomStore } from '@/stores/roomStore'
 import webSocketAPI from '@/api/webSocket'
+import WatchWaiting from './eachroom/adminWatchWaiting.vue'
 import Mushroom from './eachroom/eachMushRoom.vue'
 import Swal from 'sweetalert2'
 import contentsAPI from '@/api/contents'
@@ -99,6 +100,7 @@ const goToMultiRoom = () => {
 
 <template>
   <div class="room-waiting">
+    <!-- [진행자 대기화면 Header] -->
     <header class="room-waiting-header">
       <div class="room-waiting-title">
         <span>😀</span> 
@@ -106,61 +108,31 @@ const goToMultiRoom = () => {
       </div>
       <div class="room-waiting-count-info">
           현재 인원  
-          <span class="total-count-info">{{ currentCount }}/{{ maxCount }}</span>
+          <span class="total-count-info">{{ currentCount }}/ 60</span>
       </div>
     </header>
 
-    <div v-if="!currentContents">
-      <v-row>
-        <v-col v-for="(room, index) in rooms" :key="index" cols="12" md="6">
-          <v-btn
-            size="x-large"
-            width="300"
-            height="100"
-            rounded="lg"
-            block
-            color="#e9ecef"
-            class="mb-2"
-          >
-            <b>{{ room.groupName || `그룹${index + 1}` }}</b>
-            <div class="mr">
-              <span v-if="room.isReady" class="ready-status"> (준비 완료) </span
-              >{{ room.occupants }}/{{ room.capacity }}
-            </div>
-            <div class="mr">
-              <v-icon icon="$next"></v-icon>
-            </div>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </div>
-    <!-- 진행되는 콘텐츠에 따라 바뀌는 부분(?) -->
+    <!-- [진행자 대기화면 그룹별 현황 뷰] : 진행되는 콘텐츠에 따라 바뀌는 부분 -->
+    <!-- 0. 기본 대기 화면 -->
+    <WatchWaiting v-if="!currentContents"/>
+    
+    <!-- 3. 공 키우기 화면 -->
     <div v-if="currentContents === '3'">
       <div class="grid-container">
-        <!-- UI 수정 -->
         <Mushroom v-for="mushroom in mushrooms" :key="mushroom.sessionId" :group="mushroom" />
       </div>
     </div>
-    <!-- 
-    === 기존 코드부분 === 
-    <div class="d-flex justify-center mt">
-      <v-btn color="deep-orange" @click="goToMultiRoom"> 돌아가기 </v-btn>
-    </div>
-    <div class="d-flex justify-center mt">
-      <v-btn color="pink" @click="startGame"> 게임 시작 </v-btn>
-    </div> 
-    >>>
-    -->
-  </div>
-
-  <div class="room-waiting-footer">
-    <div></div>
-    <div class="room-waiting-footer-start">
-      <button class="start-session-btn" @click="startGame">컨텐츠 시작하기</button>
-    </div>
-    <div class="room-waiting-footer-share">
-      <v-btn class="share-session-btn">공유</v-btn>
-      <div class="share-info-text">방 코드 공유로 편리한 오리엔테이션을 만드세요</div>
+        
+    <!-- [진행자 대기화면 Footer] -->
+    <div class="room-waiting-footer">
+      <div></div>
+      <div class="room-waiting-footer-start">
+        <button class="start-session-btn" @click="startGame">컨텐츠 시작하기</button>
+      </div>
+      <div class="room-waiting-footer-share">
+        <v-btn class="share-session-btn">공유</v-btn>
+        <div class="share-info-text">방 코드 공유로 편리한 오리엔테이션을 만드세요</div>
+      </div>
     </div>
   </div>
 </template>
@@ -292,6 +264,81 @@ div {
 .share-info-text {
   max-width: 100%;
   font-size: 3vm;
+}
+
+.group-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.group-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid #00FF00;
+  border-radius: 20px;
+  width: 23%;
+  text-align: center;
+  width: 315px;
+  height: 315px;
+}
+
+.group-card.ready .group-status {
+  background-color: #1F4F16;
+  color: #ffffff;
+}
+
+.group-card.preparing .group-status {
+  background-color: #00D200;
+  color: #ffffff;
+}
+
+.group-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 45px;
+  margin: 10px 0;
+  padding: 10px 0;
+}
+
+.group-name {
+  flex: 1;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.group-count {
+  flex: 1;
+  font-size: 20px;
+}
+
+.group-members {
+  list-style: none;
+  height: 130px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.group-status {
+  background-color: #364b41;
+  color: white;
+  height: 45px;
+  font-size: 20px;
+  border: none;
+  align-content: center;
+}
+
+.empty-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #00D200;
+  height: 315px;
+  width: 315px;
 }
 
 </style>

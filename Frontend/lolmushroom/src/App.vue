@@ -38,7 +38,6 @@ onMounted(() => {
     <!-- IMP : 현재 의도는 Navigation Drawer가 Group / GroupFight 여부에 따라 달라지는 것 -->
     <v-navigation-drawer :width="10" permanent> </v-navigation-drawer>
     <v-navigation-drawer :width="10" location="right" permanent></v-navigation-drawer>
-    <GlobalHeader />
     <v-main class="d-flex align-center justify-center background">
       <v-container class="container">
         <RouterView></RouterView>
