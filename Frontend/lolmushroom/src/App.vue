@@ -4,7 +4,8 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
-import PlayerWatingGround from './components/room/playerWating/PlayerWatingGround.vue'
+import PlayerNicknameSetting from './components/room/playerWating/PlayerNicknameSetting.vue'
+
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
  * IMP : ContentsAPI.getContents()를 호출하는 fetchContents를 통해 Pinia에 저장
@@ -40,7 +41,7 @@ onMounted(() => {
     <v-main class="d-flex align-center justify-center">
       <v-container>
         <!--<RouterView></RouterView>-->
-        <PlayerWatingGround />
+        <PlayerNicknameSetting />
       </v-container>
       <div class="mushroomGreen mushroom-1"></div>
       <div class="mushroomOrange mushroom-2"></div>
@@ -50,6 +51,20 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
+
+@font-face {
+  font-family: Line;
+  src:
+    url('@/assets/fonts/LINESeedKR-Bd.woff') format('woff'),
+    url('@/assets/fonts/LINESeedKR-Bd.woff2') format('woff2');
+}
+
+*{
+  font-family: Line;
+}
+
+
 /* .container {
   max-width: calc(100%);
   height: 100%;

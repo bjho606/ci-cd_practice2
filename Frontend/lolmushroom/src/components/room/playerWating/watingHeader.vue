@@ -31,13 +31,12 @@ const props = defineProps({
   .box {
     flex: 1;
     text-align: center;
-    font-weight: bold;
     padding: 20px;
     border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 70px; 
+    min-height: 100px; 
   }
   .first {
     background-color: #90FF77;
