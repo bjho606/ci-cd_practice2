@@ -24,7 +24,7 @@ export const useContentsStore = defineStore('contents', {
       1: 'TOF',
       2: null,
       3: 'MushroomGrowContainer',
-      4: null,
+      4: 'alphabet',
       5: null,
       6: null,
       7: null,
