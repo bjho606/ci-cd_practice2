@@ -2,28 +2,30 @@
 import { onMounted, ref, watch } from 'vue';
 
 const category_name = ref('동물');
-const userInput = ref('asd');
+const userInput = ref('ㅎ ㄹ ㅇ');
 
 </script>
 
 <template>
-<div class="container">
   <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
   </div>
-  <div class="progress-bar">
-    공통 컴포넌트인 프로그래스바 넣어야됨 feat. 규석
-  </div>
-  <div class="playContainer">
+<div class="container">
+  <div class="statusContainer">
     <div class="info">
       <div class="info-category">카테고리</div>
       <div class="info-text">{{ category_name }}</div>
+    </div>
+  </div>
+  <div class="playContainer">
+    <div class="userInput">
+      <div class="emojiField"></div><div :userInput class="initialBox">{{ userInput }}</div>
     </div>
     <div class="userInput">
       <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
     </div>
     <button class="submit">
-          제출하기
+          정답 맞추기
     </button>
   </div>
 </div>
@@ -42,21 +44,19 @@ const userInput = ref('asd');
   height: 94px;
   background-color: blueviolet;
 }
+
+.statusContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
 .progress-bar{
-  margin: 20px auto auto ;
   width: 1000px;
   height: 69px;
   background-color: yellow;
-}
-
-.playContainer {
-  margin-top: 10px;
-  height: 650px;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 수직으로 가운데 정렬 */
-  /* flex: 1; */
-  justify-content: space-around; /* 수평으로 가운데 정렬 */
 }
 
 .info{
@@ -64,7 +64,7 @@ const userInput = ref('asd');
   width: 600px;
   height: 60px;
   border-radius: 5px;
-  margin-bottom: 100px;
+  margin-top: 80px;
 }
 .info-category{
   margin: 0;
@@ -88,6 +88,16 @@ const userInput = ref('asd');
   align-items: center;
   
 }
+.playContainer {
+  margin-top: 10px;
+  height: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 수직으로 가운데 정렬 */
+  /* flex: 1; */
+  justify-content: space-around; /* 수평으로 가운데 정렬 */
+}
+
 .userInput{
   width: 571px;
   height: 134px;
@@ -103,6 +113,17 @@ const userInput = ref('asd');
   width: 60px;
   height: 60px;
   background-color: #1F4F16;
+}
+.initialBox {
+  flex: 1;
+  height: 120px;
+  outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
+  border: none; /* 기본 테두리 제거 */
+  background-color: transparent; /* 배경색 투명하게 설정 */
+  font-size: 64px; /* 원하는 폰트 크기로 조정 */
+  font-weight: bold;
+  padding: 10px; /* 내부 여백 추가 */
+  text-align: center;
 }
 .inputText {
   flex: 1;
@@ -124,9 +145,10 @@ const userInput = ref('asd');
 }
 
 .submit{
-  width: 682px;
+  font-size: 32px;
+  width: 292px;
   height: 94px;
-  background-color: #1F4F16;
+  background-color: #24A319;
   border-radius: 20px;
   color: #fff;
   display: flex;
