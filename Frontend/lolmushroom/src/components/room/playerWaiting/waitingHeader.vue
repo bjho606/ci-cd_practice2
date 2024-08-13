@@ -1,3 +1,4 @@
+<!-- eslint-disable no-unused-vars -->
 <script setup>
 import { defineProps } from 'vue'
 import SmileyFace from '@/assets/image/Smileyface.svg'
@@ -37,7 +38,7 @@ const props = defineProps({
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  box-shadow: 0px 3px 0px 0px #555555;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .first {
   border-radius: 5px 0px 0px 5px;

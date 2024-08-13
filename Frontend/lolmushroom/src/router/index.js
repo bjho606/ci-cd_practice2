@@ -36,7 +36,7 @@ const routes = [
     children: [
       { path: 'multiroom', name: 'multiroom', component: MultiRoom },
       { path: 'roomwatching', name: 'roomwatching', component: RoomWatching },
-      { path: 'managerwaiting', name: 'managerwaiting', component: ManagerWaiting }
+      { path: 'managerwaiting', name: 'managerwaiting', component: ManagerWaiting },
     ]
   },
 
@@ -52,8 +52,8 @@ const routes = [
         children: [
           { path: 'TOF', name: 'TOF', component: TOFInputComponent },
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent },
-          { path: 'alphabet',name: 'alphabet', component: AlphabetSubmitComponent },
-          { path: 'alphabetContent',name: 'alphabetContent', component: AlphabetMainComponent },
+          { path: 'alphabet', name: 'alphabet', component: AlphabetSubmitComponent },
+          { path: 'alphabetContent', name: 'alphabetContent', component: AlphabetMainComponent },
         ]
       },
       {
@@ -63,7 +63,7 @@ const routes = [
         children: [
           {
             path: '',
-            name: 'MushroomGrowContainer',
+            name: 'BallGrowContainer',
             component: BallGrowContainer
           }
         ]

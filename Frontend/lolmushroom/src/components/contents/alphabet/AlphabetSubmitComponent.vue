@@ -11,6 +11,7 @@
   const userStore = useUserStore()
   const quizWord = ref('');
   const showAlter = ref('')
+
   // 세션에 참가한 유저 정보를 요청하는 함수
   const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
   store.setTotalUser(response['data']['result']['currentUserCount'])

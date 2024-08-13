@@ -23,11 +23,11 @@ export const useContentsStore = defineStore('contents', {
     routeMapping: {
       1: 'TOF',
       2: null,
-      3: 'MushroomGrowContainer',
+      3: null,
       4: 'alphabet',
       5: null,
       6: null,
-      7: null,
+      7: 'BallGrowContainer',
       8: null,
       null: 'EndingPage'
     },
@@ -52,22 +52,7 @@ export const useContentsStore = defineStore('contents', {
   }),
   actions: {
     setContents(contents) {
-      this.contents = contents.map((content, index) => {
-        let category
-        if (index < 2) {
-          category = '자기소개'
-        } else if (index < 5) {
-          category = '협동'
-        } else if (index < 8) {
-          category = '경쟁'
-        }
-        return {
-          ...content,
-          category,
-          icon: 'mdi-account',
-          isPlayable: true
-        }
-      })
+      this.contents = contents
     },
     setPickedContents(pickedContent) {
       this.pickedContents = pickedContent

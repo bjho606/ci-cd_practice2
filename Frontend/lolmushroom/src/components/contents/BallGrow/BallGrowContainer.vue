@@ -3,7 +3,7 @@ import { onMounted, computed } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import watingHeader from '@/components/room/playerWaiting/waitingHeader.vue'
+import waitingHeader from '@/components/room/playerWaiting/waitingHeader.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 
@@ -32,7 +32,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <watingHeader />
+  <waitingHeader />
   <div class="main-container">
     <div class="content-container">
       <div class="left-container">

@@ -8,7 +8,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import setName from '@/components/room/playerWaiting/setName.vue'
+import SetName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
 
@@ -61,9 +61,8 @@ const onSessionEventReceived = (message) => {
 }
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
-  // 이규석 개발용
-  console.log('초성 겜으로 연결')
-  router.push({ name: 'alphabet', params: { subSessionId: sessionStore.subSessionId } })
+  console.log(sessionStore.subSessionId)
+  router.push({name: 'alphabet', params: {subSessionId: sessionStore.subSessionId}})
 }
 
 /**
@@ -133,7 +132,7 @@ onMounted(() => {
     </div>
   </div>
   <!-- IMP : NickName Modal -->
-  <setName
+  <SetName
     :show="showNameModal"
     @update:show="showNameModal = $event"
     @name-saved="userFlowHandler"
