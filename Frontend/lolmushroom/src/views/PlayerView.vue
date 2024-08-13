@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useUserStore } from '@/stores/userStore'
@@ -13,6 +13,7 @@ import ChatScreen from '@/components/common/ChatScreen.vue'
 import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const route = useRoute()
+const router = useRouter()
 const contentsStore = useContentsStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -61,12 +62,15 @@ const onSessionEventReceived = (message) => {
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
   console.log('뱉어내')
-  console.log(contentsStore.currentContentsId)
-  console.log(contentsStore.contentsSequence)
-  console.log(contentsStore.totalContentsCount)
-  console.log(contentsStore.finishGroupCount)
-  console.log(contentsStore.totalGroupCount)
-  console.log(contentsStore.currentGroupState)
+  // console.log(contentsStore.currentContentsId)
+  // console.log(contentsStore.contentsSequence)
+  // console.log(contentsStore.totalContentsCount)
+  // console.log(contentsStore.finishGroupCount)
+  // console.log(contentsStore.totalGroupCount)
+  // console.log(contentsStore.currentGroupState)
+  console.log(sessionStore.subSessionId)
+  // 개발용으로 여기로 보냄
+  router.push({name: 'alphabet', params: {subSessionId: sessionStore.subSessionId}})
 }
 
 /**

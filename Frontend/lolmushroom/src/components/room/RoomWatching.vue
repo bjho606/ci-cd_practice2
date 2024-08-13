@@ -108,7 +108,7 @@ const goToMultiRoom = () => {
       </div>
       <div class="room-waiting-count-info">
           현재 인원  
-          <span class="total-count-info">{{ currentCounts }}/ 60</span>
+          <span class="total-count-info">{{ 1 }}/ 60</span>
       </div>
     </header>
 
@@ -121,6 +121,11 @@ const goToMultiRoom = () => {
       <div class="grid-container">
         <Mushroom v-for="mushroom in mushrooms" :key="mushroom.sessionId" :group="mushroom" />
       </div>
+    </div>
+
+    <!-- 4. 초성 게임 화면 -->
+    <div v-if="currentContents === '4'">
+      <p>우선 초성 게임 관리자 화면</p>
     </div>
         
     <!-- [진행자 대기화면 Footer] -->

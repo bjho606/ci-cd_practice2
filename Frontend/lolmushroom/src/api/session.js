@@ -15,6 +15,7 @@ export default {
     return axios.get(`${API_URL}/sessions/${sessionId}`).then(success).catch(failure)
   },
   getSubSessionInfo(sessionId, subSessionId, success, failure) {
+    console.log(`${API_URL}/sessions/${sessionId}/${subSessionId}`)
     // * Player : Sub Session의 정보를 가져온다.
     return axios
       .get(`${API_URL}/sessions/${sessionId}/${subSessionId}`)

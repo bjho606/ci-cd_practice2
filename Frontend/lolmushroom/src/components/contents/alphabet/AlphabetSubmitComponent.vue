@@ -17,7 +17,7 @@
 
   console.log('총 인원수', store.totalUserCount)
 
-  const categoryName = contentsAPI.getCategory(sessionStore.subSessionId)
+  const categoryName = await contentsAPI.getCategory(sessionStore.subSessionId)
 
   console.log('내 퀴즈 카테고리', categoryName)
 
