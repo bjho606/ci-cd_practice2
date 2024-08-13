@@ -26,7 +26,7 @@ export const useRoomStore = defineStore('room', {
       occupants: 0,
       users: [],
       isReady: false,
-      buttonClicked: false
+      isActive: false
     }))
   }),
   actions: {
@@ -46,7 +46,7 @@ export const useRoomStore = defineStore('room', {
           occupants: group.currentUserCount,
           users: group.username,
           isReady: group.isReady,
-          buttonClicked: true
+          isActive: true
         }
         this.activeButtonIndex = index + 1
       })
@@ -54,13 +54,13 @@ export const useRoomStore = defineStore('room', {
     
     setButtonClicked(index){
       if(index >=0 && index < this.rooms.length){
-        this.rooms[index].buttonClicked = true;
+        this.rooms[index].isActive = true;
       }
     }
   },
   getters: {
     getRooms: (state) => state.rooms,
-    getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
+    getActiveRooms: (state) => state.rooms.filter((room) => room.isActive),
     getActiveButtonIndex: (state) => state.activeButtonIndex,
     getTotalUserCount: (state) => state.currentUserCount,
     getTotalMaxUserCount: (state) => state.maxUserCount,

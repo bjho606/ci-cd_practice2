@@ -15,6 +15,7 @@ const fetchContents = async () => {
   try {
     const response = await contentsAPI.getContents()
     if (response.data.isSuccess) {
+      console.log(response.data)
       contentsStore.setContents(response.data.result.contents)
 
     }
@@ -36,3 +37,11 @@ onMounted(() => {
     <RouterView />
   </v-app>
 </template>
+
+
+<style scoped>
+
+
+
+
+</style>
