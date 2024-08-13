@@ -1,0 +1,3 @@
+[2024-08-13 17:00:35:583] INFO  14272 --- [  restartedMain] c.s.m.backend.BackendApplication         : Starting BackendApplication using Java 17.0.12 with PID 14272 (C:\gyuseok\S11P12A401\Backend\build\classes\java\main started by SSAFY in C:\gyuseok\S11P12A401\Backend)
+[2024-08-13 17:00:35:583] DEBUG 14272 --- [  restartedMain] c.s.m.backend.BackendApplication         : Running with Spring Boot v3.3.2, Spring v6.1.11
+[2024-08-13 17:00:35:584] INFO  14272 --- [  restartedMain] c.s.m.backend.BackendApplication         : The following 3 profiles are active: "_dev", "dev", "dev-log"
