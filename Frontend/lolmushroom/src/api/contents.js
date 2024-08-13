@@ -33,8 +33,8 @@ export default {
   getCategory(sessionId, success, failure) {
     return axios.get(`${API_URL}/game/ini-quiz/category/${sessionId}`).then(success).catch(failure)
   },
-  createQuizWord(sessionId, object, success, failure) {
-    return axios.post(`${API_URL}/game/ini-quiz/${sessionId}`, object).then(success).catch(failure)
+  createQuizWord(sessionId, subSessionId, object, success, failure) {
+    return axios.post(`${API_URL}/game/ini-quiz/${sessionId}/${subSessionId}`, object).then(success).catch(failure)
   },
   getQuizWords(sessionId, success, failure) {
     return axios.get(`${API_URL}/game/ini-quiz/${sessionId}`).then(success).catch(failure)

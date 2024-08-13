@@ -139,6 +139,9 @@ const addSubscriptions = (
       case 'end':
         addFinishSubscription(onEndReceived)
         break
+      case 'guess':
+        addGuessSubscription(sessionId, subSessionId, onEventReceived)
+        break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
     }
@@ -266,6 +269,21 @@ const addFinishSubscription = (onEndReceived) => {
   }
 }
 
+// 다른 사람의 예측 단어 구독
+const addGuessSubscription = (sessionId, subSessionId, onEventReceived) => {
+  const guessKey = 'guess'
+  if (!subscriptionMap.has(guessKey)) {
+    console.log('unholy')
+    const finishSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`, (event) => {
+      console.log(`Received event from Subscribe - 다른 사람`, event.body)
+      if (onEventReceived) {
+        onEventReceived(JSON.parse(event.body))
+      }
+    })
+    subscriptionMap.set(guessKey, finishSubscription)
+  }
+}
+
 /**
  * IMP : ContentsId을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
  * @param {*} sessionId
@@ -386,6 +404,8 @@ const sendSubmitData = (destination, data) => {
 
 // 진술 선택 완료시, 제출 유저와 제출 문항 전달
 const sendAnswerData = (destination, data) => {
+  console.log(destination)
+  console.log(data)
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,

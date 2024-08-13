@@ -4,15 +4,17 @@
   import { useAlphabetStore } from '@/stores/alphabetStore';
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
+  import CountDownComponent from '@/components/common/CountDownComponent.vue'
 
   const store = useAlphabetStore()
   const sessionStore = useSessionStore()
   const isTimeUp = ref()
   const counting = ref(true)
-  const index = ref()
+  const showAlert = ref()
+  const index = ref(0)
   const guessWord = ref('')
   const guessWords = []
-  const areSubmitAnswer = computed(store.submitUserCount === store.totalUserCount ? true : '') 
+  const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
 
   // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
   const timeUp = (bool) => {
@@ -20,34 +22,41 @@
     counting.value = !bool
   }
 
-  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)['result']
-  
+  // 모든 문제를 가져옴
+  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
+  const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
+
   // 정답을 발행
   const publishAnswer = () => {
-    const data = {
-      guessWord: guessWord.value
+    if (guessWord.value === '') {
+      showAlert.value = true
+    } else {
+      const data = {
+        guessWord: guessWord.value
+      }
+      const response = webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
+      guessWord.value = ''
+      console.log(response)
     }
-    webSocketAPI.sendAnswerData(`/publish/game/tf/answer/${sessionStore.subSessionId}`, data)
   }
 
   // 다른 사용자의 정답을 구독
   const onAnswerReceived = (event) => {
     console.log('초성 게임 전달 받았음', event)
-    const { ovToken, userName, guessWord } = event
-    guessWords.push(guessWord)
+    // const { ovToken, userName, guessWord } = event
+    // guessWords.push(guessWord)
+    console.log(guessWords, '이규석')
   }
 
 
   onMounted(async () => {
-    console.log('연결 좀...')
+    console.log('초성 게임 연결 중..')
     // 세션 연결
     webSocketAPI.connect({
           sessionId: sessionStore.subSessionId,
           contentsName: 'tf',
           onEventReceived: onAnswerReceived,
-          // onNextReceived: onNextReceived,
-          // onEndReceived: onEndReceived,
-          subscriptions: ['answer', 'next', 'end']
+          subscriptions: ['guess']
         })
   })
 
@@ -61,16 +70,20 @@
     <div class="statusContainer">
       <div class="info">
         <div class="info-category">카테고리</div>
-        <div class="info-text">{{ quizWords[index]['categoryName'] }}</div>
+        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
       </div>
     </div>
     <div class="playContainer">
       <div class="userInput">
         <div class="emojiField"></div>
-        <div div :userInput class="initialBox">{{ quizWords[index]['quizWord'] }}</div>
+        <div div :guessWord class="initialBox">{{ alliIniQuizInfos[index]['quizWord'] }}</div>
       </div>
       <div class="userInput">
-        <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!">
+        <div class="emojiField"></div>
+        <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
+      </div>
+      <div>
+        <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert" class="warning-alert"/>
       </div>
       <button class="submit" @click="publishAnswer()">
             정답 맞추기
@@ -219,5 +232,7 @@
   align-items: center;
 }
 
-
+.warning-alert {
+  width: 100%;
+}
 </style>
