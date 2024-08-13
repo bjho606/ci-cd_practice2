@@ -26,7 +26,7 @@ export const useRoomStore = defineStore('room', {
       occupants: 0,
       users: [],
       isReady: false,
-      isActive: false
+      teamLeaderId: '',
       isActive: false
     }))
   }),
@@ -46,6 +46,7 @@ export const useRoomStore = defineStore('room', {
           occupants: group.currentUserCount,
           users: group.username,
           isReady: group.isReady,
+          teamLeaderId: group.teamLeaderId,
           isActive: true
         }
         this.activeButtonIndex = index + 1

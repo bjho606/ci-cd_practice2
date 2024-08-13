@@ -8,7 +8,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import setName from '@/components/room/playerWaiting/setName.vue'
+import SetName from '@/components/room/playerWaiting/SetName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
 const route = useRoute()
@@ -128,7 +128,7 @@ onMounted(() => {
     </div>
   </div>
   <!-- IMP : NickName Modal -->
-  <setName
+  <SetName
     :show="showNameModal"
     @update:show="showNameModal = $event"
     @name-saved="userFlowHandler"

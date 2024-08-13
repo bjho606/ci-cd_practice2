@@ -65,7 +65,7 @@ const routes = [
         children: [
           {
             path: '',
-            name: 'MushroomGrowContainer',
+            name: 'BallGrowContainer',
             component: BallGrowContainer
           }
         ]
