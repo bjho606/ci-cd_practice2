@@ -8,8 +8,6 @@
   import contentsAPI from '@/api/contents'
   import sessionAPI from '@/api/session'
   import webSocketAPI from '@/api/webSocket';
-  import ButtonComponent from '@/components/common/ButtonComponent.vue';
-  import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue';
   
   const router = useRouter()
   const userStore = useUserStore()

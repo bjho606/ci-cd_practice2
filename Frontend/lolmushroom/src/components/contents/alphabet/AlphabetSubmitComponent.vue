@@ -1,16 +1,25 @@
 <script setup>
   import { onMounted, ref, watch } from 'vue';
+  import { useSessionStore } from '@/stores/sessionStore'
   import { useAlphabetStore } from '@/stores/alphabetStore'
+  import sessionAPI from '@/api/session'
 
   const store = useAlphabetStore()
+  const sessionStore = useSessionStore()
   const category_name = ref('동물');
   const userInput = ref('asd');
+
+  // 세션에 참가한 유저 정보를 요청하는 함수
+  const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
+  store.setTotalUser(response['data']['result']['currentUserCount'])
+
+  console.log(store.totalUserCount)
 </script>
 
 <template>
-  <div class="header">
+  <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
-  </div>
+  </div> -->
 <div class="container">
   <div class="statusContainer">
     <div class="progress-bar">

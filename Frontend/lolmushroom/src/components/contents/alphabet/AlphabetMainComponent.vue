@@ -7,9 +7,9 @@ const userInput = ref('ㅎ ㄹ ㅇ');
 </script>
 
 <template>
-  <div class="header">
+  <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
-  </div>
+  </div> -->
 <div class="container">
   <div class="statusContainer">
     <div class="info">

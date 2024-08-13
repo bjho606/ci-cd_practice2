@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia'
+
 // import router from '@/router'
+
+
 
 // TOFStore 정의
 export const useAlphabetStore = defineStore('alphabet', {
@@ -19,6 +22,9 @@ export const useAlphabetStore = defineStore('alphabet', {
   actions: {
     submitUserIncrease() {
       this.submitUserCount++
+    },
+    setTotalUser (userCount) {
+      this.totalUserCount = userCount
     },
     addChosenData(user, chosen) {
       this.chosenArray[chosen].push(user)

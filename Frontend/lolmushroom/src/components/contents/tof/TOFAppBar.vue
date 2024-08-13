@@ -1,4 +1,9 @@
 <script setup>
+  const props = defineProps({
+    title: String,
+    subtitle: String,
+    text: String,
+  })
 </script>
 
 <template>
@@ -7,15 +12,14 @@
     <div class="box first elevation-8">
       <div class="content-wrapper">
         <v-img src="../../../../src/assets/image/Smillyface.svg" class="smile-image"/>
-        <strong>진실 혹은 거짓</strong>
+        <strong>{{ props.title }}</strong>
       </div>
     </div>
     <div class="box second elevation-8">
-      <p>
-        <span style="color: blue;">진실 3개</span>, <span style="color: red;">거짓 1개</span>로 나를 소개해 보세요!</p>
+      <p>{{ props.subtitle }}</p>
     </div>
     <div class="box third elevation-8">
-      <p>당신의 얼굴이 카메라에 보이면 당신의 차례입니다.</p>
+      {{ props.text }}
     </div>
   </header>
 </template>

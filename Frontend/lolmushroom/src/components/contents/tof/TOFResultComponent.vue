@@ -10,13 +10,13 @@
   const store = useTOFStore()
   const expanded = ref({})
 
-  const correctRate = computed(() => {
-    return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
-  })
+  // const correctRate = computed(() => {
+  //   return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
+  // })
 
-  const toggleList = (choice) => {
-    expanded.value[choice] = !expanded.value[choice]
-  }
+  // const toggleList = (choice) => {
+  //   expanded.value[choice] = !expanded.value[choice]
+  // }
 </script>
 
 <template>

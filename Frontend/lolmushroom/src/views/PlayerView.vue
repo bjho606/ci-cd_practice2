@@ -151,8 +151,16 @@ onMounted(async () => {
     <AudioPlayer />
   </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
-  <div class="main">
-    <TOFAppBar />
+  <div class="main" v-if="contentsStore.currentContentsId === '1'">
+    <TOFAppBar title="진실 혹은 거짓" subtitle="진실 3개, 거짓 1개로 나를 소개해 보세요!" text="당신의 얼굴이 카메라에 보이면 당신의 차례입니다."/>
+    <RouterView />
+  </div>
+  <div class="main" v-else-if="contentsStore.currentContentsId === '4'">
+    <TOFAppBar title="초성 맞추기" subtitle="초성을 토대로 단어를 맞춰보세요." text="제출하기를 누르면 입력한 단어가 초성으로 보입니다!"/>
+    <RouterView />
+  </div>
+  <div class="main" v-else>
+    <!-- <TOFAppBar title="초성 맞추기" subtitle="초성을 토대로 단어를 맞춰보세요." text="제출하기를 누르면 입력한 단어가 초성으로 보입니다!"/> -->
     <RouterView />
   </div>
   <!-- IMP : NickName Modal -->
@@ -164,7 +172,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-  .main {
+  /* .main {
     background:#E7FFDE;;
-  }
+  } */
 </style>

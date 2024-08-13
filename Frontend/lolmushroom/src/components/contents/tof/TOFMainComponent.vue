@@ -7,13 +7,11 @@
   import sessionAPI from '@/api/session';
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
-  import ButtonComponent from '@/components/common/ButtonComponent.vue';
   import ProgressBar from '@/components/common/OtherUserWaitingComponent.vue';
   import OpenViduComponent from '@/components/contents/tof/openvidu/OpenViduComponent.vue';
   import CountDownComponent from '@/components/common/CountDownComponent.vue';
-  import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue';
   import TOFResultComponent from '@/components/contents/tof/TOFResultComponent.vue'
-  import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue';
+  // import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue';
   // import ResultOverlayComponent from '@/components/common/ResultOverlayComponent.vue';
 
   const store = useTOFStore()
