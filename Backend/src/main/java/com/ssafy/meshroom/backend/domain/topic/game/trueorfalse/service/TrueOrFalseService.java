@@ -72,8 +72,8 @@ public class TrueOrFalseService {
         );
     }
 
-    public void sendSignalToAdministrator(String sessionId, int curStep, Boolean isDone) {
-        String redisKey = "tf-" + sessionId + "-" + curStep;
+    public void sendSignalToAdministrator(String mainSessionId, String subSessionId, int curStep, Boolean isDone) {
+        String redisKey = "tf-" + subSessionId + "-" + curStep;
 
         Integer curCount = redisTemplate.opsForValue().get(redisKey);
 
@@ -85,7 +85,7 @@ public class TrueOrFalseService {
         redisTemplate.opsForValue().set(redisKey, curCount);
 
         TFAdministratorSignal signalForAdministrator = new TFAdministratorSignal();
-        signalForAdministrator.setSessionId(sessionId);
+        signalForAdministrator.setSessionId(subSessionId);
         signalForAdministrator.setCurStep(curStep);
         switch (curStep) {
             case 1:
@@ -101,6 +101,6 @@ public class TrueOrFalseService {
                 signalForAdministrator.setFinishCount(0);
         }
 
-        messagingTemplate.convertAndSend("/subscribe/manage/game/tf", signalForAdministrator);
+        messagingTemplate.convertAndSend("/subscribe/manage/game/tf/" + mainSessionId, signalForAdministrator);
     }
 }
