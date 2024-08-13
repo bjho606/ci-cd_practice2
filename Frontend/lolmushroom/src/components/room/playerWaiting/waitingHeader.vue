@@ -1,9 +1,7 @@
 <script setup>
-import { useRoomStore } from '@/stores/roomStore'
 import { defineProps } from 'vue'
+import SmileyFace from '@/assets/image/Smileyface.svg'
 
-const roomStore = useRoomStore()
-// description 으로 props 수신
 const props = defineProps({
   firstDescription: {
     type: String,
@@ -22,7 +20,7 @@ const props = defineProps({
   <v-container class="d-flex flex-row align-center justify-space-between box-layout">
     <div class="box first">
       <div class="content-wrapper">
-        <v-img src="src/assets/image/Smillyface.svg" class="smile-image"></v-img>
+        <v-img :src="SmileyFace" class="smile-image"></v-img>
         <span v-html="firstDescription"></span>
       </div>
     </div>

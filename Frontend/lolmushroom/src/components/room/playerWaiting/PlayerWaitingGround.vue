@@ -1,26 +1,21 @@
 <script setup>
-import {ref, onMounted, computed} from 'vue';
-import { useRoomStore } from '@/stores/roomStore';
-import { useSessionStore } from '@/stores/sessionStore';
-import { useUserStore } from '@/stores/userStore';
-import { useRouter } from 'vue-router';
-import sessionAPI from '@/api/session';
+import { computed } from 'vue'
+import { useRoomStore } from '@/stores/roomStore'
+import { useSessionStore } from '@/stores/sessionStore'
+import { useUserStore } from '@/stores/userStore'
+import sessionAPI from '@/api/session'
 
-const router = useRouter();
-const roomStore = useRoomStore();
-const sessionStore = useSessionStore();
-const userStore = useUserStore();
+const roomStore = useRoomStore()
+const sessionStore = useSessionStore()
+const userStore = useUserStore()
 const rooms = computed(() => roomStore.getActiveRooms)
 
-
-// 세션 연결 
-
+// SubSession 연결
 const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data)
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -48,184 +43,192 @@ const createSubSessionHandler = async (sessionId) => {
   }
 }
 
-
 // IMPL1 준비 버튼 클릭하면 준비 되기
-const toggleReady = (index) =>{
-    if (userStore.getIsTeamLeader){        
-        roomStore.rooms[index].isReady = !roomStore.rooms[index].isReady;
-    }
-} 
+/**
+ * IMP 준비 Button이 클릭되면 준비 하기
+ * @param index
+ */
+const toggleReady = (index) => {
+  if (userStore.getIsTeamLeader) {
+    roomStore.rooms[index].isReady = !roomStore.rooms[index].isReady
+  }
+}
 
+/**
+ * IMP 참가하기 Button을 누르면, 밑으로 닉네임 이동
+ * @param index
+ */
 // IMPL2 참가하기 버튼 누르면 밑으로 닉네임 이동
-const joinSubsession = async (index) =>{
-    const room =  rooms.value[index]
-    // 닉네임이 없을 시 
-    if (!room.users.includes(userStore.userNickname)) { 
-        // 만약 room에 사람이 없으면 true
-        const isFirstUserInGroup = room.occupants === 0
+const joinSubsession = async (index) => {
+  const room = rooms.value[index]
+  // 닉네임이 없을 시
+  if (!room.users.includes(userStore.userName)) {
+    // 만약 room에 사람이 없으면 true
+    const isFirstUserInGroup = room.occupants === 0
 
-        await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
+    await getSessionConnection(room.sessionId, { userName: userStore.userName })
 
-        if (isFirstUserInGroup) userStore.setTeamLeader(true);
-        else userStore.setTeamLeader(false);
+    if (isFirstUserInGroup) userStore.setTeamLeader(true)
+    else userStore.setTeamLeader(false)
 
-        sessionStore.setSubSessionId(room.sessionId)
-        room.users.push(userStore.userNickname);
-    } 
+    sessionStore.setSubSessionId(room.sessionId)
+    room.users.push(userStore.userName)
+  }
+}
+/**
+ * IMP Group  새로 만들기 클릭하면 New Group 생성
+ */
+const addGroup = async () => {
+  const newIndex = rooms.value.length
+  // roomStore.setCurrentContentsState
+  await createSubSessionHandler(sessionStore.sessionId)
+  roomStore.setButtonClicked(newIndex)
 }
 
-
-// IMPL3 그룹 새로 만들기 클릭하면 새로운 그룹 생성
-const addGroup = async () =>{
-    const newIndex = rooms.value.length;   
-    // roomStore.setCurrentContentsState
-    await createSubSessionHandler(sessionStore.sessionId)
-    await getSessionConnection(sessionStore.sessionId, { userName: userStore.userNickname })
-
-    roomStore.setButtonClicked(newIndex);
-    sessionStore.setSessionId(sessionStore.sessionId)
-}
-
-
-// IMPL 4 이름 버튼 누르면 그룹명 바꾸기 
+/**
+ * IMP 이름 버튼을 누르면 이름이 변경됨
+ */
 const changeRoomName = async () => {
-    const response = await sessionAPI.changeSubSessionName(sessionStore.subSessionId);
-    console.log("새로운 방 이름 " + response);
+  const response = await sessionAPI.changeSubSessionName(sessionStore.subSessionId)
+  console.log('새로운 방 이름 ' + response)
 }
-
 </script>
 
 <template>
-    <div class="room-list-container">
-        <div class="room-list">
-        <v-container v-for="(group, index) in rooms.filter(room => room.buttonClicked)" :key="group.sessionId" class="group-container">
+  <div class="room-list-container">
+    <div class="room-list">
+      <v-container
+        v-for="(group, index) in rooms.filter((room) => room.buttonClicked)"
+        :key="group.sessionId"
+        class="group-container"
+      >
         <v-card class="group-card">
-            <v-btn
-            :style="{ backgroundColor: group.isReady ? '#000000' : '#D9D9D9', color: group.isReady ? '#FFFFFF' : '#000000' }"
+          <v-btn
+            :style="{
+              backgroundColor: group.isReady ? '#000000' : '#D9D9D9',
+              color: group.isReady ? '#FFFFFF' : '#000000'
+            }"
             @click="toggleReady(index)"
             class="ready-btn"
-            >
+          >
             <div>{{ group.isReady ? '준비완료' : '준비' }}</div>
-            </v-btn>
-            <v-btn class="group-name" @click="changeRoomName">
+          </v-btn>
+          <v-btn class="group-name" @click="changeRoomName">
             <v-img src="src/assets/image/autorenew.svg" class="icon" />
             {{ group.groupName }}
-            </v-btn>
-            <v-btn :style="{ backgroundColor: '#E7FFDE'}" class="join-btn"  @click ="joinSubsession(index)">
+          </v-btn>
+          <v-btn
+            :style="{ backgroundColor: '#E7FFDE' }"
+            class="join-btn"
+            @click="joinSubsession(index)"
+          >
             참가하기
+          </v-btn>
+          <!-- 하위 세션 밑에 USER 정보 삽입 -->
+          <div v-if="group.users.length > 0" class="user-list">
+            <v-btn v-for="user in group.users" :key="user" class="user-btn" min-width="180">
+              {{ group.groupName }}
+              <div>
+                {{ user }}
+              </div>
             </v-btn>
-            <!-- 하위 세션 밑에 USER 정보 삽입 -->
-            <div v-if="group.users.length > 0" class="user-list">
-                <v-btn v-for="user in group.users" :key="user" class="user-btn" min-width="180">
-                    {{ group.groupName}}
-                    <div>
-                        {{ user }}
-                    </div>
-                </v-btn>
-            </div>
-            <!-- 정보 삽입 END -->
+          </div>
+          <!-- 정보 삽입 END -->
         </v-card>
-        </v-container>
-        <v-btn
+      </v-container>
+      <v-btn
         min-width="150px"
-        varient = "elevated"
-        :style ="{backgroundColor: '#CEFFBC'}"
+        varient="elevated"
+        :style="{ backgroundColor: '#CEFFBC' }"
         class="add-group-button"
-        @click = "addGroup"
-        > 
+        @click="addGroup"
+      >
         그룹 새로 만들기
-    </v-btn>
+      </v-btn>
     </div>
-</div>
-
-
+  </div>
 </template>
 
-<style scoped>  
-
+<style scoped>
 /* 글씨 가운데 */
-v-container{
-    text-align: center;
+v-container {
+  text-align: center;
 }
 
 /* 전체 컨테이너 이동 */
 .room-list-container {
-width: 100%;
-height: 90%;
-overflow-x: auto;
+  width: 100%;
+  height: 90%;
+  overflow-x: auto;
 }
-
 
 .room-list {
-display: flex;
-flex-wrap: nowrap;
-justify-content: flex-start;
-gap: 10px;
-padding: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
 }
-
 
 .group-container {
-flex: 0 0 auto;
-width: 250px;
-margin-bottom: 20px;
+  flex: 0 0 auto;
+  width: 250px;
+  margin-bottom: 20px;
 }
-
 
 /* 그룹 플렉스로 설정 */
 .group-card {
-display: flex;
-flex-direction: column;
-align-items: center;
-padding: 20px;
-height: 100%;
-background-color: #FFF2F7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  height: 100%;
+  background-color: #fff2f7;
 }
 
 /* 전체 크기만 설정 */
-.ready-btn, .group-name, .join-btn {
-width: 100%;
-
+.ready-btn,
+.group-name,
+.join-btn {
+  width: 100%;
 }
 
-.ready-btn{
-    min-height: 40px;
+.ready-btn {
+  min-height: 40px;
 }
 
-.group-name{
-    background-color: #66FF4F;
-    font-size: larger;
-    font-weight: bold;
-    min-height: 60px;
-    margin-bottom: 20px;
+.group-name {
+  background-color: #66ff4f;
+  font-size: larger;
+  font-weight: bold;
+  min-height: 60px;
+  margin-bottom: 20px;
 }
 
 /* 그룹 만들기 버튼 */
-.add-group-button{
-    margin-top: 30px;
-    min-height: 80px;
+.add-group-button {
+  margin-top: 30px;
+  min-height: 80px;
 }
 
 /* 유저 정보 나열 */
-.user-list{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 10px;
+.user-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
 
-.user-btn{
-    background-color: #CEFFBC;
-    font-size : 12px;
-    padding : 5px 10px;
-    margin-bottom: 10px;
+.user-btn {
+  background-color: #ceffbc;
+  font-size: 12px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
 }
-
 
 /* 다시하기 이미지 아이콘 설정 */
-.icon{
-    width: 20px;
-    margin-right: 10px;
+.icon {
+  width: 20px;
+  margin-right: 10px;
 }
 </style>
-

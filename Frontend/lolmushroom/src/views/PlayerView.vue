@@ -34,6 +34,7 @@ const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
+      console.log('Session Connected')
       userStore.setUserId(response.data.result.userId)
       userStore.userOvToken = response.data.result['ovToken']
     }
