@@ -2,18 +2,46 @@
   import { onMounted, ref, watch } from 'vue';
   import { useSessionStore } from '@/stores/sessionStore'
   import { useAlphabetStore } from '@/stores/alphabetStore'
+  import { useUserStore } from '@/stores/userStore';
   import sessionAPI from '@/api/session'
+  import contentsAPI from '@/api/contents';
 
   const store = useAlphabetStore()
   const sessionStore = useSessionStore()
-  const category_name = ref('동물');
-  const userInput = ref('asd');
-
+  const userStore = useUserStore()
+  const quizWord = ref('');
+  const showAlter = ref('')
   // 세션에 참가한 유저 정보를 요청하는 함수
   const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
   store.setTotalUser(response['data']['result']['currentUserCount'])
 
-  console.log(store.totalUserCount)
+  console.log('총 인원수', store.totalUserCount)
+
+  const categoryName = contentsAPI.getCategory(sessionStore.subSessionId)
+
+  console.log('내 퀴즈 카테고리', categoryName)
+
+  // 퀴즈를 제출하는 함수
+  const submitQuizWord = () => {
+    if (quizWord.value === '') {
+      showAlter.value = true; return
+    } else {
+      const object = {
+        ovToken: userStore.ovToken,
+        categoryName,
+        quizWord: quizWord.value,
+      }
+      contentsAPI.createQuizWord(sessionStore.subSessionId, object)
+      .then(
+        store.submitUserIncrease()
+        // 제출 인원과 총 인원 수 계산 하는 함수 추가 -> 구독자들도 화랑님한테 물어봐서 로직 추가
+        
+      )
+      .catch(error => console.log(error, '단어 제출 에러'))
+    }
+  }
+
+  
 </script>
 
 <template>
@@ -39,14 +67,15 @@
 
     <div class="info">
       <div class="info-category">카테고리</div>
-      <div class="info-text">{{ category_name }}</div>
+      <div class="info-text">{{ categoryName }}</div>
     </div>
   </div>
   <div class="playContainer">
     <div class="userInput">
       <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
+      <v-alert title="진실? 혹은 거짓!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter" class="warning-alert"/>
     </div>
-    <button class="submit" @click="$router.push({name: 'AlphabetMain'})">
+    <button class="submit" @click="submitQuizWord()">
           제출하기
     </button>
   </div>

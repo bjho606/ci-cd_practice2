@@ -52,7 +52,7 @@ const callNextContents = async (isStart) => {
 watch(currentContents, (newContentsId, oldContentsId) => {
   console.log('changed?')
   if (oldContentsId) {
-    webSocketAPI.unsubscribeGame(oldContentsId)
+    webSocketAPI.unsubscribe(oldContentsId)
   }
   if (newContentsId) {
     switch (newContentsId) {

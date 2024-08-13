@@ -10,7 +10,7 @@ const content = computed(() => contentsStore.getPickedContents)
   <div v-if="content" class="contents-card-shadow contents-card">
     <!-- 이미지 섹션 -->
     <div class="image-section">
-      <v-img :src="content.imgUrl" max-width="300px" max-height="300px"></v-img>
+      <v-img :src="content.imgUrl"  max-width="300px" max-height="300px"></v-img>
     </div>
 
     <!-- 제목 섹션 -->
@@ -29,10 +29,12 @@ const content = computed(() => contentsStore.getPickedContents)
 </template>
 
 <style scoped>
+
 .contents-card {
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin-left: 10px;
 }
 
 .contents-card-shadow {

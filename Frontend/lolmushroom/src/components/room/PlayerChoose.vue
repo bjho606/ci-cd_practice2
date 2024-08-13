@@ -75,7 +75,7 @@ const handleRoomClick = async (index) => {
   } else {
     console.log('하부 세션으로 입장을 하시는 군요! 하부 세션에 대한 연결을 해드릴게요:)')
     const isFirstUserInGroup = room.occupants === 0
-    await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
+    await getSessionConnection(room.sessionId, { userName: userStore.userName })
     if (isFirstUserInGroup) userStore.setTeamLeader(true)
     else userStore.setTeamLeader(false)
     sessionStore.setSubSessionId(room.sessionId)

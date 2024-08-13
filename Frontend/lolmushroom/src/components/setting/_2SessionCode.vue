@@ -6,13 +6,11 @@ import QrcodeVue from 'qrcode.vue'
 const sessionStore = useSessionStore()
 const sessionURL = computed(() => sessionStore.getSessionUrl)
 
-// 클립보드에 링크 복사하기
 const copyToClipboard = () => {
   navigator.clipboard.writeText(sessionURL.value)
-  alert('링크가 복사되었습니다!')
 }
 const closeWindow = () => {
-  window.close() // 창 닫기
+  window.close()
 }
 </script>
 

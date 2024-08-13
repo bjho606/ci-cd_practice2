@@ -22,10 +22,21 @@ export default {
   },
 
   // 진실 혹은 거짓 관련 API
-  createStatements(sessionId, statesObject, success, failure) {
-    return axios.post(`${API_URL}/game/tf/${sessionId}`, statesObject).then(success).catch(failure)
+  createStatements(sessionId, object, success, failure) {
+    return axios.post(`${API_URL}/game/tf/${sessionId}`, object).then(success).catch(failure)
   },
   getStatements(sessionId, success, failure) {
     return axios.get(`${API_URL}/game/tf/${sessionId}`).then(success).catch(failure)
+  },
+
+  // 초성 게임 관련 API
+  getCategory(sessionId, success, failure) {
+    return axios.get(`${API_URL}/game/ini-quiz/category/${sessionId}`).then(success).catch(failure)
+  },
+  createQuizWord(sessionId, object, success, failure) {
+    return axios.post(`${API_URL}/game/ini-quiz/${sessionId}`, object).then(success).catch(failure)
+  },
+  getQuizWords(sessionId, success, failure) {
+    return axios.get(`${API_URL}/game/ini-quiz/${sessionId}`).then(success).catch(failure)
   }
 }

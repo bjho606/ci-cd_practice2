@@ -43,6 +43,7 @@ const onSessionEventReceived = (message) => {
 }
 const onProgressEventReceived = (message) => {
   console.log(message)
+  console.log('왜 안 돼?')
   contentsStore.setCurrentContentsState(message)
 }
 

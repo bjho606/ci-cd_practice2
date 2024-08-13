@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-
 import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useUserStore } from '@/stores/userStore'
@@ -9,10 +8,8 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-
-import NicknameModal from '@/components/common/NicknameModal.vue'
+import setName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
-import AudioPlayer from '@/components/common/AudioPlayer.vue'
 import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const route = useRoute()
@@ -21,25 +18,12 @@ const chatStore = useChatStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
-
-const showNicknameModal = ref(false)
-const cameraIcon = ref('custom:cameraOn')
-const micIcon = ref('custom:micOn')
-
-/**
- * * Camera, Mic Icon을 Toggle할 수 있는 CallBack()
- */
-const toggleCameraIcon = () => {
-  cameraIcon.value = cameraIcon.value === 'custom:cameraOn' ? 'custom:cameraOff' : 'custom:cameraOn'
-}
-const toggleMicIcon = () => {
-  micIcon.value = micIcon.value === 'custom:micOn' ? 'custom:micOff' : 'custom:micOn'
-}
+const showNameModal = ref(false)
 
 /**
  * IMP 1. MainSession에 대한 Connection을 생성하는 CallBack()
  * REQ
- * @param sessionId
+ * @param `sessionId`
  * @param userName
  *
  * RES openvide_token, user_token
@@ -51,10 +35,8 @@ const getSessionConnection = async (sessionId, userName) => {
   try {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
-      console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data)
+      console.log('Session Connected')
       userStore.setUserId(response.data.result.userId)
-      // userStore.userOvToken = response.data.result['ovToken'].slice(-20)
       userStore.userOvToken = response.data.result['ovToken']
     }
   } catch (error) {
@@ -74,15 +56,21 @@ const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
 const onSessionEventReceived = (message) => {
-  roomStore.setSessionData(message) // 방 정보를 업데이트
+  roomStore.setSessionData(message)
 }
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
+  console.log('뱉어내')
+  console.log(contentsStore.currentContentsId)
+  console.log(contentsStore.contentsSequence)
+  console.log(contentsStore.totalContentsCount)
+  console.log(contentsStore.finishGroupCount)
+  console.log(contentsStore.totalGroupCount)
+  console.log(contentsStore.currentGroupState)
 }
 
 /**
  * IMP 3. PlayerView에 처음 들어왔을 때, Session의 상태를 가져오는 getSessionInfo API 호출
- * ! MainConnection과 연결되고 Socket 연결이 되기 때문에, API를 통해 Group 정보를 호출해야 함.
  */
 const getSessionInfo = async (sessionId) => {
   try {
@@ -101,15 +89,11 @@ const getSessionInfo = async (sessionId) => {
  * * 4.2. Connection을 바탕으로 Global Chatting에 대한 Socket 연결을 진행한다.
  * * 4.3. Connection을 바탕으로 Session Info에 대한 Socket 연결을 진행한다.
  * * 4.4  Connection을 바탕으로 MeshRoom의 Contents Progress에 대한 Socket 연결을 진행한다.
- * TODO : 추가적으로 더 많은 Socket에 연결해야 할 수도 있다. ( Group Chat, Other Game에 대한 Socket )
  */
 const userFlowHandler = async () => {
   const sessionId = route.params.sessionId
   sessionStore.setSessionId(sessionId)
-  console.log(
-    `URL의 Query String을 통해 SessionID를 알아냈습니다! => ${sessionId}. 이제 Main Connection을 만들게요:)`
-  )
-  await getSessionConnection(sessionId, { userName: userStore.userNickname })
+  await getSessionConnection(sessionId, { userName: userStore.userName })
   await getSessionInfo(sessionId)
   webSocketAPI.connect({
     sessionId: sessionStore.sessionId,
@@ -125,10 +109,9 @@ const userFlowHandler = async () => {
  * * 5.1 : 닉네임 설정 X => showNicknameModal -> userFlowHandler()
  * * 5.2 : 닉네임 설정 O => webSocketAPI를 통한 Socket 재연결
  */
-onMounted(async () => {
-  if (userStore.userNickname === '닉네임을 설정해주세요') {
-    showNicknameModal.value = true
-    // await userFlowHandler()
+onMounted(() => {
+  if (!userStore.userName) {
+    showNameModal.value = true
   } else {
     webSocketAPI.connect({
       sessionId: sessionStore.sessionId,
@@ -143,31 +126,23 @@ onMounted(async () => {
 
 <template>
   <!-- IMP : ChatScreen Component -->
-  <!-- <ChatScreen /> -->
-  <!-- IMP : Camera, Mic, Audio Player Icon -->
-  <!-- <v-container>
-    <v-icon :icon="cameraIcon" @click="toggleCameraIcon"></v-icon>
-    <v-icon :icon="micIcon" @click="toggleMicIcon"></v-icon>
-    <AudioPlayer />
-  </v-container> -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
-  <div class="main" v-if="contentsStore.currentContentsId === '1'">
-    <TOFAppBar title="진실 혹은 거짓" subtitle="진실 3개, 거짓 1개로 나를 소개해 보세요!" text="당신의 얼굴이 카메라에 보이면 당신의 차례입니다."/>
-    <RouterView />
-  </div>
-  <div class="main" v-else-if="contentsStore.currentContentsId === '4'">
-    <TOFAppBar title="초성 맞추기" subtitle="초성을 토대로 단어를 맞춰보세요." text="제출하기를 누르면 입력한 단어가 초성으로 보입니다!"/>
-    <RouterView />
-  </div>
-  <div class="main" v-else>
-    <!-- <TOFAppBar title="초성 맞추기" subtitle="초성을 토대로 단어를 맞춰보세요." text="제출하기를 누르면 입력한 단어가 초성으로 보입니다!"/> -->
-    <RouterView />
+  <div class="contents-container">
+    <div class="main-content">
+      <!-- <TOFAppBar title="진실 혹은 거짓" subtitle="진실 3개, 거짓 1개로 나를 소개해 보세요!" text="당신의 얼굴이 카메라에 보이면 당신의 차례입니다."/> -->
+      <!-- <TOFAppBar title="초성 맞추기" subtitle="초성을 토대로 단어를 맞춰보세요." text="제출하기를 누르면 입력한 단어가 초성으로 보입니다!"/> -->
+      <!-- <TOFAppBar title="우리들의 오리엔테이션 세션" subtitle="초성을 토대로 단어를 맞춰보세요." text="원하는 팀을 구성하고 컨텐츠를 함께 하세요 ! 먼저 들어간 사람이 그룹장이 됩니다!"/> -->
+      <RouterView />
+    </div>
+    <div class="sub-content">
+      <ChatScreen />
+    </div>
   </div>
   <!-- IMP : NickName Modal -->
-  <NicknameModal
-    :show="showNicknameModal"
-    @update:show="showNicknameModal = $event"
-    @nickname-saved="userFlowHandler"
+  <setName
+    :show="showNameModal"
+    @update:show="showNameModal = $event"
+    @name-saved="userFlowHandler"
   />
 </template>
 
@@ -175,4 +150,21 @@ onMounted(async () => {
   /* .main {
     background:#E7FFDE;;
   } */
+.contents-container {
+  background-color: #fff2f7;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  height: 93%;
+}
+
+.sub-content {
+  height: 5%;
+  display: flex;
+  flex-direction: flext-start;
+  margin-left: 0.5%;
+}
 </style>
