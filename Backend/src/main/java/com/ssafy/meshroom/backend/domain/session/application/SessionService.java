@@ -1,12 +1,12 @@
 package com.ssafy.meshroom.backend.domain.session.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
-import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderService;
+import com.ssafy.meshroom.backend.domain.session.dao.GroupNameRepository;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
+import com.ssafy.meshroom.backend.domain.session.domain.GroupName;
 import com.ssafy.meshroom.backend.domain.session.dto.*;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
-import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
@@ -18,7 +18,6 @@ import io.openvidu.java.client.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,9 +42,7 @@ public class SessionService {
     private final OpenViduService openViduService;
     private final TokenProvider tokenProvider;
     private final OVTokenService ovTokenService;
-    private final OVTokenRepository ovTokenRepository;
-    private final User user;
-    private final DelegatingFilterProxyRegistrationBean securityFilterChainRegistration;
+    private final GroupNameRepository groupNameRepository;
 
     @Transactional
     public Response<SessionCreateResponse> createSession(List<String> contents) throws OpenViduJavaClientException, OpenViduHttpException {
@@ -82,7 +79,7 @@ public class SessionService {
                         .sessionId(session.getSessionId())
                         .url("url")
                         .isMain(false)
-                        .groupName("그룹")
+                        .groupName(groupNameRepository.findRandomGroupName().get().getGroupName())
                         .maxUserCount(60L)
                         .maxSubuserCount(10L)
                         .mainSession(sessionId)
@@ -283,11 +280,13 @@ public class SessionService {
     }
 
     @Transactional
-    public Response<?> updateSubSessionGroupName(String subsessionId, UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+    public Response<?> updateSubSessionGroupName(String subsessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         com.ssafy.meshroom.backend.domain.session.domain.Session session = sessionRepository.findBySessionId(subsessionId)
                 .orElseThrow(SessionNotExistException::new);
 
-        session.setGroupName(request.getGroupName());
+        GroupName groupName = groupNameRepository.findRandomGroupName().orElseThrow(RuntimeException::new);
+
+        session.setGroupName(groupName.getGroupName());
         sessionRepository.save(session);
 
         simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + session.getMainSession(), getSessionInfo(session.getMainSession()).getResult());
