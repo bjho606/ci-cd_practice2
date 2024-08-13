@@ -6,6 +6,7 @@ let subscriptionMap = new Map() // 구독을 관리할 Map 객체
 
 const connect = ({
   sessionId,
+  subSessionId,
   contentsId,
   onMessageReceived,
   onEventReceived,
@@ -14,7 +15,7 @@ const connect = ({
   onEndReceived,
   onConnect,
   onError,
-  subscriptions  // 추가된 파라미터: 구독할 리스트
+  subscriptions // 추가된 파라미터: 구독할 리스트
 }) => {
   // stompClient가 이미 존재하고 연결된 상태라면 새로운 클라이언트를 생성하지 않음
   if (stompClient && stompClient.connected) {
@@ -23,6 +24,7 @@ const connect = ({
     // 기존 연결 상태에서 새 구독 추가
     addSubscriptions(
       sessionId,
+      subSessionId,
       contentsId,
       onMessageReceived,
       onEventReceived,
@@ -49,6 +51,7 @@ const connect = ({
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
       addSubscriptions(
         sessionId,
+        subSessionId,
         contentsId,
         onMessageReceived,
         onEventReceived,
@@ -87,6 +90,7 @@ const connect = ({
 
 const addSubscriptions = (
   sessionId,
+  subSessionId,
   contentsId,
   onMessageReceived,
   onEventReceived,
@@ -124,13 +128,13 @@ const addSubscriptions = (
         addManagerGameSubscription(sessionId, contentsId, onEventReceived)
         break
       case 'question':
-        addQuestionSubscription(sessionId, onEventReceived)
+        addQuestionSubscription(sessionId, subSessionId, onEventReceived)
         break
       case 'answer':
-        addAnswerSubscription(sessionId, onEventReceived)
+        addAnswerSubscription(subSessionId, onEventReceived)
         break
       case 'next':
-        addNextSubscription(sessionId, onNextReceived)
+        addNextSubscription(sessionId, subSessionId, onNextReceived)
         break
       case 'end':
         addFinishSubscription(onEndReceived)
@@ -201,11 +205,11 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
 }
 
 // 진술서 구독 시 내용 전달받기
-const addQuestionSubscription = (sessionId, onEventReceived) => {
+const addQuestionSubscription = (sessionId, subSessionId, onEventReceived) => {
   const questionKey = 'question'
   if (!subscriptionMap.has(questionKey)) {
     const gameSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/question/${sessionId}`,
+      `/subscribe/game/tf/question/${sessionId}/${subSessionId}`,
       (event) => {
         console.log('Received event from Subscribe - 진술서 작성')
         if (onEventReceived) {
@@ -217,11 +221,11 @@ const addQuestionSubscription = (sessionId, onEventReceived) => {
   }
 }
 
-const addAnswerSubscription = (sessionId, onEventReceived) => {
+const addAnswerSubscription = (subSessionId, onEventReceived) => {
   const answerKey = 'answer'
   if (!subscriptionMap.has(answerKey)) {
     const contentsSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/answer/${sessionId}`,
+      `/subscribe/game/tf/answer/${subSessionId}`,
       (event) => {
         console.log('Received event from Subscribe - 답변')
         if (onEventReceived) {
@@ -233,11 +237,11 @@ const addAnswerSubscription = (sessionId, onEventReceived) => {
   }
 }
 
-const addNextSubscription = (sessionId, onNextReceived) => {
+const addNextSubscription = (sessionId, subSessionId, onNextReceived) => {
   const nextKey = 'next'
   if (!subscriptionMap.has(nextKey)) {
     const contentsSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/next/${sessionId}`,
+      `/subscribe/game/tf/next/${sessionId}/${subSessionId}`,
       (event) => {
         console.log('Received event fromSubscribe - 다음 발표자', event.body)
         if (onNextReceived) {

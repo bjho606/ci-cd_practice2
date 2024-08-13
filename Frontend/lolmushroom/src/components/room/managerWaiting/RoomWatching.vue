@@ -64,7 +64,7 @@ watch(currentContents, (newContentsId, oldContentsId) => {
       case '1':
         TOFStore.initSocketConnection(sessionStore.sessionId, groups.value)
         break
-      case '3':
+      case '7':
         mushroomStore.initSocketConnection(
           sessionStore.sessionId,
           sessionStore.subSessionId,
