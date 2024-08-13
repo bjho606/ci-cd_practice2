@@ -2,13 +2,15 @@ package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto;
 
 import lombok.*;
 
+import java.util.ArrayList;
+
 @ToString
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class IniQuizWordSignal {
+@AllArgsConstructor
+public class IniQuizInfoCreateRequest {
     private String ovToken;
+    private String categoryName;
     private String quizWord;
 }
