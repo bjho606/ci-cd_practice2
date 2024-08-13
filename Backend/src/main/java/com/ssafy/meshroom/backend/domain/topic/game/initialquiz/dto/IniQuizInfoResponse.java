@@ -15,15 +15,15 @@ public class IniQuizInfoResponse {
     private String userName;
     private String ovToken;
     private String categoryName;
-    private String word;
+    private String quizWord;
 
     public static IniQuizInfoResponse from (InitialQuizInfo initialQuizInfo) {
         IniQuizInfoResponse iniQuizInfoResponse = new IniQuizInfoResponse();
         iniQuizInfoResponse.userName = initialQuizInfo.getUserName();
         iniQuizInfoResponse.ovToken = initialQuizInfo.getOvToken();
         iniQuizInfoResponse.categoryName = initialQuizInfo.getCategoryName();
-//        iniQuizInfoResponse.word = initialQuizInfo.getWord();
-        iniQuizInfoResponse.word = convertQuizWord(initialQuizInfo.getWord());
+//        iniQuizInfoResponse.quizWord = initialQuizInfo.getWord();
+        iniQuizInfoResponse.quizWord = convertQuizWord(initialQuizInfo.getWord());
 
         return iniQuizInfoResponse;
     }

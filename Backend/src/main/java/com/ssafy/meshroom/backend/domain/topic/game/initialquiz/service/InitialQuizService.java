@@ -40,7 +40,7 @@ public class InitialQuizService {
         );
     }
 
-    public Response<IniQuizInfoCreateResponse> insertIniQuizInfo(String sessionId, String userSid, IniQuizInfoCreateRequest iniQuizInfoCreateRequest) {
+    public Response<IniQuizInfoCreateResponse> insertIniQuizInfo(String mainSessionId, String subSessionId, String userSid, IniQuizInfoCreateRequest iniQuizInfoCreateRequest) {
         String userName = userRepository.findById(userSid)
                 .orElseThrow(() -> new RuntimeException("유저 없음"))
                 .getUsername();
@@ -48,13 +48,13 @@ public class InitialQuizService {
         InitialQuizInfo newInitialQuizInfo = InitialQuizInfo.builder()
                 .userName(userName)
                 .ovToken(iniQuizInfoCreateRequest.getOvToken())
-                .sessionId(sessionId)
+                .sessionId(subSessionId)
                 .categoryName(iniQuizInfoCreateRequest.getCategoryName())
                 .word(iniQuizInfoCreateRequest.getQuizWord())
                 .build();
 
-        if (initialQuizRepository.existsByOvTokenAndSessionId(iniQuizInfoCreateRequest.getOvToken(), sessionId)) {
-            InitialQuizInfo foundInitialQuizInfo = initialQuizRepository.findByOvTokenAndSessionId(iniQuizInfoCreateRequest.getOvToken(), sessionId)
+        if (initialQuizRepository.existsByOvTokenAndSessionId(iniQuizInfoCreateRequest.getOvToken(), subSessionId)) {
+            InitialQuizInfo foundInitialQuizInfo = initialQuizRepository.findByOvTokenAndSessionId(iniQuizInfoCreateRequest.getOvToken(), subSessionId)
                     .orElseThrow(() -> new RuntimeException("정보가 존재하지 않음"));
             foundInitialQuizInfo.setUserName(userName);
             foundInitialQuizInfo.setCategoryName(iniQuizInfoCreateRequest.getCategoryName());
@@ -64,10 +64,10 @@ public class InitialQuizService {
             initialQuizRepository.save(newInitialQuizInfo);
         }
 
-        setQuizWordToRedis(sessionId, iniQuizInfoCreateRequest.getOvToken(), iniQuizInfoCreateRequest.getQuizWord());
+        setQuizWordToRedis(subSessionId, iniQuizInfoCreateRequest.getOvToken(), iniQuizInfoCreateRequest.getQuizWord());
 
-        sendSignalToOtherUsers(sessionId);
-        sendSignalToAdministrator(sessionId, 1, true);
+        sendSignalToOtherUsers(subSessionId);
+        sendSignalToAdministrator(mainSessionId, subSessionId, 1, true);
 
         return new Response<IniQuizInfoCreateResponse>(true, 2010L, "SUCCESS",
                 IniQuizInfoCreateResponse.builder()
@@ -90,8 +90,8 @@ public class InitialQuizService {
         );
     }
 
-    public boolean isGuessWordCorrect(String sessionId, String guessWord) {
-        String redisKey = "ini-quiz:" + sessionId;
+    public boolean isGuessWordCorrect(String mainSessionId, String subSessionId, String guessWord) {
+        String redisKey = "ini-quiz:" + subSessionId;
         String answerWord = wordRedisTemplate.opsForValue().get(redisKey);
 
         if (answerWord == null || guessWord == null) return false;
@@ -99,7 +99,7 @@ public class InitialQuizService {
         boolean result = answerWord.equals(guessWord);
 
         if (result) {
-            sendSignalToAdministrator(sessionId, 2, true);
+            sendSignalToAdministrator(mainSessionId, subSessionId, 2, true);
         }
 
         return result;
@@ -115,8 +115,8 @@ public class InitialQuizService {
         messagingTemplate.convertAndSend("/subscribe/game/ini-quiz/word/" + sessionId, true);
     }
 
-    public void sendSignalToAdministrator(String sessionId, int curStep, Boolean isDone) {
-        String redisKey = "iq-" + sessionId + "-" + curStep;
+    public void sendSignalToAdministrator(String mainSessionId, String subSessionId, int curStep, Boolean isDone) {
+        String redisKey = "iq-" + subSessionId + "-" + curStep;
 
         Integer curCount = redisTemplate.opsForValue().get(redisKey);
 
@@ -128,7 +128,7 @@ public class InitialQuizService {
         redisTemplate.opsForValue().set(redisKey, curCount);
 
         IniQuizAdministratorSignal signalForAdministrator = new IniQuizAdministratorSignal();
-        signalForAdministrator.setSessionId(sessionId);
+        signalForAdministrator.setSessionId(subSessionId);
         signalForAdministrator.setCurStep(curStep);
         switch (curStep) {
             case 1:
@@ -144,7 +144,7 @@ public class InitialQuizService {
                 signalForAdministrator.setFinishCount(0);
         }
 
-        messagingTemplate.convertAndSend("/subscribe/manage/game/ini-quiz", signalForAdministrator);
+        messagingTemplate.convertAndSend("/subscribe/manage/game/ini-quiz/" + mainSessionId, signalForAdministrator);
     }
 
 }

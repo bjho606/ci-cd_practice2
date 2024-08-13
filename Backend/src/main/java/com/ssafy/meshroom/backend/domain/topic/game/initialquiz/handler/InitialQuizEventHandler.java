@@ -30,7 +30,24 @@ public class InitialQuizEventHandler {
 
     private final InitialQuizService initialQuizService;
 
-
+    @Operation(
+            summary = "초성 카테고리 하나를 랜덤하게 불러오기",
+            description = "초성 문제 입력하기 전, 랜덤으로 카테고리 하나를 불러옵니다.",
+            parameters = {
+                    @Parameter(name = "sessionId", description = "그룹(하위) 세션의 ID", required = true)
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "2000",
+                            description = "성공적으로 초성문제 정보들을 불러옴",
+                            content = @Content(
+                                    schema = @Schema(implementation = IniQuizCategoryResponse.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
+    )
     @GetMapping("/api/v1/game/ini-quiz/category{sessionId}")
     public ResponseEntity<Response<IniQuizCategoryResponse>> getIniQuizCategory (
             @PathVariable String sessionId) {
@@ -49,7 +66,8 @@ public class InitialQuizEventHandler {
                     )
             ),
             parameters = {
-                    @Parameter(name = "sessionId", description = "그룹(하위) 세션의 ID", required = true)
+                    @Parameter(name = "mainSessionId", description = "메인 세션의 ID", required = true),
+                    @Parameter(name = "subSessionId", description = "그룹(하위) 세션의 ID", required = true)
             },
             responses = {
                     @ApiResponse(
@@ -63,13 +81,14 @@ public class InitialQuizEventHandler {
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             }
     )
-    @PostMapping("/api/v1/game/ini-quiz/{sessionId}")
+    @PostMapping("/api/v1/game/ini-quiz/{mainSessionId}/{subSessionId}")
     public ResponseEntity<Response<IniQuizInfoCreateResponse>> createIniQuiz (
-            @PathVariable String sessionId,
+            @PathVariable String mainSessionId,
+            @PathVariable String subSessionId,
             @RequestBody IniQuizInfoCreateRequest iniQuizInfoCreateRequest) {
         String userSid = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Response<IniQuizInfoCreateResponse> iniQuizInfoCreateResponse = initialQuizService.insertIniQuizInfo(sessionId, userSid, iniQuizInfoCreateRequest);
+        Response<IniQuizInfoCreateResponse> iniQuizInfoCreateResponse = initialQuizService.insertIniQuizInfo(mainSessionId, subSessionId, userSid, iniQuizInfoCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(iniQuizInfoCreateResponse);
@@ -113,12 +132,14 @@ public class InitialQuizEventHandler {
 //        return iniQuizWordSignal;
 //    }
 
-    @MessageMapping("/game/ini-quiz/guess/{sessionId}")
-    @SendTo("/subscribe/game/ini-quiz/guess/{sessionId}")
-    public IniQuizAnswerResponseSignal handleAnswerIniQuiz(@DestinationVariable String sessionId, IniQuizAnswerRequestSignal iniQuizAnswerRequestSignal) {
-        log.info("guess quiz signal received : " + sessionId + " - " + iniQuizAnswerRequestSignal.toString());
+    @MessageMapping("/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
+    @SendTo("/subscribe/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
+    public IniQuizAnswerResponseSignal handleAnswerIniQuiz(@DestinationVariable String mainSessionId,
+                                                           @DestinationVariable String subSessionId,
+                                                           IniQuizAnswerRequestSignal iniQuizAnswerRequestSignal) {
+        log.info("guess quiz signal received : " + mainSessionId + "/" + subSessionId + " - " + iniQuizAnswerRequestSignal.toString());
 
-        boolean guessResult = initialQuizService.isGuessWordCorrect(sessionId, iniQuizAnswerRequestSignal.getGuessWord());
+        boolean guessResult = initialQuizService.isGuessWordCorrect(mainSessionId, subSessionId, iniQuizAnswerRequestSignal.getGuessWord());
 
         IniQuizAnswerResponseSignal iniQuizAnswerResponseSignal = new IniQuizAnswerResponseSignal();
         iniQuizAnswerResponseSignal.setOvToken(iniQuizAnswerRequestSignal.getOvToken());
