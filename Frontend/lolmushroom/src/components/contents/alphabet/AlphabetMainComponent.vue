@@ -1,0 +1,223 @@
+<script setup>
+  import { onMounted, ref, computed } from 'vue';
+  import { useSessionStore } from '@/stores/sessionStore';
+  import { useAlphabetStore } from '@/stores/alphabetStore';
+  import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
+
+  const store = useAlphabetStore()
+  const sessionStore = useSessionStore()
+  const isTimeUp = ref()
+  const counting = ref(true)
+  const index = ref()
+  const guessWord = ref('')
+  const guessWords = []
+  const areSubmitAnswer = computed(store.submitUserCount === store.totalUserCount ? true : '') 
+
+  // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
+  const timeUp = (bool) => {
+    isTimeUp.value = bool
+    counting.value = !bool
+  }
+
+  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)['result']
+  
+  // 정답을 발행
+  const publishAnswer = () => {
+    const data = {
+      guessWord: guessWord.value
+    }
+    webSocketAPI.sendAnswerData(`/publish/game/tf/answer/${sessionStore.subSessionId}`, data)
+  }
+
+  // 다른 사용자의 정답을 구독
+  const onAnswerReceived = (event) => {
+    console.log('초성 게임 전달 받았음', event)
+    const { ovToken, userName, guessWord } = event
+    guessWords.push(guessWord)
+  }
+
+
+  onMounted(async () => {
+    console.log('연결 좀...')
+    // 세션 연결
+    webSocketAPI.connect({
+          sessionId: sessionStore.subSessionId,
+          contentsName: 'tf',
+          onEventReceived: onAnswerReceived,
+          // onNextReceived: onNextReceived,
+          // onEndReceived: onEndReceived,
+          subscriptions: ['answer', 'next', 'end']
+        })
+  })
+
+</script>
+
+<template>
+  <!-- <div class="header">
+      공통 컴포넌트인 헤더 넣어야됨
+  </div> -->
+  <div class="container" v-show="isTimeUp">
+    <div class="statusContainer">
+      <div class="info">
+        <div class="info-category">카테고리</div>
+        <div class="info-text">{{ quizWords[index]['categoryName'] }}</div>
+      </div>
+    </div>
+    <div class="playContainer">
+      <div class="userInput">
+        <div class="emojiField"></div>
+        <div div :userInput class="initialBox">{{ quizWords[index]['quizWord'] }}</div>
+      </div>
+      <div class="userInput">
+        <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!">
+      </div>
+      <button class="submit" @click="publishAnswer()">
+            정답 맞추기
+      </button>
+      <!-- 침여자의 답변 렌더링 -->
+      <v-container v-for="word in guessWords" :key="word">
+        <p>{{ word }}</p>
+      </v-container>
+    </div>
+  </div>
+
+  <v-container class="countdown-container" v-show="!isTimeUp">
+    <div class="countdown-timer">
+      <CountDownComponent v-if="counting" time="2.5" text="집중해서 초성을 맞춰보세요!" @end-count-down="timeUp(true)"/>
+    </div>
+    
+  </v-container>
+
+  <v-container v-show="areSubmitAnswer">
+    <p>1</p>
+  </v-container>
+</template>
+
+<style scoped>
+.container{
+  display: flex;
+  flex-direction: column;
+  background-color: #E7FFDE;
+  height: 100%;
+}
+.header{
+  margin: 20px auto auto ;
+  width: 1856px;
+  height: 94px;
+  background-color: blueviolet;
+}
+
+.statusContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.progress-bar{
+  width: 1000px;
+  height: 69px;
+  background-color: yellow;
+}
+
+.info{
+  display: flex;
+  width: 600px;
+  height: 60px;
+  border-radius: 5px;
+  margin-top: 80px;
+}
+.info-category{
+  margin: 0;
+  height: 60px;
+  width: 600px;
+  border-radius: 10px 0 0 10px;
+  background-color: #CEFFBC;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+.info-text{
+  margin: 0;
+  height: 60px;
+  width: 600px;
+  border-radius: 0 10px 10px 0;
+  background-color: #00FF00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+.playContainer {
+  margin-top: 10px;
+  height: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 수직으로 가운데 정렬 */
+  /* flex: 1; */
+  justify-content: space-around; /* 수평으로 가운데 정렬 */
+}
+
+.userInput{
+  width: 571px;
+  height: 134px;
+  border-radius: 20px;
+  background-color: #fff;
+  border: 2px solid black;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 3px;
+}
+.emojiField{
+  width: 60px;
+  height: 60px;
+  background-color: #1F4F16;
+}
+.initialBox {
+  flex: 1;
+  height: 120px;
+  outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
+  border: none; /* 기본 테두리 제거 */
+  background-color: transparent; /* 배경색 투명하게 설정 */
+  font-size: 64px; /* 원하는 폰트 크기로 조정 */
+  font-weight: bold;
+  padding: 10px; /* 내부 여백 추가 */
+  text-align: center;
+}
+.inputText {
+  flex: 1;
+  height: 60px;
+  outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
+  border: none; /* 기본 테두리 제거 */
+  background-color: transparent; /* 배경색 투명하게 설정 */
+  font-size: 16px; /* 원하는 폰트 크기로 조정 */
+  padding: 10px; /* 내부 여백 추가 */
+}
+
+/* 선택적: WebKit 브라우저(Chrome, Safari 등)의 자동 채우기 스타일 제거 */
+.inputText:-webkit-autofill,
+.inputText:-webkit-autofill:hover,
+.inputText:-webkit-autofill:focus,
+.inputText:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: inherit !important;
+}
+
+.submit{
+  font-size: 32px;
+  width: 292px;
+  height: 94px;
+  background-color: #24A319;
+  border-radius: 20px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+</style>
