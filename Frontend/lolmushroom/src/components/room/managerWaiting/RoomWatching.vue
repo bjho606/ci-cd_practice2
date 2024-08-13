@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useContentsStore } from '@/stores/contentsStore'
@@ -115,7 +114,6 @@ const startGame = () => {
       <template v-slot:start>
         <FooterStart @start-game="startGame" />
       </template>
-      <!-- Conditionally render FooterShare once -->
       <template v-slot:share v-if="showShareFooter">
         <FooterShare />
       </template>

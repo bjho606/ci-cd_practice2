@@ -70,7 +70,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- * Manager의 RouterView -->
   <RouterView />
 </template>
 

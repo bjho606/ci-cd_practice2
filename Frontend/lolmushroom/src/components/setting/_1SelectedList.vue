@@ -26,7 +26,10 @@ const onEnd = () => {
 </script>
 
 <template>
-  <div class="bottom-list">
+  <div v-if="localSelectedContents.length === 0" class="empty-container">
+    <p class="empty-message">컨텐츠를 골라주세요! 📚</p>
+  </div>
+  <div v-else class="bottom-list">
     <VueDraggableNext
       v-model="localSelectedContents"
       item-key="_id"
@@ -53,6 +56,22 @@ const onEnd = () => {
   width: 100%;
   height: 100%;
   padding: 40px;
+}
+
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #fff2f7;
+  border-radius: 10px;
+}
+
+.empty-message {
+  font-size: 1.5em;
+  color: #888;
+  text-align: center;
 }
 
 .draggable-container {

@@ -21,6 +21,9 @@ export const useChatStore = defineStore('chat', {
     addSubSessionMessage(message) {
       this.subSessionMessages.push(message)
     },
+    resetSubSessionMessage() {
+      this.subSessionMessages = []
+    },
     setCurrentMode(mode) {
       this.currentMode = mode
     }

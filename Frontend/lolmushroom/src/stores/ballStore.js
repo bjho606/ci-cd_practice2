@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import webSocketAPI from '@/api/webSocket'
-import blueBall from '@/assets/ballGrow/blueBall.svg'
-import greenBall from '@/assets/ballGrow/greenBall.svg'
+import blueBall from '@/assets/ballGrow/BlueBall.svg'
+import greenBall from '@/assets/ballGrow/GreenBall.svg'
 
 export const useBallStore = defineStore('ballStore', {
   state: () => ({

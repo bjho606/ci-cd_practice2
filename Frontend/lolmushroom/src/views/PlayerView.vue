@@ -54,6 +54,9 @@ const getSessionConnection = async (sessionId, userName) => {
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
+const onSubSessionMessageReceived = (message) => {
+  chatStore.addSubSessionMessage(message)
+}
 const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message)
 }
@@ -105,6 +108,9 @@ onMounted(() => {
   if (!userStore.userName) {
     showNameModal.value = true
   } else {
+    /**
+     * IMP : 새로고침 한다면, Main Chat, SessionInfo, Contents Progress Socket을 재구독
+     */
     webSocketAPI.connect({
       sessionId: sessionStore.sessionId,
       onMessageReceived: onMainSessionMessageReceived,
@@ -112,12 +118,22 @@ onMounted(() => {
       onProgressReceived: onProgressEventReceived,
       subscriptions: ['chat', 'session', 'progress']
     })
+
+    /**
+     * IMP : 새로고침을 할 때, Session Storage에 subSessionId가 남아 있다면, Sub Chat을 재구독
+     */
+    if (sessionStore.subSessionId) {
+      webSocketAPI.connect({
+        sessionId: sessionStore.subSessionId,
+        onMessageReceived: onSubSessionMessageReceived,
+        subscriptions: ['chat']
+      })
+    }
   }
 })
 </script>
 
 <template>
-  <!-- IMP : ChatScreen Component -->
   <!-- IMP : PlayerView의 RouterView 요소들 -->
   <div class="contents-container">
     <div class="main-content">

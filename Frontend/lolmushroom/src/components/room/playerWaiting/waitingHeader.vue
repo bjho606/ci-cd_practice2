@@ -37,7 +37,7 @@ const props = defineProps({
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
+  height: 50px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .first {
@@ -63,5 +63,38 @@ const props = defineProps({
   width: 30px;
   height: 30px;
   margin-right: 10px;
+}
+/* 반응형 폰트 크기 조정 */
+@media (max-width: 1200px) {
+  .first,
+  .second {
+    font-size: large;
+  }
+
+  .third {
+    font-size: small;
+  }
+}
+
+@media (max-width: 768px) {
+  .first,
+  .second {
+    font-size: medium;
+  }
+
+  .third {
+    font-size: x-small;
+  }
+}
+
+@media (max-width: 480px) {
+  .first,
+  .second {
+    font-size: small;
+  }
+
+  .third {
+    font-size: xx-small;
+  }
 }
 </style>

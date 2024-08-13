@@ -51,6 +51,7 @@ const isFormValid = computed(() => !!inputName.value.trim())
             :rules="[required]"
             variant="outlined"
             color="green"
+            @keydown.enter.prevent="saveName"
           ></v-textarea>
         </v-card-text>
         <v-card-actions class="pt-0 pr-6">

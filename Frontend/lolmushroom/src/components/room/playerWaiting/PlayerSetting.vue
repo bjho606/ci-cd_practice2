@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoomStore } from '@/stores/roomStore'
 import waitingHeader from './WaitingHeader.vue'
-import PlayerWaitingGround from './PlayerWaitingGround.vue'
+import PlayerWaitng from './PlayerWaitng.vue'
 
 // onMounted 될 시 닉네임 만들기 창 열리게 작동
 const roomStore = useRoomStore()
@@ -22,7 +22,8 @@ const text3 =
       :second-description="text2"
       :third-description="text3"
     />
-    <PlayerWaitingGround />
+    <!-- <PlayerWaitingGround /> -->
+    <PlayerWaitng />
   </div>
 </template>
 

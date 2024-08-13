@@ -14,6 +14,10 @@ const pickContents = (item) => {
 const addContents = (item) => {
   contentsStore.addContent(item)
 }
+
+const isItemSelected = (item) => {
+  return contentsStore.selectedContents.includes(item)
+}
 </script>
 
 <template>
@@ -26,6 +30,7 @@ const addContents = (item) => {
           v-for="item in category.items"
           :key="item._id"
           :item="item"
+          :isItemSelected="isItemSelected(item)"
           @pick="pickContents"
           @add="addContents"
         />
