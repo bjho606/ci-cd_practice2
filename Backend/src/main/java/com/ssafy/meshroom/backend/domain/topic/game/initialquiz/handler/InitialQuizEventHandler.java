@@ -48,7 +48,7 @@ public class InitialQuizEventHandler {
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             }
     )
-    @GetMapping("/api/v1/game/ini-quiz/category{sessionId}")
+    @GetMapping("/api/v1/game/ini-quiz/category/{sessionId}")
     public ResponseEntity<Response<IniQuizCategoryResponse>> getIniQuizCategory (
             @PathVariable String sessionId) {
         return ResponseEntity.status(HttpStatus.OK)
