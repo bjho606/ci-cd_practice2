@@ -31,6 +31,17 @@ export const useContentsStore = defineStore('contents', {
       8: null,
       null: 'EndingPage'
     },
+    socketMapping: {
+      1: 'tf',
+      2: null,
+      3: 'touch',
+      4: 'ini-quiz',
+      5: null,
+      6: null,
+      7: null,
+      8: null,
+      null: 'EndingPage'
+    },
 
     currentContentsId: null,
     contentsSequence: null,

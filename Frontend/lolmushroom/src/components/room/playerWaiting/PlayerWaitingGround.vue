@@ -98,7 +98,7 @@ const changeRoomName = async () => {
   <div class="room-list-container">
     <div class="room-list">
       <v-container
-        v-for="(group, index) in rooms.filter((room) => room.buttonClicked)"
+        v-for="(group, index) in rooms.filter((room) => room.isActive)"
         :key="group.sessionId"
         class="group-container"
       >

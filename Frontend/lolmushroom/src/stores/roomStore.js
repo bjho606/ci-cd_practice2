@@ -26,7 +26,7 @@ export const useRoomStore = defineStore('room', {
       occupants: 0,
       users: [],
       isReady: false,
-      buttonClicked: false
+      isActive: false
     }))
   }),
   actions: {
@@ -37,7 +37,6 @@ export const useRoomStore = defineStore('room', {
       this.setRooms(sessionData.groups)
     },
     setRooms(groups) {
-      this.rooms = groups
       groups.forEach((group, index) => {
         this.rooms[index] = {
           sessionId: group.sessionId,
@@ -46,32 +45,32 @@ export const useRoomStore = defineStore('room', {
           occupants: group.currentUserCount,
           users: group.username,
           isReady: group.isReady,
-          buttonClicked: true
+          isActive: true
         }
         this.activeButtonIndex = index + 1
       })
     },
-    
-    setButtonClicked(index){
-      if(index >=0 && index < this.rooms.length){
-        this.rooms[index].buttonClicked = true;
+
+    setButtonClicked(index) {
+      if (index >= 0 && index < this.rooms.length) {
+        this.rooms[index].isActive = true
       }
     }
   },
   getters: {
     getRooms: (state) => state.rooms,
-    getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
+    getActiveRooms: (state) => state.rooms.filter((room) => room.isActive),
     getActiveButtonIndex: (state) => state.activeButtonIndex,
     getTotalUserCount: (state) => state.currentUserCount,
     getTotalMaxUserCount: (state) => state.maxUserCount,
     getGroupInfoBySessionId: (state) => (sessionId) => {
-    const groupInfo = state.rooms.find((room) => room.sessionId === sessionId)
-    return groupInfo
+      const groupInfo = state.rooms.find((room) => room.sessionId === sessionId)
+      return groupInfo
     }
   },
   persist: {
     key: 'room-info-store',
     storage: sessionStorage,
-    paths: ['activeButtonIndex', 'maxUserCount', 'currentUserCount', 'roomCount', 'rooms'] 
+    paths: ['activeButtonIndex', 'maxUserCount', 'currentUserCount', 'roomCount', 'rooms']
   }
 })

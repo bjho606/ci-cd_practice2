@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MakeSessionView from '@/views/MakeSessionView.vue'
-import RoomWatching from '@/components/room/RoomWatching.vue'
+import RoomWatching from '@/components/room/managerWaiting/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
 import ManagerWaiting from '@/components/room/ManagerWaiting.vue'
 import PlayerSetting from '@/components/room/playerWaiting/PlayerSetting.vue'

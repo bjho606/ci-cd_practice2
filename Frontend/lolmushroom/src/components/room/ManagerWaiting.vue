@@ -52,11 +52,6 @@ const startGame = () => {
     }
   })
 }
-
-/**
- * IMP TODO : Contents/start , next , reload API를 호출 => WS이 되면, 이거 Message만 보고싶어.. => 돌아감의 마지노선..
- * IMP 진행자에게 그에 맞는 UI 버튼 같은 것을 추가해줘야 한다. ( 각 팀의 완료 여부를 볼 수 있는 UI 추가 필수 !! )
- */
 </script>
 
 <template>
