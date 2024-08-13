@@ -111,7 +111,10 @@ const changeRoomName = async () => {
             @click="toggleReady(index)"
             class="ready-btn"
           >
-            <div>{{ group.isReady ? '준비완료' : '준비' }}</div>
+            <div>
+              {{ group.isReady ? '준비완료' : '준비' }}
+              <p class="warning">팀장만 준비완료가 가능합니다!</p>
+            </div>
           </v-btn>
           <v-btn class="group-name" @click="changeRoomName">
             <v-img src="src/assets/image/autorenew.svg" class="icon" />
@@ -153,6 +156,21 @@ const changeRoomName = async () => {
 /* 글씨 가운데 */
 v-container {
   text-align: center;
+}
+
+/* 말풍선 팀장만 준비 가능*/
+.warning {
+  display: none;
+  position: absolute;
+  width: 100px;
+  padding: 8px;
+  left: 0;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
 }
 
 /* 전체 컨테이너 이동 */
