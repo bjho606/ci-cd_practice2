@@ -14,7 +14,7 @@ const connect = ({
   onEndReceived,
   onConnect,
   onError,
-  subscriptions // 추가된 파라미터: 구독할 리스트
+  subscriptions  // 추가된 파라미터: 구독할 리스트
 }) => {
   // stompClient가 이미 존재하고 연결된 상태라면 새로운 클라이언트를 생성하지 않음
   if (stompClient && stompClient.connected) {

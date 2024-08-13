@@ -27,6 +27,7 @@ export const useRoomStore = defineStore('room', {
       users: [],
       isReady: false,
       isActive: false
+      isActive: false
     }))
   }),
   actions: {

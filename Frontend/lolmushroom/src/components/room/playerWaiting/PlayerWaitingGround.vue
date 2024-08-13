@@ -44,29 +44,39 @@ const createSubSessionHandler = async (sessionId) => {
 }
 
 // IMPL1 준비 버튼 클릭하면 준비 되기
-/**
- * IMP 준비 Button이 클릭되면 준비 하기
- * @param index
- */
-const toggleReady = (index) => {
-  if (userStore.getIsTeamLeader) {
-    roomStore.rooms[index].isReady = !roomStore.rooms[index].isReady
+
+const sendReadyMessage = async (sessionId) => {
+  try {
+    const response = await sessionAPI.getSubSessionReady(sessionId)
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 모두 준비 완료입니다:)')
+    }
+  } catch (error) {
+    console.error('Error Ready Message to Manager')
   }
 }
 
-/**
- * IMP 참가하기 Button을 누르면, 밑으로 닉네임 이동
- * @param index
- */
+const toggleReady = (index) => {
+  if (userStore.getIsTeamLeader) {
+    roomStore.rooms[index].isReady = !roomStore.rooms[index].isReady
+    sendReadyMessage(sessionStore.subSessionId)
+  }
+}
+
 // IMPL2 참가하기 버튼 누르면 밑으로 닉네임 이동
 const joinSubsession = async (index) => {
   const room = rooms.value[index]
+
+  // 이미 방을 들어 갈때
+  if (sessionStore.subSessionId && sessionStore.subSessionId !== room.sessionId) {
+    await handleLeaveSession()
+  }
+
   // 닉네임이 없을 시
-  if (!room.users.includes(userStore.userName)) {
+  if (!room.users.includes(userStore.userNickname)) {
     // 만약 room에 사람이 없으면 true
     const isFirstUserInGroup = room.occupants === 0
-
-    await getSessionConnection(room.sessionId, { userName: userStore.userName })
+    await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
 
     if (isFirstUserInGroup) userStore.setTeamLeader(true)
     else userStore.setTeamLeader(false)
@@ -89,8 +99,26 @@ const addGroup = async () => {
  * IMP 이름 버튼을 누르면 이름이 변경됨
  */
 const changeRoomName = async () => {
-  const response = await sessionAPI.changeSubSessionName(sessionStore.subSessionId)
-  console.log('새로운 방 이름 ' + response)
+  const newRoomName = await sessionAPI.changeSubSessionName(sessionStore.subSessionId)
+  console.log('새로운 방 이름 ' + newRoomName)
+}
+
+// IMPL 5 Player가 방을 나간다.
+const handleLeaveSession = async () => {
+  try {
+    await sessionAPI.getSubSessionQuit(sessionStore.subSessionId)
+    const currentRoom = rooms.value.find((room) => room.sessionId === sessionStore.subSessionId)
+    if (currentRoom) {
+      const userIndex = currentRoom.users.indexOf(userStore.userNickname)
+      // user닉네임이 방에 있을 때
+      if (userIndex !== -1) {
+        currentRoom.users.splice(userIndex, 1)
+      }
+    }
+    sessionStore.setSubSessionId(null)
+  } catch (error) {
+    console.error('Error Leaving Session', error)
+  }
 }
 </script>
 
@@ -113,7 +141,7 @@ const changeRoomName = async () => {
           >
             <div>
               {{ group.isReady ? '준비완료' : '준비' }}
-              <p class="warning">팀장만 준비완료가 가능합니다!</p>
+              <p v-if="!userStore.getIsTeamLeader" class="warning">팀장만 준비완료가 가능합니다!</p>
             </div>
           </v-btn>
           <v-btn class="group-name" @click="changeRoomName">
@@ -162,15 +190,20 @@ v-container {
 .warning {
   display: none;
   position: absolute;
-  width: 100px;
-  padding: 8px;
-  left: 0;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
+  width: 320px;
+  padding: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px; /* Space between button and warning */
   border-radius: 8px;
   background: #333;
   color: #fff;
   font-size: 14px;
+  z-index: 10;
+}
+
+.ready-btn:hover .warning {
+  display: block;
 }
 
 /* 전체 컨테이너 이동 */
@@ -181,10 +214,10 @@ v-container {
 }
 
 .room-list {
+  flex-direction: row;
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  gap: 10px;
   padding: 10px;
 }
 
