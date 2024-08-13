@@ -20,7 +20,6 @@ const getSessionConnection = async (sessionId, userName) => {
     const response = await sessionAPI.getSessionConnection(sessionId, userName)
     if (response.data.isSuccess) {
       console.log('Connection을 성공적으로 만들어 냈습니다. Connection Token은 다음과 같습니다:)')
-      console.log(response.data)
     }
   } catch (error) {
     console.error('Error Getting Session Connection', error)
@@ -63,7 +62,6 @@ const joinSubsession = async (index) =>{
     if (!room.users.includes(userStore.userNickname)) { 
         // 만약 room에 사람이 없으면 true
         const isFirstUserInGroup = room.occupants === 0
-
         await getSessionConnection(room.sessionId, { userName: userStore.userNickname })
 
         if (isFirstUserInGroup) userStore.setTeamLeader(true);
@@ -80,7 +78,6 @@ const addGroup = async () =>{
     const newIndex = rooms.value.length;   
     // roomStore.setCurrentContentsState
     await createSubSessionHandler(sessionStore.sessionId)
-    await getSessionConnection(sessionStore.sessionId, { userName: userStore.userNickname })
 
     roomStore.setButtonClicked(newIndex);
     sessionStore.setSessionId(sessionStore.sessionId)
@@ -105,7 +102,10 @@ const changeRoomName = async () => {
             @click="toggleReady(index)"
             class="ready-btn"
             >
-            <div>{{ group.isReady ? '준비완료' : '준비' }}</div>
+            <div>
+                {{ group.isReady ? '준비완료' : '준비' }}
+                <p class="warning">팀장만 준비완료가 가능합니다!</p>
+            </div>
             </v-btn>
             <v-btn class="group-name" @click="changeRoomName">
             <v-img src="src/assets/image/autorenew.svg" class="icon" />
@@ -146,6 +146,21 @@ const changeRoomName = async () => {
 /* 글씨 가운데 */
 v-container{
     text-align: center;
+}
+
+/* 말풍선 팀장만 준비 가능*/
+.warning {
+  display: none;
+  position: absolute;
+  width: 100px;
+  padding: 8px;
+  left: 0;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
 }
 
 /* 전체 컨테이너 이동 */
