@@ -1,34 +1,97 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+  import { onMounted, ref, computed } from 'vue';
+  import { useSessionStore } from '@/stores/sessionStore';
+  import { useAlphabetStore } from '@/stores/alphabetStore';
+  import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
 
-const category_name = ref('동물');
-const userInput = ref('ㅎ ㄹ ㅇ');
+  const store = useAlphabetStore()
+  const sessionStore = useSessionStore()
+  const isTimeUp = ref()
+  const counting = ref(true)
+  const index = ref()
+  const guessWord = ref('')
+  const guessWords = []
+  const areSubmitAnswer = computed(store.submitUserCount === store.totalUserCount ? true : '') 
+
+  // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
+  const timeUp = (bool) => {
+    isTimeUp.value = bool
+    counting.value = !bool
+  }
+
+  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)['result']
+  
+  // 정답을 발행
+  const publishAnswer = () => {
+    const data = {
+      guessWord: guessWord.value
+    }
+    webSocketAPI.sendAnswerData(`/publish/game/tf/answer/${sessionStore.subSessionId}`, data)
+  }
+
+  // 다른 사용자의 정답을 구독
+  const onAnswerReceived = (event) => {
+    console.log('초성 게임 전달 받았음', event)
+    const { ovToken, userName, guessWord } = event
+    guessWords.push(guessWord)
+  }
+
+
+  onMounted(async () => {
+    console.log('연결 좀...')
+    // 세션 연결
+    webSocketAPI.connect({
+          sessionId: sessionStore.subSessionId,
+          contentsName: 'tf',
+          onEventReceived: onAnswerReceived,
+          // onNextReceived: onNextReceived,
+          // onEndReceived: onEndReceived,
+          subscriptions: ['answer', 'next', 'end']
+        })
+  })
 
 </script>
 
 <template>
-  <div class="header">
+  <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
-  </div>
-<div class="container">
-  <div class="statusContainer">
-    <div class="info">
-      <div class="info-category">카테고리</div>
-      <div class="info-text">{{ category_name }}</div>
+  </div> -->
+  <div class="container" v-show="isTimeUp">
+    <div class="statusContainer">
+      <div class="info">
+        <div class="info-category">카테고리</div>
+        <div class="info-text">{{ quizWords[index]['categoryName'] }}</div>
+      </div>
+    </div>
+    <div class="playContainer">
+      <div class="userInput">
+        <div class="emojiField"></div>
+        <div div :userInput class="initialBox">{{ quizWords[index]['quizWord'] }}</div>
+      </div>
+      <div class="userInput">
+        <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!">
+      </div>
+      <button class="submit" @click="publishAnswer()">
+            정답 맞추기
+      </button>
+      <!-- 침여자의 답변 렌더링 -->
+      <v-container v-for="word in guessWords" :key="word">
+        <p>{{ word }}</p>
+      </v-container>
     </div>
   </div>
-  <div class="playContainer">
-    <div class="userInput">
-      <div class="emojiField"></div><div :userInput class="initialBox">{{ userInput }}</div>
+
+  <v-container class="countdown-container" v-show="!isTimeUp">
+    <div class="countdown-timer">
+      <CountDownComponent v-if="counting" time="2.5" text="집중해서 초성을 맞춰보세요!" @end-count-down="timeUp(true)"/>
     </div>
-    <div class="userInput">
-      <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
-    </div>
-    <button class="submit">
-          정답 맞추기
-    </button>
-  </div>
-</div>
+    
+  </v-container>
+
+  <v-container v-show="areSubmitAnswer">
+    <p>1</p>
+  </v-container>
 </template>
 
 <style scoped>

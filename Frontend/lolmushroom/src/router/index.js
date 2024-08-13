@@ -12,6 +12,7 @@ import GroupFightSessionView from '@/views/GroupFightSessionView.vue'
 import TOFMainComponent from '@/components/contents/tof/TOFMainComponent.vue'
 import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
 import AlphabetSubmitComponent from '@/components/contents/alphabet/AlphabetSubmitComponent.vue'
+import AlphabetMainComponent from '@/components/contents/alphabet/AlphabetMainComponent.vue'
 import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
@@ -35,7 +36,7 @@ const routes = [
     children: [
       { path: 'multiroom', name: 'multiroom', component: MultiRoom },
       { path: 'roomwatching', name: 'roomwatching', component: RoomWatching },
-      { path: 'managerwaiting', name: 'managerwaiting', component: ManagerWaiting }
+      { path: 'managerwaiting', name: 'managerwaiting', component: ManagerWaiting },
     ]
   },
 
@@ -51,11 +52,8 @@ const routes = [
         children: [
           { path: 'TOF', name: 'TOF', component: TOFInputComponent },
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent },
-          {
-            path: 'alphabet',
-            name: 'AlphabetSubmitComponent',
-            component: AlphabetSubmitComponent
-          }
+          { path: 'alphabet', name: 'alphabet', component: AlphabetSubmitComponent },
+          { path: 'alphabetContent', name: 'alphabetContent', component: AlphabetMainComponent },
         ]
       },
       {
