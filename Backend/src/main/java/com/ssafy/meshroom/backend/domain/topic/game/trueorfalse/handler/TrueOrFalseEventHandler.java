@@ -92,8 +92,8 @@ public class TrueOrFalseEventHandler {
     }
 
 
-    @MessageMapping("/game/tf/question/{mainSessionId}/{sessionId}")
-    @SendTo("/subscribe/game/tf/question/{mainSessionId}/{sessionId}")
+    @MessageMapping("/game/tf/question/{mainSessionId}/{subSessionId}")
+    @SendTo("/subscribe/game/tf/question/{mainSessionId}/{subSessionId}")
     public Boolean handleSubmitTF(@DestinationVariable String mainSessionId,
                                   @DestinationVariable String subSessionId,
                                   Boolean isDone) {
