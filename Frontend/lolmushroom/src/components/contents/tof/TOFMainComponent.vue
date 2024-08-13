@@ -206,7 +206,7 @@
         </v-container>
         
         <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
-          <ButtonComponent text="선택하기" size="large"/>
+          <v-btn text="선택하기" size="large" rounded color="#1F4F16"/>
         </div>
       </div>
       

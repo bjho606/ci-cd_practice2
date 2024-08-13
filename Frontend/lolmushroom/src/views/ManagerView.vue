@@ -42,6 +42,7 @@ const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message)
 }
 const onProgressEventReceived = (message) => {
+  console.log(message)
   contentsStore.setCurrentContentsState(message)
 }
 

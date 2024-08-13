@@ -163,4 +163,8 @@ onMounted(async () => {
   />
 </template>
 
-<style scoped></style>
+<style scoped>
+  .main {
+    background:#E7FFDE;;
+  }
+</style>

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MakeSessionView from '@/views/MakeSessionView.vue'
 import RoomWatching from '@/components/room/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
 import ManagerWaiting from '@/components/room/ManagerWaiting.vue'
@@ -13,12 +12,12 @@ import MushroomGrowContainer from '@/components/contents/mushroomGrow/MushroomGr
 import TOFMainComponent from '@/components/contents/tof/TOFMainComponent.vue'
 import TOFInputComponent from '@/components/contents/tof/TOFInputComponent.vue'
 import AlphabetSubmitComponent from '@/components/contents/alphabet/AlphabetSubmitComponent.vue'
+import AlphabetMainComponent from '@/components/contents/alphabet/AlphabetMainComponent.vue'
 import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
 
 const routes = [
-  // { path: '/', name: 'home', component: MakeSessionView },
   { path: '/', name: 'home', component: StartPage },
   { path: '/curation', name: 'curation', component: CurationPage },
   { path: '/sessioncode', name: 'sessioncode', component: SessionCode },
@@ -47,9 +46,12 @@ const routes = [
           { path: 'TOFContent', name: 'TOFContent', component: TOFMainComponent },
           {
             path: 'alphabet',
-            name: 'AlphabetSubmitComponent',
-            component: AlphabetSubmitComponent
-          }
+            name: 'alphabet',
+            component: AlphabetSubmitComponent,
+            children: [
+              { path: 'main', name: 'AlphabetMain', component: AlphabetMainComponent },
+            ]
+          },
         ]
       },
       {

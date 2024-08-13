@@ -25,7 +25,7 @@
     :model-value="props.current"
     rounded
     style="border: #000000 2px solid"
-    >
+  >
       <strong style="color: #000000;">{{ props.current }} / {{ props.total }}</strong>
   </v-progress-linear>
 </template>

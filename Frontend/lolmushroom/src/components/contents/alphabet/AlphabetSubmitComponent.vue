@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
+  import { useAlphabetStore } from '@/stores/alphabetStore'
 
-const category_name = ref('동물');
-const userInput = ref('asd');
-
+  const store = useAlphabetStore()
+  const category_name = ref('동물');
+  const userInput = ref('asd');
 </script>
 
 <template>
@@ -13,8 +14,20 @@ const userInput = ref('asd');
 <div class="container">
   <div class="statusContainer">
     <div class="progress-bar">
-      공통 컴포넌트인 프로그래스바 넣어야됨 feat. 규석
+      <v-progress-linear
+        bg-color="#FFFFFF"
+        color="#24A319"
+        height="30"
+        :max="store.totalUserCount"
+        min="0"
+        :model-value="store.submitUserCount"
+        rounded
+        style="border: #000000 2px solid"
+      >
+      <strong style="color: #000000;">{{ store.submitUserCount }} / {{ store.totalUserCount }}</strong>
+      </v-progress-linear>
     </div>
+
     <div class="info">
       <div class="info-category">카테고리</div>
       <div class="info-text">{{ category_name }}</div>
@@ -24,7 +37,7 @@ const userInput = ref('asd');
     <div class="userInput">
       <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
     </div>
-    <button class="submit">
+    <button class="submit" @click="$router.push({name: 'AlphabetMain'})">
           제출하기
     </button>
   </div>
@@ -56,7 +69,6 @@ const userInput = ref('asd');
 .progress-bar{
   width: 1000px;
   height: 69px;
-  background-color: yellow;
 }
 
 .info{

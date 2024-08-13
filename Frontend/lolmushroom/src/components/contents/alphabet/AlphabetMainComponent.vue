@@ -22,7 +22,7 @@ const userInput = ref('ㅎ ㄹ ㅇ');
       <div class="emojiField"></div><div :userInput class="initialBox">{{ userInput }}</div>
     </div>
     <div class="userInput">
-      <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
+      <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !">
     </div>
     <button class="submit">
           정답 맞추기

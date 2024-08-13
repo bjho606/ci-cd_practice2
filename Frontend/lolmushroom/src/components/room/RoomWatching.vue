@@ -108,7 +108,7 @@ const goToMultiRoom = () => {
       </div>
       <div class="room-waiting-count-info">
           현재 인원  
-          <span class="total-count-info">{{ currentCount }}/ 60</span>
+          <span class="total-count-info">{{ currentCounts }}/ 60</span>
       </div>
     </header>
 
