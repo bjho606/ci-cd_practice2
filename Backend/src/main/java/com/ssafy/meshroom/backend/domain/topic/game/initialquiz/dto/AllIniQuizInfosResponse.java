@@ -1,6 +1,5 @@
 package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto;
 
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.TFInfoResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

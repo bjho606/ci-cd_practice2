@@ -1,8 +1,6 @@
 package com.ssafy.meshroom.backend.global.auth.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.meshroom.backend.global.common.dto.Response;
-import com.ssafy.meshroom.backend.global.error.code.CommonErrorCode;
 import com.ssafy.meshroom.backend.global.error.dto.ErrorResponse;
 import com.ssafy.meshroom.backend.global.error.exception.SecurityAuthenticationException;
 import jakarta.servlet.ServletException;

@@ -12,18 +12,11 @@ import org.springframework.stereotype.Service;
 public class KafkaTouchMeshProducer {
 
     private KafkaTemplate<String, Object> kafkaTemplate;
-    private OVTokenRepository ovTokenRepository;
-    private SessionRepository sessionRepository;
 
     private static final String TOPIC = "game-touchmesh";
 
     public void sendEvent(TouchDto touchEvent) {
 
-        // session Sid  두개 뽑을 수 있음
-        // findby id Session객체
-        // isMain, sessionId
-        // => 내 그룹의 sessionID
-        // 사용자가 클릭한 sessionID
         kafkaTemplate.send(TOPIC, touchEvent);
     }
 }

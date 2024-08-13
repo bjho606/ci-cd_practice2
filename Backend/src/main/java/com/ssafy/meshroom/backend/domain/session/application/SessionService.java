@@ -1,14 +1,12 @@
 package com.ssafy.meshroom.backend.domain.session.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
-import com.ssafy.meshroom.backend.domain.OVToken.dao.OVTokenRepository;
 import com.ssafy.meshroom.backend.domain.contents.application.ContentsOrderService;
 import com.ssafy.meshroom.backend.domain.session.dao.GroupNameRepository;
 import com.ssafy.meshroom.backend.domain.session.dao.SessionRepository;
 import com.ssafy.meshroom.backend.domain.session.domain.GroupName;
 import com.ssafy.meshroom.backend.domain.session.dto.*;
 import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
-import com.ssafy.meshroom.backend.domain.user.domain.User;
 import com.ssafy.meshroom.backend.domain.user.domain.UserRole;
 import com.ssafy.meshroom.backend.global.auth.jwt.TokenProvider;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
@@ -20,7 +18,6 @@ import io.openvidu.java.client.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

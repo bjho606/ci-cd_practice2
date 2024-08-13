@@ -1,14 +1,8 @@
 package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.handler;
 
-import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dao.InitialQuizRepository;
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto.*;
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.service.InitialQuizService;
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.AllTFInfosResponse;
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.TFInfoCreateRequest;
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.TFInfoCreateResponse;
-import com.ssafy.meshroom.backend.domain.user.application.UserDetailService;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
-import com.ssafy.meshroom.backend.global.util.HangulToChosung;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,13 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 

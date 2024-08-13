@@ -1,14 +1,11 @@
 package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto;
 
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.domain.InitialQuizInfo;
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.domain.TFInfo;
 import com.ssafy.meshroom.backend.global.util.HangulToChosung;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
 
 @Builder
 @Getter

@@ -5,17 +5,14 @@ import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dao.InitialQuizR
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.domain.InitialQuizCategory;
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.domain.InitialQuizInfo;
 import com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto.*;
-import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.*;
 import com.ssafy.meshroom.backend.domain.user.dao.UserRepository;
 import com.ssafy.meshroom.backend.global.common.dto.Response;
-import com.ssafy.meshroom.backend.global.util.HangulToChosung;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -2,8 +2,6 @@ package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto;
 
 import lombok.*;
 
-import java.util.ArrayList;
-
 @ToString
 @Getter
 @Setter

@@ -1,6 +1,5 @@
 package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.service;
 
-import com.ssafy.meshroom.backend.domain.topic.game.touchmesh.dto.TouchDto;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dao.TrueOrFalseRepository;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.domain.TFInfo;
 import com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto.*;
