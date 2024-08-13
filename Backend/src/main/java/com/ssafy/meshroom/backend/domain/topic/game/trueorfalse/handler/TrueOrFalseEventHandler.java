@@ -92,12 +92,14 @@ public class TrueOrFalseEventHandler {
     }
 
 
-    @MessageMapping("/game/tf/question/{sessionId}")
-    @SendTo("/subscribe/game/tf/question/{sessionId}")
-    public Boolean handleSubmitTF(@DestinationVariable String sessionId, Boolean isDone) {
-        log.info("submit signal recieved : " + sessionId + " - " + isDone);
+    @MessageMapping("/game/tf/question/{mainSessionId}/{subSessionId}")
+    @SendTo("/subscribe/game/tf/question/{mainSessionId}/{subSessionId}")
+    public Boolean handleSubmitTF(@DestinationVariable String mainSessionId,
+                                  @DestinationVariable String subSessionId,
+                                  Boolean isDone) {
+        log.info("submit signal recieved : " + mainSessionId+"/"+subSessionId + " - " + isDone);
 
-        sendToAdministrator(sessionId, 1, isDone);
+        sendToAdministrator(mainSessionId, subSessionId, 1, isDone);
 
         return isDone;
     }
@@ -118,12 +120,14 @@ public class TrueOrFalseEventHandler {
         return answerResponseSignal;
     }
 
-    @MessageMapping("/game/tf/next/{sessionId}")
-    @SendTo("/subscribe/game/tf/next/{sessionId}")
-    public Boolean handleNextTF(@DestinationVariable String sessionId, Boolean isDone) {
-        log.info("presentation finished signal recieved : " + sessionId + " - " + isDone);
+    @MessageMapping("/game/tf/next/{mainSessionId}/{subSessionId}")
+    @SendTo("/subscribe/game/tf/next/{mainSessionId}/{subSessionId}")
+    public Boolean handleNextTF(@DestinationVariable String mainSessionId,
+                                @DestinationVariable String subSessionId,
+                                Boolean isDone) {
+        log.info("presentation finished signal recieved : " + mainSessionId+"/"+subSessionId + " - " + isDone);
 
-        sendToAdministrator(sessionId, 2, isDone);
+        sendToAdministrator(mainSessionId, subSessionId, 2, isDone);
 
         return isDone;
     }
@@ -136,7 +140,7 @@ public class TrueOrFalseEventHandler {
 //        return sessionId;
 //    }
 
-    public void sendToAdministrator(String sessionId, int curStep, Boolean isDone) {
-        trueOrFalseService.sendSignalToAdministrator(sessionId, curStep, isDone);
+    public void sendToAdministrator(String mainSessionId, String subSessionId, int curStep, Boolean isDone) {
+        trueOrFalseService.sendSignalToAdministrator(mainSessionId, subSessionId, curStep, isDone);
     }
 }
