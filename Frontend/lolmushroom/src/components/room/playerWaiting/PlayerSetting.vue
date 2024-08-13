@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoomStore } from '@/stores/roomStore'
-import waitingHeader from './WaitingHeader.vue'
+import waitingHeader from './waitingHeader.vue'
 import PlayerWaitingGround from './PlayerWaitingGround.vue'
 
 // onMounted 될 시 닉네임 만들기 창 열리게 작동

@@ -1,13 +1,13 @@
 <template>
-  <svg @click="bounce"
-      :class="{ 'is-bouncing': isBouncing }"
-      :width="sizeWithUnit"
-      :height="sizeWithUnit"
-      :viewBox="viewBox"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect :width="sizeWithUnit" :height="sizeWithUnit" fill="url(#pattern0_692_1626)"/>
+    <svg @click="handleClick"
+        :class="{ 'is-bouncing': isBouncing }"
+        :width="sizeWithUnit"
+        :height="sizeWithUnit"
+        :viewBox="viewBox"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect :width="sizeWithUnit" :height="sizeWithUnit" fill="url(#pattern0_692_1626)"/>
 <defs>
 <pattern id="pattern0_692_1626" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0_692_1626" transform="matrix(0.000980484 0 0 0.000976562 -0.00200803 0)"/>
@@ -20,6 +20,18 @@
 
 <script setup>
 import { computed,ref } from 'vue';
+
+const handleClick = () =>{
+  bounce();
+
+}
+
+
+// 효과음 재생
+function playSound() {
+  const audio = new Audio('/path/to/sound.mp3'); // Path to your sound file
+  audio.play();
+}
 
 const isBouncing = ref(false);
 
@@ -99,4 +111,21 @@ const transform = computed(() => {
     transform: scale(1) rotate(0deg);
   }
 }
+
+/* spark effect */
+.spark {
+  animation: spark 0.3s ease-in-out;
+}
+
+@keyframes spark {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
 </style>

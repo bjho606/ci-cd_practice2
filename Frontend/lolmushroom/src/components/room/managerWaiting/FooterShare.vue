@@ -1,8 +1,27 @@
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/stores/sessionStore'
+
+
+const router = useRouter()
+const sessionStore = useSessionStore()
+const sessioncodeUrl = router.resolve({
+    name: 'sessioncode',
+    query: {
+      sessionUrl: sessionStore.getSessionUrl
+    }
+  }).href
+
+const shareCode = () => {
+  window.open(sessioncodeUrl, '_blank', 'width=1200,height=800')
+}
+
+
+</script>
 
 <template>
   <div class="share-session">
-    <v-btn class="share-session-btn" icon>
+    <v-btn class="share-session-btn" icon  @click="shareCode()">
       <v-icon class="share-icon" icon="mdi-share" />
       공유
     </v-btn>

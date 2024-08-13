@@ -17,6 +17,8 @@ const onAddClick = () => {
   <div class="item-content" @click="onPickClick">
     <v-icon class="item-icon">{{ item.icon }}</v-icon>
     <span class="item-text">{{ item.contentTitle }}</span>
+    <!-- 미출시 컨텐츠 개발-->
+    <span v-if=!item.isActive class="item-notDevelop">서비스 개발 중</span>
     <v-icon class="item-add" @click.stop="onAddClick">mdi-plus</v-icon>
   </div>
 </template>
@@ -63,5 +65,12 @@ const onAddClick = () => {
 .item-add:hover {
   background-color: #247719;
   color: white;
+}
+
+.item-notDevelop{
+  flex-grow: 0;
+  color: red;
+  margin-right: 10px;
+
 }
 </style>

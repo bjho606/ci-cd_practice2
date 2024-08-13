@@ -4,6 +4,7 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
+import BallMain from './components/contents/BallGrow/BallMain.vue';
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
@@ -34,7 +35,8 @@ onMounted(() => {
 
 <template>
   <v-app id="v-app">
-    <RouterView />
+    <!-- <RouterView /> -->
+     <BallMain/>
   </v-app>
 </template>
 
