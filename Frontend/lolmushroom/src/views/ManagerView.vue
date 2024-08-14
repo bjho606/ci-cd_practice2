@@ -45,7 +45,7 @@ const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
 }
 const onFinishEventReceived = (message) => {
-  contentsStore.fetchCurrentContentsState(message)
+  contentsStore.setContentsFinish(message)
 }
 
 /**

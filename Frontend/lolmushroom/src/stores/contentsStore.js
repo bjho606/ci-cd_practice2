@@ -77,7 +77,7 @@ export const useContentsStore = defineStore('contents', {
       }
     },
 
-    fetchCurrentContentsState(isFinish) {
+    setContentsFinish(isFinish) {
       this.currentContentState = isFinish
     },
 
@@ -111,6 +111,7 @@ export const useContentsStore = defineStore('contents', {
     getTotalDuration: (state) => state.totalDuration,
     getCurrentContentsId: (state) => state.currentContentsId,
     getContentsSequence: (state) => state.contentsSequence,
+    getContentsFinish: (state) => state.currentContentState,
     getRouteMapping: (state) => state.routeMapping,
     getSocketMapping: (state) => state.socketMapping
   },

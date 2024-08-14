@@ -40,7 +40,7 @@ const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
 turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
 
 // 정답을 발행
-const publishAnswer = () => {
+const publishGuess = () => {
   if (guessWord.value === '') {
     showAlert.value = true
   } else {
@@ -84,33 +84,38 @@ const onGuessReceived = (event) => {
   guessWords.value.push(wordData)
 
   // 만약 정답이 나오면
-  if (result === true) {
+  if (result === true && ovToken !== turn.ownerOvToken) {
     turn.answer = submittedWord
     turn.winner = userName
     isCorrected.value = true
     guessWords.value = []
-    // 3초 후에 isCorrected를 false로 변경하고 index 증가
-    setTimeout(() => {
-      isCorrected.value = false
-      index.value += 1
-    }, 3000)
+    index.value += 1
   }
 }
 
 // index 값이 증가할 때마다 관련 값 갱신
-watch(index, (newIndex, oldIndex) => {
-  if (newIndex < store.totalUserCount) {
+watch(index, async (newIndex, oldIndex) => {
+  if (newIndex < alliIniQuizInfos.length) {
     turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
+    // 3초 후에 isCorrected를 false로 변경하고 index 증가
+    setTimeout(() => {
+      isCorrected.value = false
+    }, 3000)
+    return
+  } else if (turn.ownerOvToken === userStore.userOvToken) {
+    await contentsAPI.finishContents(sessionStore.subSessionId)
+    router.push({
+      name: 'mainSession',
+      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+    })
   } else {
     router.push({
-      name: 'roomwaiting',
-      params: {
-        sessionId: sessionStore.sessionId,
-        subSessionId: sessionStore.subSessionId
-      }
+      name: 'mainSession',
+      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
     })
   }
 })
+
 onMounted(async () => {
   console.log('초성 게임 연결 중..')
   // 세션 연결
@@ -130,8 +135,10 @@ onMounted(async () => {
   <div class="container" v-show="isTimeUp && !isCorrected">
     <div class="statusContainer">
       <div class="info">
-        <div class="info-category">카테고리</div>
-        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
+        <div class="info-category"><h1>카테고리</h1></div>
+        <div class="info-text">
+          <h1>{{ alliIniQuizInfos[index]['categoryName'] }}</h1>
+        </div>
       </div>
     </div>
     <div class="playContainer">
@@ -146,19 +153,11 @@ onMounted(async () => {
           class="inputText"
           placeholder="카테고리에 관한 입력을 해주세요!"
           v-model="guessWord"
-          @keyup.enter="publishAnswer()"
+          @keyup.enter="publishGuess()"
         />
       </div>
-      <div>
-        <v-alert
-          title="초성 게임!"
-          text="입력 창을 모두 채워주세요."
-          type="warning"
-          v-if="showAlert"
-          class="warning-alert"
-        />
-      </div>
-      <button class="submit" @click="publishAnswer()">정답 맞추기</button>
+      <div></div>
+      <button class="submit" @click="publishGuess()">정답 맞추기</button>
       <!-- 침여자의 답변 렌더링 -->
       <div
         v-for="wordData in guessWords"
@@ -172,7 +171,7 @@ onMounted(async () => {
           color: wordData.color
         }"
       >
-        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 300%">
+        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 200%">
           {{ wordData.word }}
         </h2>
         <h2 v-else>{{ wordData.word }}</h2>

@@ -9,7 +9,7 @@ import EachBall from './EachBall.vue'
 
 const props = defineProps({
   currentContents: {
-    type: Number
+    type: String
   }
 })
 
@@ -41,11 +41,11 @@ const rooms = computed(() => {
         </div>
         <EachWait v-if="!currentContents" :room="room" />
         <div v-if="room.gameEnd">게임 종료</div>
-        <v-else>
+        <div v-else>
           <EachTOF v-if="currentContents === '1'" :room="room" />
           <EachAlpha v-if="currentContents === '4'" :room="room" />
           <EachBall v-if="currentContents === '7'" :room="room" />
-        </v-else>
+        </div>
       </div>
       <div v-else class="inactive-content">
         <div class="inactive-icon">✖</div>

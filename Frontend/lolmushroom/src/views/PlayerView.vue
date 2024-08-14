@@ -66,7 +66,7 @@ const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
 }
 const onFinishEventReceived = (message) => {
-  contentsStore.fetchCurrentContentsState(message)
+  contentsStore.setContentsFinish(message)
 }
 
 /**
@@ -106,7 +106,7 @@ const userFlowHandler = async () => {
 }
 
 /**
- *
+ * TODO : Team Leader는 Contents가 종료되면, 종료 Signal을 진행자에게 보낸다.
  * @param sessionId
  */
 const finishContents = async (sessionId) => {
@@ -122,24 +122,15 @@ const finishContents = async (sessionId) => {
 }
 
 /**
- * IMP : Finish Event를 처리하는 Watcher
+ * IMP : Finish Event를 처리하는 Watcher => TeamLeader는 Group 종료 Signal을 날린다.
  */
-watch(
-  () => contentsStore.currentContentState,
-  (newState) => {
-    if (newState) {
-    }
-
-    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
-    if (group && group.isFinish) {
-      router.push({
-        name: 'mainSession',
-        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-      })
-    }
-  },
-  { deep: true } // Ensure the watcher detects nested changes within the array
-)
+const isFinish = computed(() => contentsStore.getContentsFinish)
+watch(isFinish, (newState) => {
+  if (newState && userStore.isTeamLeader) {
+    console.log('Contents를 종료합니다.')
+    finishContents(sessionStore.subSessionId)
+  }
+})
 
 /**
  * IMP 적절한 ContentsID에 맞게 Routing을 해주는 Watcher
@@ -167,7 +158,9 @@ watch(currentContents, (newContentsId, oldContentsId) => {
     }
   }
   if (newContentsId && routeMapping[newContentsId]) {
+    console.log(newContentsId)
     userStore.setIsStarted()
+    contentsStore.setContentsFinish(null)
     router.push({
       name: routeMapping[newContentsId],
       params: {
