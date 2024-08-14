@@ -37,6 +37,7 @@ const correctRate = computed(() => {
 
     <div class="selectResult-div">
       <div class="correctRate-div">정답률: {{ correctRate * 100 }}%</div>
+      <div>총 참여자 수: {{ store.submitUserCount }} / {{ store.totalUserCount-1 }} 명</div>
     </div>
   </v-container>
 
