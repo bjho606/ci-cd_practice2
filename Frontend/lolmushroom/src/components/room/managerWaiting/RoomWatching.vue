@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useContentsStore } from '@/stores/contentsStore'
@@ -9,10 +8,8 @@ import { useMushroomStore } from '@/stores/mushroomStore'
 import Swal from 'sweetalert2'
 import webSocketAPI from '@/api/webSocket'
 import contentsAPI from '@/api/contents'
-
-import ManagerHeader from './ManagerHeader.vue'
 import WatchWaiting from '@/components/room/eachroom/adminWatchWaiting.vue'
-import Mushroom from '@/components/room/eachroom/eachMushRoom.vue'
+import ManagerHeader from './ManagerHeader.vue'
 import ManagerFooter from './ManagerFooter.vue'
 import FooterStart from './FooterStart.vue'
 import FooterShare from './FooterShare.vue'
@@ -25,7 +22,6 @@ const mushroomStore = useMushroomStore()
 const showShareFooter = ref(true)
 
 const currentContents = computed(() => contentsStore.getCurrentContentsId)
-const mushrooms = computed(() => mushroomStore.getAllMushrooms)
 const groups = computed(() => {
   return roomStore.getActiveRooms.map((room) => ({
     sessionId: room.sessionId,
@@ -99,23 +95,12 @@ const startGame = () => {
 
 <template>
   <div class="room-waiting">
-    <!-- 진행자 대기화면 Header -->
     <ManagerHeader />
-    <WatchWaiting v-if="!currentContents" />
-
-    <!-- 3. 공 키우기 화면 -->
-    <div v-if="currentContents === '3'">
-      <div class="grid-container">
-        <Mushroom v-for="mushroom in mushrooms" :key="mushroom.sessionId" :group="mushroom" />
-      </div>
-    </div>
-
-    <!-- [진행자 대기화면 Footer] -->
+    <WatchWaiting :currentContents="currentContents" />
     <ManagerFooter>
       <template v-slot:start>
         <FooterStart @start-game="startGame" />
       </template>
-      <!-- Conditionally render FooterShare once -->
       <template v-slot:share v-if="showShareFooter">
         <FooterShare />
       </template>

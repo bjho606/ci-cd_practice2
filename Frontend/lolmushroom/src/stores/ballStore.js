@@ -1,11 +1,8 @@
 import { defineStore } from 'pinia'
 import webSocketAPI from '@/api/webSocket'
-import blueBall from '@/assets/ballGrow/BlueBall.svg'
-import greenBall from '@/assets/ballGrow/GreenBall.svg'
 
 export const useBallStore = defineStore('ballStore', {
   state: () => ({
-    // IMP : User Group Check & Total Group Info
     userGroup: null,
     currentGroup: null,
     groupNameMap: new Map(),
@@ -62,26 +59,21 @@ export const useBallStore = defineStore('ballStore', {
       return state.groupNameMap.get(groupId)
     },
     getBallSize: (state) => (groupId) => {
-      return state.mushroomMap.get(groupId)
+      return state.ballMap.get(groupId)
     },
-    getBallSize: (state) => (groupId) => {
-      // groupId가 userGroup과 같으면 green ball 이미지를 반환
-      if (groupId === state.userGroup) {
-        return greenBall
-      }
-      // groupId가 userGroup과 다르면 blue ball 이미지를 반환
-      return blueBall
+    getIsMyBall: (state) => (groupId) => {
+      return groupId === state.userGroup
     },
     getTotalBalls: (state) => {
       const totalBalls = []
-      state.mushroomMap.forEach((size, sessionId) => {
-        allMushrooms.push({
+      state.ballMap.forEach((size, sessionId) => {
+        totalBalls.push({
           sessionId,
           groupName: state.groupNameMap.get(sessionId),
           size
         })
       })
-      return allMushrooms
+      return totalBalls
     }
   }
 })

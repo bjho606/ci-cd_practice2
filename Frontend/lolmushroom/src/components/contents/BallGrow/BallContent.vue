@@ -1,20 +1,64 @@
 <script setup>
 import { computed } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
+import BlueBallComponent from '@/components/contents/BallGrow/BlueBallComponent.vue'
+import GreenBallComponent from '@/components/contents/BallGrow/GreenBallComponent.vue'
 
-const props = defineProps({
-  ball: Object
-})
 const ballStore = useBallStore()
-const ballImage = computed(() => ballStore.getBallImage(props.ball.sessionId))
-const ballSize = computed(() => props.ball.size)
-console.log(ballImage.value)
+const props = defineProps({
+  isMain: Boolean,
+  groupId: String
+})
+
+const isMine = computed(() => ballStore.getIsMyBall(props.groupId))
+const groupName = computed(() => ballStore.getCurrentGroupName(props.groupId))
+const currentSize = computed(() => ballStore.getBallSize(props.groupId))
+const containerClass = computed(() => (props.isMain ? 'main-container' : 'sub-container'))
 </script>
 
 <template>
-  <div>
-    <v-img :src="ballImage" :style="{ width: ballSize, height: ballSize }"> </v-img>
+  <div :class="containerClass">
+    <div class="ball-name">{{ groupName }}</div>
+    <div class="ball-container">
+      <GreenBallComponent v-if="isMine" :health="currentSize" :isMain="isMain" />
+      <BlueBallComponent v-else :health="currentSize" :isMain="isMain" />
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.main-container,
+.sub-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff2f7;
+  border: 1px solid black;
+  border-radius: 20px;
+}
+
+.main-container {
+  width: 600px;
+  height: 400px;
+}
+
+.sub-container {
+  width: 300px;
+  height: 200px;
+}
+
+.ball-name {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px;
+  font-size: x-large;
+}
+
+.ball-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

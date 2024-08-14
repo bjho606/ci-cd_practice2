@@ -56,6 +56,9 @@ const getSessionConnection = async (sessionId, userName) => {
 const onMainSessionMessageReceived = (message) => {
   chatStore.addMainSessionMessage(message)
 }
+const onSubSessionMessageReceived = (message) => {
+  chatStore.addSubSessionMessage(message)
+}
 const onSessionEventReceived = (message) => {
   roomStore.setSessionData(message)
 }
@@ -63,6 +66,9 @@ const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
   console.log(sessionStore.subSessionId)
   router.push({name: 'alphabet', params: {subSessionId: sessionStore.subSessionId}})
+}
+const onFinishEventReceived = (message) => {
+  contentsStore.fetchCurrentContentsState(message)
 }
 
 /**
@@ -96,7 +102,8 @@ const userFlowHandler = async () => {
     onMessageReceived: onMainSessionMessageReceived,
     onEventReceived: onSessionEventReceived,
     onProgressReceived: onProgressEventReceived,
-    subscriptions: ['chat', 'session', 'progress']
+    onFinishReceived: onFinishEventReceived,
+    subscriptions: ['chat', 'session', 'progress', 'finish']
   })
 }
 
@@ -109,52 +116,65 @@ onMounted(() => {
   if (!userStore.userName) {
     showNameModal.value = true
   } else {
+    /**
+     * IMP : 새로고침 한다면, Main Chat, SessionInfo, Contents Progress Socket을 재구독
+     */
     webSocketAPI.connect({
       sessionId: sessionStore.sessionId,
       onMessageReceived: onMainSessionMessageReceived,
       onEventReceived: onSessionEventReceived,
       onProgressReceived: onProgressEventReceived,
-      subscriptions: ['chat', 'session', 'progress']
+      onFinishReceived: onFinishEventReceived,
+      subscriptions: ['chat', 'session', 'progress', 'finish']
     })
+
+    /**
+     * IMP : 새로고침을 할 때, Session Storage에 subSessionId가 남아 있다면, Sub Chat을 재구독
+     */
+    if (sessionStore.subSessionId) {
+      webSocketAPI.connect({
+        sessionId: sessionStore.subSessionId,
+        onMessageReceived: onSubSessionMessageReceived,
+        subscriptions: ['chat']
+      })
+    }
   }
 })
 </script>
 
 <template>
-  <!-- IMP : ChatScreen Component -->
-  <!-- IMP : PlayerView의 RouterView 요소들 -->
   <div class="contents-container">
     <div class="main-content">
       <RouterView />
     </div>
+    <!-- IMP : NickName Modal -->
+    <SetName
+      :show="showNameModal"
+      @update:show="showNameModal = $event"
+      @name-saved="userFlowHandler"
+    />
     <div class="sub-content">
       <ChatScreen />
     </div>
   </div>
-  <!-- IMP : NickName Modal -->
-  <SetName
-    :show="showNameModal"
-    @update:show="showNameModal = $event"
-    @name-saved="userFlowHandler"
-  />
 </template>
 
 <style scoped>
 .contents-container {
   background-color: #fff2f7;
-  height: 100%;
+  height: 100vh; /* 전체 화면 높이 설정 */
   display: flex;
   flex-direction: column;
+  position: relative; /* 자식 요소의 absolute 위치 설정을 위해 relative 설정 */
+  overflow-y: hidden;
 }
 
 .main-content {
-  height: 93%;
+  height: 100%; /* 100% 높이 설정 */
 }
 
 .sub-content {
-  height: 5%;
-  display: flex;
-  flex-direction: flext-start;
-  margin-left: 0.5%;
+  position: absolute;
+  bottom: 0;
 }
 </style>

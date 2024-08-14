@@ -10,14 +10,14 @@ const content = computed(() => contentsStore.getPickedContents)
   <div v-if="content" class="contents-card-shadow contents-card">
     <!-- 이미지 섹션 -->
     <div class="image-section">
-      <v-img :src="content.imgUrl"  max-width="300px" max-height="300px"></v-img>
+      <v-img :src="content.imgUrl"  max-width="300px" max-height="300px" style="border: 2px solid black; border-radius: 10%;"></v-img>
     </div>
 
     <!-- 제목 섹션 -->
     <div class="title-section">
-      <h2>{{ content.contentTitle }}</h2>
+      <h1>{{ content.contentTitle }}</h1>
     </div>
-
+    
     <!-- Green Section (설명 섹션) -->
     <div class="green-section">
       {{ content.description }}
@@ -56,14 +56,16 @@ const content = computed(() => contentsStore.getPickedContents)
   flex: 0.1;
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: center;
+  margin-bottom: 2.5%;
 }
 
 .green-section {
-  flex: 0.5;
+  flex: 0.4;
   background-color: #e7ffde;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 15%;
 }
 </style>

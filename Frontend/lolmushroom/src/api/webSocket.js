@@ -11,8 +11,8 @@ const connect = ({
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
+  onFinishReceived,
   onNextReceived,
-  onEndReceived,
   onConnect,
   onError,
   subscriptions // 추가된 파라미터: 구독할 리스트
@@ -29,8 +29,8 @@ const connect = ({
       onMessageReceived,
       onEventReceived,
       onProgressReceived,
+      onFinishReceived,
       onNextReceived,
-      onEndReceived,
       subscriptions
     )
 
@@ -56,8 +56,8 @@ const connect = ({
         onMessageReceived,
         onEventReceived,
         onProgressReceived,
+        onFinishReceived,
         onNextReceived,
-        onEndReceived,
         subscriptions
       )
 
@@ -95,8 +95,8 @@ const addSubscriptions = (
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
+  onFinishReceived,
   onNextReceived,
-  onEndReceived,
   subscriptions
 ) => {
   if (!stompClient || !stompClient.connected) {
@@ -120,6 +120,9 @@ const addSubscriptions = (
         break
       case 'progress':
         addProgressSubscription(sessionId, onProgressReceived)
+        break
+      case 'finish':
+        addFinishSubscription(sessionId, onFinishReceived)
         break
       case 'game':
         addGameSubscription(sessionId, contentsId, onEventReceived)
@@ -207,6 +210,22 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
   }
 }
 
+const addFinishSubscription = (sessionId, onFinishReceived) => {
+  const finishKey = 'finsih'
+  if (!subscriptionMap.has(finishKey)) {
+    const finishSubscription = stompClient.subscribe(
+      `/subscribe/contents/${sessionId}/finish`,
+      (message) => {
+        console.log('Received event from Contents Subscribe', message.body)
+        if (onFinishReceived) {
+          onFinishReceived(JSON.parse(message.body))
+        }
+      }
+    )
+    subscriptionMap.set(finishKey, finishSubscription)
+  }
+}
+
 // 진술서 구독 시 내용 전달받기
 const addQuestionSubscription = (sessionId, subSessionId, onEventReceived) => {
   const questionKey = 'question'
@@ -259,12 +278,15 @@ const addNextSubscription = (sessionId, subSessionId, onNextReceived) => {
 const addWordSubscription = (subSessionId, onEndReceived) => {
   const wordKey = 'word'
   if (!subscriptionMap.has(wordKey)) {
-    const wordSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/word/${subSessionId}`, (event) => {
-      console.log(`Received event from Subscribe - 초성 문제`, event.body)
-      if (onEndReceived) {
-        onEndReceived(JSON.parse(event.body))
+    const wordSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/word/${subSessionId}`,
+      (event) => {
+        console.log(`Received event from Subscribe - 초성 문제`, event.body)
+        if (onEndReceived) {
+          onEndReceived(JSON.parse(event.body))
+        }
       }
-    })
+    )
     subscriptionMap.set(wordKey, wordSubscription)
   }
 }
@@ -274,12 +296,15 @@ const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceiv
   const guessKey = contentsId
   console.log(`/subscribe/game/ini-quiz/${contentsId}/${sessionId}/${subSessionId}`)
   if (!subscriptionMap.has(guessKey)) {
-    const finishSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`, (event) => {
-      console.log(`Received event from Subscribe - 다른 사람`, event.body)
-      if (onEventReceived) {
-        onEventReceived(JSON.parse(event.body))
+    const finishSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
+      (event) => {
+        console.log(`Received event from Subscribe - 다른 사람`, event.body)
+        if (onEventReceived) {
+          onEventReceived(JSON.parse(event.body))
+        }
       }
-    })
+    )
     subscriptionMap.set(guessKey, finishSubscription)
   }
 }
@@ -428,19 +453,6 @@ const sendNextData = (destination, data) => {
   }
 }
 
-// 콘텐츠 종료시
-const sendFinishData = (destination, data) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({
-      destination: destination,
-      body: JSON.stringify(data)
-    })
-    console.log('컨텐츠 종료')
-  } else {
-    console.error('WebSocket is not Connected')
-  }
-}
-
 export default {
   connect,
   disconnect,
@@ -450,6 +462,5 @@ export default {
   unsubscribeGame,
   sendSubmitData,
   sendAnswerData,
-  sendNextData,
-  sendFinishData
+  sendNextData
 }

@@ -26,7 +26,10 @@ const onEnd = () => {
 </script>
 
 <template>
-  <div class="bottom-list">
+  <div v-if="localSelectedContents.length === 0" class="empty-container">
+    <p class="empty-message">🎮 나만의 오리엔테이션을 구성해보자 🎮</p>
+  </div>
+  <div v-else class="bottom-list">
     <VueDraggableNext
       v-model="localSelectedContents"
       item-key="_id"
@@ -39,7 +42,7 @@ const onEnd = () => {
         class="draggable-item-container"
       >
         <SelectedCard :item="each" :order="index + 1" @remove="removeContent" />
-        <div v-if="index < localSelectedContents.length - 1" class="arrow-container">→</div>
+        <div v-if="index < localSelectedContents.length - 1" class="arrow-container">▶️</div>
       </div>
     </VueDraggableNext>
     <SessionStartButton v-if="localSelectedContents.length > 0" />
@@ -52,7 +55,25 @@ const onEnd = () => {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding: 40px;
+  margin-left: 2%;
+}
+
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+}
+
+.empty-message {
+  font-size: 1.5em;
+  color: #000000;
+  text-align: center;
+  font-weight: bolder;
+  font-size: medium;
 }
 
 .draggable-container {
