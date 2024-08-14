@@ -33,7 +33,7 @@ import SelectedList from './_1SelectedList.vue'
 .top-list {
   display: flex;
   flex-direction: row;
-  height: 75%;
+  height: 80%;
 }
 
 .card-section {
