@@ -2,7 +2,6 @@ package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto;
 
 import lombok.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @ToString

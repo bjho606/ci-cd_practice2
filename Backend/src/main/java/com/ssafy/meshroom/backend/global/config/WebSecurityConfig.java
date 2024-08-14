@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -56,10 +54,6 @@ public class WebSecurityConfig {
                 .addFilterBefore(corsFilter(), jwtAuthenticationFilter.getClass())
                 .addFilterBefore(authFailHandlerFilter, jwtAuthenticationFilter.getClass())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/{subsessionId}/group-name").hasAnyAuthority(
-                                UserRole.TEAM_LEADER.getAuthority()
-                                ,UserRole.FACILITATOR.getAuthority()
-                        )
                         .requestMatchers(HttpMethod.PATCH,"/api/v1/sessions/{sessionId}").hasAuthority(UserRole.FACILITATOR.getAuthority())
                         .anyRequest().permitAll())              // 그 외의 모든 요청은 인증 필요)
                 .exceptionHandling(e-> {
