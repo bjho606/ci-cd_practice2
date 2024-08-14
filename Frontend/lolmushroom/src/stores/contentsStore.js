@@ -48,6 +48,7 @@ export const useContentsStore = defineStore('contents', {
     totalContentsCount: null,
     finishGroupCount: null,
     totalGroupCount: null,
+    currentContentState: null,
     currentGroupState: [] // Array of group states
   }),
   actions: {
@@ -74,6 +75,10 @@ export const useContentsStore = defineStore('contents', {
         this.selectedContents.push(content)
         this.totalDuration += content.duration
       }
+    },
+
+    fetchCurrentContentsState(isFinish) {
+      this.currentContentState = isFinish
     },
 
     setCurrentContentsState(contentState) {
