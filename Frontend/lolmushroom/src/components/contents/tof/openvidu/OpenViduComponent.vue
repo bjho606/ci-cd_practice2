@@ -20,18 +20,6 @@
   const sessionStore = useSessionStore()
   const store = useTOFStore()
 
-  const toggleMic = () => {
-    mic.value = !mic.value
-    console.log('마이크 껐다 켜기')
-  }
-
-  const toggleVideo = () => {
-    video.value = !video.value
-    console.log('비디오 껐다 켜기')
-  }
-
-
-
   const state = reactive({
     // OpenVidu 관련 상태 관리
     OV: null,
@@ -150,6 +138,22 @@
     }
   });
 
+  const toggleMic = () => {
+    mic.value = !mic.value
+    state.publisher.publishAudio(mic.value)
+  }
+
+  const toggleVideo = () => {
+    video.value = !video.value
+    state.publisher.publishVideo(video.value)
+    if (state.mainStreamManager) {
+      state.mainStreamManager = ''
+    } else {
+      state.mainStreamManager = state.publisher
+    }
+  }
+
+
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     window.addEventListener('beforeunload', leaveSession)
@@ -171,11 +175,11 @@
     <div id="main-video" class="col-md-6">
       <UserVideo :stream-manager="state.mainStreamManager" />
       <div v-if="store.targetUserToken === userStore.userOvToken">
-        <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
-        <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
+        <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
+        <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
       </div>
-      <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
-      <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
+      <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
+      <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       {{ store.targetUserToken }}
     </div>
     <div id="video-container" class="col-md-6" style="display: none;">
