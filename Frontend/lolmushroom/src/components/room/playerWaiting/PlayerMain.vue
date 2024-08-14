@@ -5,7 +5,7 @@ import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useUserStore } from '@/stores/userStore'
 import { useRoomStore } from '@/stores/roomStore'
-import waitingHeader from './WaitingHeader.vue'
+import WaitingHeader from './WaitingHeader.vue'
 import PlayerWaitng from './PlayerWaitng.vue'
 
 const router = useRouter()
@@ -39,7 +39,7 @@ watch(
 <template>
   <div class="background">
     <!-- 대기화면 소개 글 추가-->
-    <waitingHeader
+    <WaitingHeader
       :first-description="text1"
       :second-description="text2"
       :third-description="text3"

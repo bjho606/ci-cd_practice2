@@ -7,7 +7,7 @@
 
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
-  import CountDownComponent from '@/components/common/CountDownComponent.vue'
+  import CountDownComponent from '@/components/contents/CountDownComponent.vue';
 
   const router = useRouter()
   const store = useAlphabetStore()

@@ -27,14 +27,14 @@
     <v-row>
       <v-col v-for="i in 4" :key="i" cols="6">
         <v-card
-        class="mx-5 card-border"
+        class="card-border"
           :class="{
             'correct-card': props.answer === i,
             'selected-card': props.answer !== i && selectedAnswer === i
           }"
         > 
-          <div>{{ store.statements[i-1] }}</div>
-          <div>{{ store.chosenArray[i].length }}명</div>
+          <div class="statement">{{ store.statements[i-1] }}</div>
+          <div class="count">{{ store.chosenArray[i].length }}명</div>
         </v-card>
       </v-col>
     </v-row>
@@ -96,7 +96,22 @@ li {
 .card-border {
   display: flex;
   flex-direction: row;
-  
+  min-height: 50px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.card-border .statement {
+  flex-grow: 1;
+  height: 100%;
+  font-size: 1.5em;
+}
+
+.card-border .count {
+  height: 100%;
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 .tof-result-div {
@@ -105,8 +120,8 @@ li {
 }
 
 .selectResult-div {
-  padding: 12px;
-  margin: 12px;
+  padding: 20px 0;
+  margin: 20px 0;
 }
 
 .correctRate-div {
@@ -115,11 +130,11 @@ li {
 }
 
 .correct-card {
-  background-color: green;
+  background-color: rgba(46, 226, 46, 0.54);
 }
 
 .selected-card {
-  background-color: red;
+  background-color: rgba(238, 85, 85, 0.706);
 }
 
 </style>
