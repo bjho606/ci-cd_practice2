@@ -74,14 +74,14 @@ export const useBallStore = defineStore('ballStore', {
     },
     getTotalBalls: (state) => {
       const totalBalls = []
-      state.mushroomMap.forEach((size, sessionId) => {
-        allMushrooms.push({
+      state.ballMap.forEach((size, sessionId) => {
+        totalBalls.push({
           sessionId,
           groupName: state.groupNameMap.get(sessionId),
           size
         })
       })
-      return allMushrooms
+      return totalBalls.sort((a, b) => b.size - a.size)
     }
   }
 })

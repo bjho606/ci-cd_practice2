@@ -40,12 +40,12 @@ onMounted(() => {
   <WaitingHeader :first-description="firstDescription" :second-description="secondDescription" :third-description="thirdDescription"/>
   <div class="main-container">
     <div class="content-container">
-      <!-- <div class="left-container">
+      <div class="left-container">
         <BallMain />
       </div>
       <div class="right-container">
         <BallGroup />
-      </div> -->
+      </div>
     </div>
   </div>
 </template>

@@ -75,7 +75,7 @@ const sendMessage = () => {
       <v-card min-width="300" min-height="300" max-height="500" overflow-y: auto>
         <v-list>
           <v-list-item
-            prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+            prepend-avatar="src/assets/image/chat.jpg"
             :subtitle="currentSubtitle"
             :title="currentTitle"
           >

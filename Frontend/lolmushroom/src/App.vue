@@ -4,6 +4,7 @@ import './assets/fonts.css'
 import { onMounted } from 'vue'
 import { useContentsStore } from './stores/contentsStore'
 import contentsAPI from '@/api/contents'
+import BallGrowResult from './components/contents/BallGrow/BallGrowResult.vue';
 
 /**
  * * 1. Meshroom의 Contents 목록을 가져와 Pinia에 저장한다.
@@ -33,14 +34,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app id="v-app">
-     <RouterView /> 
+  <v-app id="v-app">  
+     <!-- <RouterView />  -->
+      <BallGrowResult/>
   </v-app>
 </template>
 
 <style scoped>
 
+/* Font 설정*/ 
+@font-face {
+  font-family: LineFont;
+  src:
+    url('@/assets/fonts/LINESeedKR-Bd.woff') format('woff'),
+    url('@/assets/fonts/LINESeedKR-Bd.woff2') format('woff2');
+}
 
-
+*{
+  font-family: LineFont;
+}
 
 </style>
