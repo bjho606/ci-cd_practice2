@@ -136,11 +136,11 @@ const addSubscriptions = (
       case 'next':
         addNextSubscription(sessionId, subSessionId, onNextReceived)
         break
-      case 'end':
-        addFinishSubscription(onEndReceived)
+      case 'word':
+        addWordSubscription(subSessionId, onEventReceived)
         break
       case 'guess':
-        addGuessSubscription(sessionId, subSessionId, onEventReceived)
+        addGuessSubscription(sessionId, subSessionId, contentsId, onEventReceived)
         break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
@@ -256,23 +256,23 @@ const addNextSubscription = (sessionId, subSessionId, onNextReceived) => {
   }
 }
 
-const addFinishSubscription = (onEndReceived) => {
-  const finishKey = 'finish'
-  if (!subscriptionMap.has(finishKey)) {
-    const finishSubscription = stompClient.subscribe('/subscribe/game/tf/finish/', (event) => {
-      console.log(`Received event from Subscribe - 컨텐츠 종료`, event.body)
+const addWordSubscription = (subSessionId, onEndReceived) => {
+  const wordKey = 'word'
+  if (!subscriptionMap.has(wordKey)) {
+    const wordSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/word/${subSessionId}`, (event) => {
+      console.log(`Received event from Subscribe - 초성 문제`, event.body)
       if (onEndReceived) {
         onEndReceived(JSON.parse(event.body))
       }
     })
-    subscriptionMap.set(finishKey, finishSubscription)
+    subscriptionMap.set(wordKey, wordSubscription)
   }
 }
 
-// 다른 사람의 예측 단어 구독
-const addGuessSubscription = (sessionId, subSessionId, onEventReceived) => {
-  const guessKey = 'guess'
-  console.log(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`)
+// 초성 게임 단어 제출 및 다른 사람의 예측 단어 구독
+const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceived) => {
+  const guessKey = contentsId
+  console.log(`/subscribe/game/ini-quiz/${contentsId}/${sessionId}/${subSessionId}`)
   if (!subscriptionMap.has(guessKey)) {
     const finishSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`, (event) => {
       console.log(`Received event from Subscribe - 다른 사람`, event.body)

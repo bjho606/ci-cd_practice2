@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref, computed } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useSessionStore } from '@/stores/sessionStore';
   import { useAlphabetStore } from '@/stores/alphabetStore';
   import { useUserStore } from '@/stores/userStore';
@@ -18,6 +18,7 @@
   const guessWords = ref([])
   // const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
   const isCorrected = ref()
+  const ownerOvToken = ref()
 
   // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
   const timeUp = (bool) => {
@@ -28,7 +29,7 @@
   // 모든 문제를 가져옴
   const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
   const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
-  console.log(alliIniQuizInfos, '문제와 사람')
+  ownerOvToken.value = alliIniQuizInfos[index.value]['ovToken']
 
   // 정답을 발행
   const publishAnswer = () => {
@@ -36,6 +37,7 @@
       showAlert.value = true
     } else {
       const data = {
+        ownerOvToken: ownerOvToken.value,
         ovToken: userStore.userOvToken,
         userName: userStore.userName,
         guessWord: guessWord.value.trim()
@@ -56,8 +58,7 @@
   }
 
   // 다른 사용자의 정답을 구독
-  const onAnswerReceived = (event) => {
-    console.log(event, '정답 찾기')
+  const onGuessReceived = (event) => {
     const { ovToken, result, submittedWord, userName } = event
     const wordData = {
       word: submittedWord,
@@ -72,18 +73,25 @@
     
     // 만약 정답이 나오면
     if (result) {
+      console.log('정답')
       isCorrected.value = true
     }
   }
 
+  // index 값이 증가할 때마다 관련 값 갱신
+  watch(index, (newIndex, oldIndex) => {
+    if (newIndex < store.totalUserCount) {
+      ownerOvToken.value =  alliIniQuizInfos[newIndex]['ovToken']
+    }
 
+  })
   onMounted(async () => {
     console.log('초성 게임 연결 중..')
     // 세션 연결
     webSocketAPI.connect({
           sessionId: sessionStore.sessionId,
           subSessionId: sessionStore.subSessionId,
-          onEventReceived: onAnswerReceived,
+          onEventReceived: onGuessReceived,
           subscriptions: ['guess']
         })
   })

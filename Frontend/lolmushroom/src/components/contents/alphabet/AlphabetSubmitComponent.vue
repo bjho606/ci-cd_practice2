@@ -6,12 +6,14 @@
   import { useUserStore } from '@/stores/userStore';
   import sessionAPI from '@/api/session'
   import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
 
   const router = useRouter()
   const store = useAlphabetStore()
   const sessionStore = useSessionStore()
   const userStore = useUserStore()
   const quizWord = ref('');
+  const isDisabled = ref(false)
   const showAlert = reactive({
     blank: false,
     korean: false,
@@ -26,6 +28,12 @@
   const categoryName = await contentsAPI.getCategory(sessionStore.subSessionId)
   console.log('내 퀴즈 카테고리는: ', categoryName)
 
+  const onWordReceived = () => {
+    store.submitUserIncrease()
+    if (store.submitUserCount === store.totalUserCount) {
+        router.push('alphabetContent')
+      }
+  }
 
   // 영문이나 숫자가 들어가 있으면 거른다. 
   const validateQuizWord = (word) => {
@@ -40,7 +48,9 @@
   // 퀴즈를 제출하는 함수
   const submitQuizWord = async () => {
     if (quizWord.value === '') {
-      showAlert.value = true; return
+      showAlert.blank = true;
+      showAlert.korean = true;
+      return  
     } else if (validateQuizWord(quizWord.value)) {
       quizWord.value = ''
       showAlert.blank = false
@@ -54,19 +64,22 @@
         quizWord: quizWord.value.trim(),
       }
       const response = await contentsAPI.createQuizWord(sessionStore.sessionId, sessionStore.subSessionId, object)
-      console.log(response)
       if (response['data']['result']['created'] === true) {
-      store.submitUserIncrease()
-      quizWord.value = ''
-      // 제출 인원과 총 인원 수 계산 하는 함수 추가 -> 구독자들도 화랑님한테 물어봐서 로직 추가
-      if (store.submitUserCount === store.totalUserCount) {
-        router.push('alphabetContent')
-      }
+      quizWord.value = '' 
+      isDisabled.value = true;
       }
     }
   }
 
-
+  onMounted(async () => {
+    console.log('초성 게임 연결 중..')
+    // 세션 연결
+    webSocketAPI.connect({
+          subSessionId: sessionStore.subSessionId,
+          onEventReceived: onWordReceived,
+          subscriptions: ['word']
+        })
+  })
   
 </script>
 
@@ -101,8 +114,16 @@
       <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert.blank" class="warning-alert"/>
       <v-alert title="초성 게임!" text="온전한 한국어 단어로 적어주세요." type="warning" v-if="showAlert.korean" class="warning-alert"/>
     </div>
-    <div class="userInput">
-      <div class="emojiField"></div><input v-html="quizWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !" v-model="quizWord" @keyup.enter="submitQuizWord()"/>
+    <div class="userInput" :style="{ backgroundColor: isDisabled ? '#d3d3d3' : '#fff' }">
+      <div class="emojiField"></div>
+      <input
+        v-html="quizWord"
+        class="inputText"
+        :placeholder="isDisabled ? '작성 완료' : '카테고리에 관한 입력을 해주세요!'"
+        v-model="quizWord"
+        @keyup.enter="submitQuizWord()"
+        :disabled="isDisabled"
+      />
     </div>
     <button class="submit" @click="submitQuizWord()">
           제출하기
