@@ -11,7 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 

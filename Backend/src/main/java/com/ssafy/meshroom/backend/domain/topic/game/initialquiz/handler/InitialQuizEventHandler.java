@@ -132,7 +132,7 @@ public class InitialQuizEventHandler {
 //        return iniQuizWordSignal;
 //    }
 
-    @MessageMapping("/publish/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
+    @MessageMapping("/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
     @SendTo("/subscribe/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
     public IniQuizAnswerResponseSignal handleAnswerIniQuiz(@DestinationVariable String mainSessionId,
                                                            @DestinationVariable String subSessionId,
