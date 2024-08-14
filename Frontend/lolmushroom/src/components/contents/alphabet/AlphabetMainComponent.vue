@@ -129,8 +129,8 @@
   <div class="container" v-show="isTimeUp && !isCorrected">
     <div class="statusContainer">
       <div class="info">
-        <div class="info-category">카테고리</div>
-        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
+        <div class="info-category"><h1>카테고리</h1></div>
+        <div class="info-text"><h1>{{ alliIniQuizInfos[index]['categoryName'] }}</h1></div>
       </div>
     </div>
     <div class="playContainer">
@@ -143,7 +143,6 @@
         <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
       </div>
       <div>
-        <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert" class="warning-alert"/>
       </div>
       <button class="submit" @click="publishAnswer()">
         정답 맞추기
@@ -158,7 +157,7 @@
              '--random-left': wordData.left,
              color: wordData.color
             }">
-        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 300%;">{{ wordData.word }}</h2>
+        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 200%;">{{ wordData.word }}</h2>
         <h2 v-else>{{ wordData.word }}</h2>
       </div>
     </div>
