@@ -49,7 +49,7 @@
     } else {
       showAlert.value = false
       const object = {
-        ovToken: userStore.ovToken,
+        ovToken: userStore.userOvToken,
         categoryName: categoryName['data']['result']['categoryName'],
         quizWord: quizWord.value,
       }

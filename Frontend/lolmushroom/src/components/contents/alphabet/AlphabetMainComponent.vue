@@ -2,11 +2,13 @@
   import { onMounted, ref, computed } from 'vue';
   import { useSessionStore } from '@/stores/sessionStore';
   import { useAlphabetStore } from '@/stores/alphabetStore';
+  import { useUserStore } from '@/stores/userStore';
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
   import CountDownComponent from '@/components/common/CountDownComponent.vue'
 
   const store = useAlphabetStore()
+  const userStore = useUserStore()
   const sessionStore = useSessionStore()
   const isTimeUp = ref()
   const counting = ref(true)
@@ -14,7 +16,8 @@
   const index = ref(0)
   const guessWord = ref('')
   const guessWords = ref([])
-  const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
+  // const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
+  const isCorrected = ref()
 
   // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
   const timeUp = (bool) => {
@@ -25,6 +28,7 @@
   // 모든 문제를 가져옴
   const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
   const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
+  console.log(alliIniQuizInfos, '문제와 사람')
 
   // 정답을 발행
   const publishAnswer = () => {
@@ -32,6 +36,8 @@
       showAlert.value = true
     } else {
       const data = {
+        ovToken: userStore.userOvToken,
+        userName: userStore.userName,
         guessWord: guessWord.value
       }
       webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
@@ -45,13 +51,16 @@
     const wordData = {
       word: submittedWord,
       top: Math.random(),
-      left: Math.random()
+      left: Math.random(),
+      // 10% ~ 90% 사이의 랜덤 위치
+      initialTop: Math.random() * 80 + 10 + '%', 
+      initialLeft: Math.random() * 80 + 10 + '%'
     }
     guessWords.value.push(wordData)
     
     // 만약 정답이 나오면
     if (result) {
-      
+      isCorrected.value = true
     }
   }
 
@@ -98,7 +107,12 @@
       <!-- 침여자의 답변 렌더링 -->
       <div v-for="wordData in guessWords" :key="wordData.word"
            class="moving-word"
-           :style="{ '--random-top': wordData.top, '--random-left': wordData.left }">
+           :style="{
+              '--initial-top': wordData.initialTop,
+             '--initial-left': wordData.initialLeft,
+             '--random-top': wordData.top,
+             '--random-left': wordData.left
+            }">
         <h1>{{ wordData.word }}</h1>
       </div>
     </div>
@@ -111,8 +125,8 @@
     
   </v-container>
 
-  <v-container v-show="areSubmitAnswer">
-    <p>1</p>
+  <v-container v-show="isCorrected">
+    <v-alert title="정답!" type="suceess"/>
   </v-container>
 </template>
 
@@ -248,19 +262,17 @@
 /* css 애니메이션 정의 */
 .moving-word {
   position: absolute;
-  animation: moveWord 5s infinite alternate ease-in-out;
+  animation: moveWord 3s infinite alternate ease-in-out;
 }
 
 @keyframes moveWord {
   0% {
-    top: 10%;
-    left: 10%;
+    top: var(--initial-top);
+    left: var(--initial-left);
   }
   100% {
     top: calc(90% * var(--random-top));
     left: calc(90% * var(--random-left));
   }
 }
-
-
 </style>
