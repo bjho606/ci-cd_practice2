@@ -191,7 +191,8 @@
 .emojiField{
   width: 60px;
   height: 60px;
-  background-color: #1F4F16;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/smile_face.svg')
 }
 .inputText {
   flex: 1;

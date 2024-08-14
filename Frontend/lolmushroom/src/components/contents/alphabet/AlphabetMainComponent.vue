@@ -103,11 +103,11 @@
     </div>
     <div class="playContainer">
       <div class="userInput">
-        <div class="emojiField"></div>
+        <div class="emojiField1"></div>
         <div div :guessWord class="initialBox">{{ alliIniQuizInfos[index]['quizWord'] }}</div>
       </div>
       <div class="userInput">
-        <div class="emojiField"></div>
+        <div class="emojiField2"></div>
         <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
       </div>
       <div>
@@ -221,10 +221,19 @@
   align-items: center;
   padding: 3px;
 }
-.emojiField{
+
+.emojiField1{
   width: 60px;
   height: 60px;
-  background-color: #1F4F16;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/thinking_face.svg')
+}
+
+.emojiField2{
+  width: 60px;
+  height: 60px;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/smile_face.svg')
 }
 .initialBox {
   flex: 1;
