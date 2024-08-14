@@ -3,10 +3,13 @@
   import { useSessionStore } from '@/stores/sessionStore';
   import { useAlphabetStore } from '@/stores/alphabetStore';
   import { useUserStore } from '@/stores/userStore';
+  import { useRouter } from 'vue-router';
+
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
   import CountDownComponent from '@/components/common/CountDownComponent.vue'
 
+  const router = useRouter()
   const store = useAlphabetStore()
   const userStore = useUserStore()
   const sessionStore = useSessionStore()
@@ -72,7 +75,8 @@
       // 10% ~ 90% 사이의 랜덤 위치
       initialTop: Math.random() * 80 + 10 + '%', 
       initialLeft: Math.random() * 80 + 10 + '%',
-      color: generateRandomColor()
+      color: generateRandomColor(),
+      ovToken: ovToken,
     }
     guessWords.value.push(wordData)
     
@@ -81,13 +85,27 @@
       turn.answer = submittedWord
       turn.winner = userName
       isCorrected.value = true
-    }
+      guessWords.value = []
+      // 3초 후에 isCorrected를 false로 변경하고 index 증가
+      setTimeout(() => {
+        isCorrected.value = false
+        index.value += 1
+      }, 3000)
+    } 
   }
 
   // index 값이 증가할 때마다 관련 값 갱신
   watch(index, (newIndex, oldIndex) => {
     if (newIndex < store.totalUserCount) {
       turn.ownerOvToken =  alliIniQuizInfos[newIndex]['ovToken']
+    } else {
+      router.push({
+      name: 'roomwaiting',
+      params: {
+        sessionId: sessionStore.sessionId,
+        subSessionId: sessionStore.subSessionId
+      }
+    })
     }
 
   })
@@ -131,7 +149,7 @@
         정답 맞추기
       </button>
       <!-- 침여자의 답변 렌더링 -->
-      <div v-for="wordData in guessWords" :key="wordData.word"
+      <div v-for="wordData in guessWords" :key="wordData.ovToken"
            class="moving-word"
            :style="{
               '--initial-top': wordData.initialTop,
@@ -140,7 +158,8 @@
              '--random-left': wordData.left,
              color: wordData.color
             }">
-        <h1>{{ wordData.word }}</h1>
+        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 300%;">{{ wordData.word }}</h2>
+        <h2 v-else>{{ wordData.word }}</h2>
       </div>
     </div>
   </div>
