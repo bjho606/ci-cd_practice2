@@ -13,7 +13,7 @@
   const showAlert = ref()
   const index = ref(0)
   const guessWord = ref('')
-  const guessWords = []
+  const guessWords = ref([])
   const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
 
   // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
@@ -34,18 +34,25 @@
       const data = {
         guessWord: guessWord.value
       }
-      const response = webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
+      webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
       guessWord.value = ''
-      console.log(response)
     }
   }
 
   // 다른 사용자의 정답을 구독
   const onAnswerReceived = (event) => {
-    console.log('초성 게임 전달 받았음', event)
-    // const { ovToken, userName, guessWord } = event
-    // guessWords.push(guessWord)
-    console.log(guessWords, '이규석')
+    const { ovToken, result, submittedWord, userName } = event
+    const wordData = {
+      word: submittedWord,
+      top: Math.random(),
+      left: Math.random()
+    }
+    guessWords.value.push(wordData)
+    
+    // 만약 정답이 나오면
+    if (result) {
+      
+    }
   }
 
 
@@ -89,9 +96,11 @@
             정답 맞추기
       </button>
       <!-- 침여자의 답변 렌더링 -->
-      <v-container v-for="word in guessWords" :key="word">
-        <p>{{ word }}</p>
-      </v-container>
+      <div v-for="wordData in guessWords" :key="wordData.word"
+           class="moving-word"
+           :style="{ '--random-top': wordData.top, '--random-left': wordData.left }">
+        <h1>{{ wordData.word }}</h1>
+      </div>
     </div>
   </div>
 
@@ -235,4 +244,23 @@
 .warning-alert {
   width: 100%;
 }
+
+/* css 애니메이션 정의 */
+.moving-word {
+  position: absolute;
+  animation: moveWord 5s infinite alternate ease-in-out;
+}
+
+@keyframes moveWord {
+  0% {
+    top: 10%;
+    left: 10%;
+  }
+  100% {
+    top: calc(90% * var(--random-top));
+    left: calc(90% * var(--random-left));
+  }
+}
+
+
 </style>

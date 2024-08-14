@@ -410,7 +410,6 @@ const sendAnswerData = (destination, data) => {
       destination: destination,
       body: JSON.stringify(data)
     })
-    console.log('진술 선택 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }
