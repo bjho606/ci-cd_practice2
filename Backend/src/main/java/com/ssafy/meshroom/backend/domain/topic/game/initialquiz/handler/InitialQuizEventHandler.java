@@ -48,7 +48,7 @@ public class InitialQuizEventHandler {
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             }
     )
-    @GetMapping("/api/v1/game/ini-quiz/category{sessionId}")
+    @GetMapping("/api/v1/game/ini-quiz/category/{sessionId}")
     public ResponseEntity<Response<IniQuizCategoryResponse>> getIniQuizCategory (
             @PathVariable String sessionId) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -132,7 +132,7 @@ public class InitialQuizEventHandler {
 //        return iniQuizWordSignal;
 //    }
 
-    @MessageMapping("/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
+    @MessageMapping("/publish/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
     @SendTo("/subscribe/game/ini-quiz/guess/{mainSessionId}/{subSessionId}")
     public IniQuizAnswerResponseSignal handleAnswerIniQuiz(@DestinationVariable String mainSessionId,
                                                            @DestinationVariable String subSessionId,

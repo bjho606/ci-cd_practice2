@@ -272,8 +272,8 @@ const addFinishSubscription = (onEndReceived) => {
 // 다른 사람의 예측 단어 구독
 const addGuessSubscription = (sessionId, subSessionId, onEventReceived) => {
   const guessKey = 'guess'
+  console.log(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`)
   if (!subscriptionMap.has(guessKey)) {
-    console.log('unholy')
     const finishSubscription = stompClient.subscribe(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`, (event) => {
       console.log(`Received event from Subscribe - 다른 사람`, event.body)
       if (onEventReceived) {
@@ -405,7 +405,6 @@ const sendSubmitData = (destination, data) => {
 // 진술 선택 완료시, 제출 유저와 제출 문항 전달
 const sendAnswerData = (destination, data) => {
   console.log(destination)
-  console.log(data)
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,

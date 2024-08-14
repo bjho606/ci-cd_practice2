@@ -34,6 +34,7 @@
         quizWord: quizWord.value,
       }
       const response = await contentsAPI.createQuizWord(sessionStore.sessionId, sessionStore.subSessionId, object)
+      console.log(response)
       if (response['data']['result']['created'] === true) {
       store.submitUserIncrease()
       quizWord.value = ''
@@ -44,6 +45,7 @@
       }
     }
   }
+
 
   
 </script>

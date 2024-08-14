@@ -53,8 +53,8 @@
     console.log('초성 게임 연결 중..')
     // 세션 연결
     webSocketAPI.connect({
-          sessionId: sessionStore.subSessionId,
-          contentsName: 'tf',
+          sessionId: sessionStore.sessionId,
+          subSessionId: sessionStore.subSessionId,
           onEventReceived: onAnswerReceived,
           subscriptions: ['guess']
         })
