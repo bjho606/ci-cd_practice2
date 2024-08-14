@@ -27,4 +27,6 @@ public class Contents {
     String category;
 
     Long duration;
+
+    Long timeOut;
 }
