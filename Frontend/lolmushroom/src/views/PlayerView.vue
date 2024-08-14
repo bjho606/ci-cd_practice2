@@ -8,7 +8,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import SetName from '@/components/room/playerWaiting/SetName.vue'
+import SetName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
 const route = useRoute()
