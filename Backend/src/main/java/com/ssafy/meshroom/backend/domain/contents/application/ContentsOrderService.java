@@ -2,6 +2,8 @@ package com.ssafy.meshroom.backend.domain.contents.application;
 
 import com.ssafy.meshroom.backend.domain.OVToken.application.OVTokenService;
 import com.ssafy.meshroom.backend.domain.contents.dao.ContentsOrderRepository;
+import com.ssafy.meshroom.backend.domain.contents.dao.ContentsRepository;
+import com.ssafy.meshroom.backend.domain.contents.domain.Contents;
 import com.ssafy.meshroom.backend.domain.contents.domain.ContentsOrder;
 import com.ssafy.meshroom.backend.domain.contents.dto.ContentsOrderSubscribe;
 import com.ssafy.meshroom.backend.domain.contents.dto.GroupState;
@@ -18,6 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +36,7 @@ public class ContentsOrderService {
     @Autowired
     private final RedisTemplate<String, Boolean> booleanRedisTemplate;
     private final SessionRepository sessionRepository;
+    private final ContentsRepository contentsRepository;
 
     public void saveContentsOrder(String sessionSid, List<String> contents) {
         int idx = 1;
@@ -48,7 +55,9 @@ public class ContentsOrderService {
     }
 
     public Response<ContentsOrderSubscribe> nextContents(boolean isStart) {
+
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         Session session = ovTokenService.getMainSessionFromUserId(userId);
 
         List<ContentsOrder> li = contentsOrderRepository.findAllBySessionId(session.get_id());
@@ -76,6 +85,25 @@ public class ContentsOrderService {
                 break;
             }
         }
+
+        if (!contentsId.equals("null")) {
+            Contents nowContent = contentsRepository.findById(contentsId).orElseThrow(NoSuchElementException::new);
+
+            if (nowContent.getTimeOut() > 0) {
+
+                Long timeLimit = nowContent.getTimeOut();
+                ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+                scheduler.schedule(() -> {
+
+                    simpMessagingTemplate.convertAndSend("/subscribe/contents/" + session.getSessionId() + "/finish", "true");
+                    log.info("=========================================================");
+
+                }, timeLimit, TimeUnit.SECONDS);
+
+            }
+        }
+
 
         log.info("contentsId {} , sequence {}   ", contentsId, sequence);
 

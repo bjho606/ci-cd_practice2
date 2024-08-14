@@ -23,4 +23,6 @@ public class Contents {
     String imgUrl;
 
     Long duration;
+
+    Long timeOut;
 }

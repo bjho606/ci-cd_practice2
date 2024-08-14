@@ -78,7 +78,7 @@ public class SessionController {
     )
     @PostMapping("/{sessionId}")
     public ResponseEntity<Response<SubSessionCreateResponse>> createSubSessions(
-            @PathVariable String sessionId)
+            @PathVariable("sessionId") String sessionId)
             throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session createSubSessions API");
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -90,7 +90,7 @@ public class SessionController {
             description = "세션에 대한 세부 정보를 반환합니다. 반환되는 정보에는 세부 세션 목록이 포함됩니다."
     )
     @GetMapping("/{sessionId}")
-    public ResponseEntity<Response<SessionInfoResponse>> sessionInfo(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ResponseEntity<Response<SessionInfoResponse>> sessionInfo(@PathVariable("sessionId") String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session sessionInfo API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.getSessionInfo(sessionId));
     }
@@ -117,7 +117,7 @@ public class SessionController {
     )
     @GetMapping("/{sessionId}/{subSessionId}")
     public ResponseEntity<Response<SubSessionInfoResponse>> subSessionInfo(
-            @PathVariable String sessionId, @PathVariable String subSessionId)
+            @PathVariable("sessionId") String sessionId, @PathVariable("subSessionId") String subSessionId)
             throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session subSessionInfo API");
         return ResponseEntity.status(HttpStatus.OK)
@@ -151,7 +151,7 @@ public class SessionController {
     )
     @PostMapping("/{sessionId}/connections")
     public ResponseEntity<Response<ConnectionCreateResponse>> createConnections(
-            @PathVariable String sessionId,
+            @PathVariable("sessionId") String sessionId,
             @RequestBody ConnectionCreateRequest req,
             HttpServletResponse response)
             throws OpenViduJavaClientException, OpenViduHttpException {
@@ -180,7 +180,7 @@ public class SessionController {
             }
     )
     @DeleteMapping("/{sessionId}")
-    public ResponseEntity<Response<?>> removeSession(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ResponseEntity<Response<?>> removeSession(@PathVariable("sessionId") String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session removeSession API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(sessionId));
     }
@@ -213,7 +213,7 @@ public class SessionController {
     )
     @PatchMapping("/{sessionId}")
     public ResponseEntity<Response<?>> updateSessionUserCounts(
-            @PathVariable String sessionId,
+            @PathVariable("sessionId") String sessionId,
             @RequestBody UpdateSessionRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session updateSessionUserCounts API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSessionUserCounts(sessionId, request));
@@ -245,22 +245,21 @@ public class SessionController {
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             }
     )
-    @PatchMapping("/{subsessionId}/group-name")
+    @GetMapping("/{subSessionId}/group-name")
     public ResponseEntity<Response<?>> updateSubSessionGroupName(
-            @PathVariable String subsessionId,
-            @RequestBody UpdateGroupNameRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+            @PathVariable("subSessionId") String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session updateSubSessionGroupName API");
-        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subsessionId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.updateSubSessionGroupName(subSessionId));
     }
 
     @GetMapping("{subSessionId}/ready")
-    public ResponseEntity<Response<?>> getReady(@PathVariable String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ResponseEntity<Response<?>> getReady(@PathVariable("subSessionId") String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session Ready API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.subSessionReady(subSessionId));
     }
 
     @GetMapping("{subSessionId}/quit")
-    public ResponseEntity<Response<?>> getQuit(@PathVariable String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ResponseEntity<Response<?>> getQuit(@PathVariable("subSessionId") String subSessionId) throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("Session Quit API");
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.subSessionQuit(subSessionId));
     }
