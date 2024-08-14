@@ -4,6 +4,7 @@
 
   const props = defineProps({
     targetNickName: String,
+    selectedAnswer: Number,
     answer: Number,
   })
 
@@ -22,7 +23,28 @@
 <template>
   <!-- 투표 결과 컴포넌트 -->
   <!-- 카드 컨테이너 -->
-  <v-container>
+  <v-container class="tof-result-div">
+    <v-row>
+      <v-col v-for="i in 4" :key="i" cols="6">
+        <v-card
+        class="mx-5 card-border"
+          :class="{
+            'correct-card': props.answer === i,
+            'selected-card': props.answer !== i && selectedAnswer === i
+          }"
+        > 
+          <div>{{ store.statements[i-1] }}</div>
+          <div>{{ store.chosenArray[i].length }}명</div>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <div class="selectResult-div">
+      <div class="correctRate-div">정답률: {{ correctRate * 100 }}%</div>
+    </div>
+  </v-container>
+
+  <!-- <v-container>
     <v-row>
       <v-col v-for="i in 4" :key="i" cols="6">
         <v-card
@@ -32,18 +54,6 @@
         />
       </v-col>
     </v-row>
-  </v-container>
-
-
-
-
-
-
-
-<!-- 
-  <v-container>
-    <h1>총 참여자 수: {{ store.submitUserCount }}명</h1>
-    <h2>정답률: {{ correctRate * 100 }}%</h2>
     <v-card v-for="i in 4" :key="i">
       <v-card-title>
         <v-icon :icon="`mdi-numeric-${i}-circle-outline`" v-show="answer!==i"></v-icon>
@@ -65,6 +75,7 @@
       <v-divider class="border-opacity-55"></v-divider>
     </v-card>
   </v-container> -->
+
 </template>
 
 <style scoped>
@@ -81,4 +92,34 @@ li {
 * {
   font-size: small;
 }
+
+.card-border {
+  display: flex;
+  flex-direction: row;
+  
+}
+
+.tof-result-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.selectResult-div {
+  padding: 12px;
+  margin: 12px;
+}
+
+.correctRate-div {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.correct-card {
+  background-color: green;
+}
+
+.selected-card {
+  background-color: red;
+}
+
 </style>

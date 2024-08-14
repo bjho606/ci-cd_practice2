@@ -1,30 +1,131 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+  import { onMounted, reactive, ref, watch } from 'vue';
+  import { useRouter } from 'vue-router' 
+  import { useSessionStore } from '@/stores/sessionStore'
+  import { useAlphabetStore } from '@/stores/alphabetStore'
+  import { useUserStore } from '@/stores/userStore';
+  import sessionAPI from '@/api/session'
+  import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
 
-const category_name = ref('동물');
-const userInput = ref('asd');
+  const router = useRouter()
+  const store = useAlphabetStore()
+  const sessionStore = useSessionStore()
+  const userStore = useUserStore()
+  const quizWord = ref('');
+  const isDisabled = ref(false)
+  const showAlert = reactive({
+    blank: false,
+    korean: false,
+  })
+  // const showAlter = ref('')
 
+  // 세션에 참가한 유저 정보를 요청하는 함수
+  const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
+  store.setTotalUser(response['data']['result']['currentUserCount'])
+  console.log('총 인원수', store.totalUserCount)
+
+  const categoryName = await contentsAPI.getCategory(sessionStore.subSessionId)
+  console.log('내 퀴즈 카테고리는: ', categoryName)
+
+  const onWordReceived = () => {
+    store.submitUserIncrease()
+    if (store.submitUserCount === store.totalUserCount) {
+        router.push('alphabetContent')
+      }
+  }
+
+  // 영문이나 숫자가 들어가 있으면 거른다. 
+  const validateQuizWord = (word) => {
+      const regex = /^[가-힣]+$/;
+      if (regex.test(word)) {
+        return false
+      } else {
+        return true
+      }
+    }
+
+  // 퀴즈를 제출하는 함수
+  const submitQuizWord = async () => {
+    if (quizWord.value === '') {
+      showAlert.blank = true;
+      showAlert.korean = true;
+      return  
+    } else if (validateQuizWord(quizWord.value)) {
+      quizWord.value = ''
+      showAlert.blank = false
+      showAlert.korean = true
+      return
+    } else {
+      showAlert.value = false
+      const object = {
+        ovToken: userStore.userOvToken,
+        categoryName: categoryName['data']['result']['categoryName'],
+        quizWord: quizWord.value.trim(),
+      }
+      const response = await contentsAPI.createQuizWord(sessionStore.sessionId, sessionStore.subSessionId, object)
+      if (response['data']['result']['created'] === true) {
+      quizWord.value = '' 
+      isDisabled.value = true;
+      }
+    }
+  }
+
+  onMounted(async () => {
+    console.log('초성 게임 연결 중..')
+    // 세션 연결
+    webSocketAPI.connect({
+          subSessionId: sessionStore.subSessionId,
+          onEventReceived: onWordReceived,
+          subscriptions: ['word']
+        })
+  })
+  
 </script>
 
 <template>
-  <div class="header">
+  <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
-  </div>
+  </div> -->
 <div class="container">
   <div class="statusContainer">
     <div class="progress-bar">
-      공통 컴포넌트인 프로그래스바 넣어야됨 feat. 규석
+      <v-progress-linear
+        bg-color="#FFFFFF"
+        color="#24A319"
+        height="30"
+        :max="store.totalUserCount"
+        min="0"
+        :model-value="store.submitUserCount"
+        rounded
+        style="border: #000000 2px solid"
+      >
+      <strong style="color: #000000;">{{ store.submitUserCount }} / {{ store.totalUserCount }}</strong>
+      </v-progress-linear>
     </div>
+
     <div class="info">
       <div class="info-category">카테고리</div>
-      <div class="info-text">{{ category_name }}</div>
+      <div class="info-text">{{ categoryName['data']['result']['categoryName'] }}</div>
     </div>
   </div>
   <div class="playContainer">
-    <div class="userInput">
-      <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
+    <div>
+      <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert.blank" class="warning-alert"/>
+      <v-alert title="초성 게임!" text="온전한 한국어 단어로 적어주세요." type="warning" v-if="showAlert.korean" class="warning-alert"/>
     </div>
-    <button class="submit">
+    <div class="userInput" :style="{ backgroundColor: isDisabled ? '#d3d3d3' : '#fff' }">
+      <div class="emojiField"></div>
+      <input
+        v-html="quizWord"
+        class="inputText"
+        :placeholder="isDisabled ? '작성 완료' : '카테고리에 관한 입력을 해주세요!'"
+        v-model="quizWord"
+        @keyup.enter="submitQuizWord()"
+        :disabled="isDisabled"
+      />
+    </div>
+    <button class="submit" @click="submitQuizWord()">
           제출하기
     </button>
   </div>
@@ -56,7 +157,6 @@ const userInput = ref('asd');
 .progress-bar{
   width: 1000px;
   height: 69px;
-  background-color: yellow;
 }
 
 .info{
@@ -112,7 +212,8 @@ const userInput = ref('asd');
 .emojiField{
   width: 60px;
   height: 60px;
-  background-color: #1F4F16;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/smile_face.svg')
 }
 .inputText {
   flex: 1;
@@ -144,5 +245,7 @@ const userInput = ref('asd');
   align-items: center;
 }
 
-
+.warning-alert {
+  width: 100%;
+}
 </style>

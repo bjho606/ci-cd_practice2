@@ -22,5 +22,11 @@ public class Contents {
 
     String imgUrl;
 
+    Boolean isActive;
+
+    String category;
+
     Long duration;
+
+    Long timeOut;
 }

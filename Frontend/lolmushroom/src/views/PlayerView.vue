@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useUserStore } from '@/stores/userStore'
@@ -8,10 +8,12 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import SetName from '@/components/room/playerWaiting/SetName.vue'
+import SetName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
+
 const route = useRoute()
+const router = useRouter()
 const contentsStore = useContentsStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -62,6 +64,8 @@ const onSessionEventReceived = (message) => {
 }
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
+  console.log(sessionStore.subSessionId)
+  router.push({name: 'alphabet', params: {subSessionId: sessionStore.subSessionId}})
 }
 const onFinishEventReceived = (message) => {
   contentsStore.fetchCurrentContentsState(message)

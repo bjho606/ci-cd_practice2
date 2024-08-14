@@ -139,6 +139,12 @@ const addSubscriptions = (
       case 'next':
         addNextSubscription(sessionId, subSessionId, onNextReceived)
         break
+      case 'word':
+        addWordSubscription(subSessionId, onEventReceived)
+        break
+      case 'guess':
+        addGuessSubscription(sessionId, subSessionId, contentsId, onEventReceived)
+        break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
     }
@@ -269,6 +275,40 @@ const addNextSubscription = (sessionId, subSessionId, onNextReceived) => {
   }
 }
 
+const addWordSubscription = (subSessionId, onEndReceived) => {
+  const wordKey = 'word'
+  if (!subscriptionMap.has(wordKey)) {
+    const wordSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/word/${subSessionId}`,
+      (event) => {
+        console.log(`Received event from Subscribe - 초성 문제`, event.body)
+        if (onEndReceived) {
+          onEndReceived(JSON.parse(event.body))
+        }
+      }
+    )
+    subscriptionMap.set(wordKey, wordSubscription)
+  }
+}
+
+// 초성 게임 단어 제출 및 다른 사람의 예측 단어 구독
+const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceived) => {
+  const guessKey = contentsId
+  console.log(`/subscribe/game/ini-quiz/${contentsId}/${sessionId}/${subSessionId}`)
+  if (!subscriptionMap.has(guessKey)) {
+    const finishSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
+      (event) => {
+        console.log(`Received event from Subscribe - 다른 사람`, event.body)
+        if (onEventReceived) {
+          onEventReceived(JSON.parse(event.body))
+        }
+      }
+    )
+    subscriptionMap.set(guessKey, finishSubscription)
+  }
+}
+
 /**
  * IMP : ContentsId을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
  * @param {*} sessionId
@@ -389,12 +429,12 @@ const sendSubmitData = (destination, data) => {
 
 // 진술 선택 완료시, 제출 유저와 제출 문항 전달
 const sendAnswerData = (destination, data) => {
+  console.log(destination)
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
       body: JSON.stringify(data)
     })
-    console.log('진술 선택 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }

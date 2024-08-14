@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 
-import java.time.Duration;
 import java.util.Optional;
 
 @Slf4j

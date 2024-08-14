@@ -5,11 +5,10 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class IniQuizCorrectSignal {
+@AllArgsConstructor
+public class IniQuizInfoCreateRequest {
     private String ovToken;
-    private String submittedWord;
-    private boolean result;
+    private String categoryName;
+    private String quizWord;
 }

@@ -21,7 +21,7 @@
   const state = reactive({
     // OpenVidu 관련 상태 관리
     OV: null,
-    session: sessionStore.SessionId,
+    session: sessionStore.sessionId,
     mainStreamManager: null,
     publisher: null,
     subscribers: [],

@@ -8,7 +8,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IniQuizWordSignal {
+public class IniQuizAnswerRequestSignal {
+    private String ownerOvToken;
     private String ovToken;
-    private String quizWord;
+    private String userName;
+    private String guessWord;
 }

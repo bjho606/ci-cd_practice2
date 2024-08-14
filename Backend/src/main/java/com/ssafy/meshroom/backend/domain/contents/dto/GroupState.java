@@ -1,7 +1,6 @@
 package com.ssafy.meshroom.backend.domain.contents.dto;
 
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 @Getter
 @Setter

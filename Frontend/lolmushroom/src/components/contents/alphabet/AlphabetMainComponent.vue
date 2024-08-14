@@ -1,34 +1,186 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+  import { onMounted, reactive, ref, watch } from 'vue';
+  import { useSessionStore } from '@/stores/sessionStore';
+  import { useAlphabetStore } from '@/stores/alphabetStore';
+  import { useUserStore } from '@/stores/userStore';
+  import { useRouter } from 'vue-router';
 
-const category_name = ref('동물');
-const userInput = ref('ㅎ ㄹ ㅇ');
+  import contentsAPI from '@/api/contents';
+  import webSocketAPI from '@/api/webSocket';
+  import CountDownComponent from '@/components/common/CountDownComponent.vue'
+
+  const router = useRouter()
+  const store = useAlphabetStore()
+  const userStore = useUserStore()
+  const sessionStore = useSessionStore()
+  const isTimeUp = ref()
+  const counting = ref(true)
+  const showAlert = ref()
+  const index = ref(0)
+  const guessWord = ref('')
+  const guessWords = ref([])
+  // const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
+  const isCorrected = ref()
+
+  const turn = reactive({
+    ownerOvToken: '',
+    answer: '',
+    winner: '',
+  })
+
+  // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
+  const timeUp = (bool) => {
+    isTimeUp.value = bool
+    counting.value = !bool
+  }
+
+  // 모든 문제를 가져옴
+  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
+  const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
+  turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
+
+  // 정답을 발행
+  const publishAnswer = () => {
+    if (guessWord.value === '') {
+      showAlert.value = true
+    } else {
+      const data = {
+        ownerOvToken: turn.ownerOvToken,
+        ovToken: userStore.userOvToken,
+        userName: userStore.userName,
+        guessWord: guessWord.value.trim()
+      }
+      webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
+      guessWord.value = ''
+    }
+  }
+
+  // 랜덤 색상 생성 함수
+  const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  // 다른 사용자의 정답을 구독
+  const onGuessReceived = (event) => {
+    const { ovToken, result, submittedWord, userName } = event
+    const wordData = {
+      word: submittedWord,
+      top: Math.random(),
+      left: Math.random(),
+      // 10% ~ 90% 사이의 랜덤 위치
+      initialTop: Math.random() * 80 + 10 + '%', 
+      initialLeft: Math.random() * 80 + 10 + '%',
+      color: generateRandomColor(),
+      ovToken: ovToken,
+    }
+    guessWords.value.push(wordData)
+    
+    // 만약 정답이 나오면
+    if (result === true) {
+      turn.answer = submittedWord
+      turn.winner = userName
+      isCorrected.value = true
+      guessWords.value = []
+      // 3초 후에 isCorrected를 false로 변경하고 index 증가
+      setTimeout(() => {
+        isCorrected.value = false
+        index.value += 1
+      }, 3000)
+    } 
+  }
+
+  // index 값이 증가할 때마다 관련 값 갱신
+  watch(index, (newIndex, oldIndex) => {
+    if (newIndex < store.totalUserCount) {
+      turn.ownerOvToken =  alliIniQuizInfos[newIndex]['ovToken']
+    } else {
+      router.push({
+      name: 'roomwaiting',
+      params: {
+        sessionId: sessionStore.sessionId,
+        subSessionId: sessionStore.subSessionId
+      }
+    })
+    }
+
+  })
+  onMounted(async () => {
+    console.log('초성 게임 연결 중..')
+    // 세션 연결
+    webSocketAPI.connect({
+          sessionId: sessionStore.sessionId,
+          subSessionId: sessionStore.subSessionId,
+          onEventReceived: onGuessReceived,
+          subscriptions: ['guess']
+        })
+  })
 
 </script>
 
 <template>
-  <div class="header">
+  <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
-  </div>
-<div class="container">
-  <div class="statusContainer">
-    <div class="info">
-      <div class="info-category">카테고리</div>
-      <div class="info-text">{{ category_name }}</div>
+  </div> -->
+  <div class="container" v-show="isTimeUp && !isCorrected">
+    <div class="statusContainer">
+      <div class="info">
+        <div class="info-category">카테고리</div>
+        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
+      </div>
+    </div>
+    <div class="playContainer">
+      <div class="userInput">
+        <div class="emojiField1"></div>
+        <div div :guessWord class="initialBox">{{ alliIniQuizInfos[index]['quizWord'] }}</div>
+      </div>
+      <div class="userInput">
+        <div class="emojiField2"></div>
+        <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
+      </div>
+      <div>
+        <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert" class="warning-alert"/>
+      </div>
+      <button class="submit" @click="publishAnswer()">
+        정답 맞추기
+      </button>
+      <!-- 침여자의 답변 렌더링 -->
+      <div v-for="wordData in guessWords" :key="wordData.ovToken"
+           class="moving-word"
+           :style="{
+              '--initial-top': wordData.initialTop,
+             '--initial-left': wordData.initialLeft,
+             '--random-top': wordData.top,
+             '--random-left': wordData.left,
+             color: wordData.color
+            }">
+        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 300%;">{{ wordData.word }}</h2>
+        <h2 v-else>{{ wordData.word }}</h2>
+      </div>
     </div>
   </div>
-  <div class="playContainer">
-    <div class="userInput">
-      <div class="emojiField"></div><div :userInput class="initialBox">{{ userInput }}</div>
+
+  <v-container class="countdown-container" v-show="!isTimeUp">
+    <div class="countdown-timer">
+      <CountDownComponent v-if="counting" time="2.5" text="집중해서 초성을 맞춰보세요!" @end-count-down="timeUp(true)"/>
     </div>
-    <div class="userInput">
-      <div class="emojiField"></div><input v-html="userInput" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !"></input>
+    
+  </v-container>
+
+  <div class="countdown-container" v-show="isCorrected">
+    <h1 class="countdown-number">
+      정답: {{ turn.answer }}
+    </h1>
+    <br>
+    <br>
+    <div class="countdown-tooltip">
+      <h2 style="color: white;">정답자: {{ turn.winner }}</h2>
     </div>
-    <button class="submit">
-          정답 맞추기
-    </button>
   </div>
-</div>
 </template>
 
 <style scoped>
@@ -109,10 +261,19 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   align-items: center;
   padding: 3px;
 }
-.emojiField{
+
+.emojiField1{
   width: 60px;
   height: 60px;
-  background-color: #1F4F16;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/thinking_face.svg')
+}
+
+.emojiField2{
+  width: 60px;
+  height: 60px;
+  /* background-color: #1F4F16; */
+  background-image: url('../../../../src/assets/image/smile_face.svg')
 }
 .initialBox {
   flex: 1;
@@ -133,6 +294,42 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   background-color: transparent; /* 배경색 투명하게 설정 */
   font-size: 16px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
+}
+
+/* 정답 확인창 스타일 */
+.countdown-container {
+  margin-top: 10%;
+  background: #247719;
+  opacity: 0.7;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.countdown-number {
+  font-size: 120px;
+  animation: countdown-animation 1s linear infinite;
+}
+
+@keyframes countdown-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.countdown-tooltip h1 {
+  font-size: 40px;
+  margin: 10px 0;
+  color: '#FFFFFF';
 }
 
 /* 선택적: WebKit 브라우저(Chrome, Safari 등)의 자동 채우기 스타일 제거 */
@@ -156,5 +353,24 @@ const userInput = ref('ㅎ ㄹ ㅇ');
   align-items: center;
 }
 
+.warning-alert {
+  width: 100%;
+}
 
+/* css 애니메이션 정의 */
+.moving-word {
+  position: absolute;
+  animation: moveWord 3s infinite alternate ease-in-out;
+}
+
+@keyframes moveWord {
+  0% {
+    top: var(--initial-top);
+    left: var(--initial-left);
+  }
+  100% {
+    top: calc(90% * var(--random-top));
+    left: calc(90% * var(--random-left));
+  }
+}
 </style>
