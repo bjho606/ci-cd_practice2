@@ -1,6 +1,5 @@
 package com.ssafy.meshroom.backend.global.common.properties;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

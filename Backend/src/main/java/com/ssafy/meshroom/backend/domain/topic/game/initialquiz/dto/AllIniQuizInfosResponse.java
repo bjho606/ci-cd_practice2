@@ -1,4 +1,4 @@
-package com.ssafy.meshroom.backend.domain.topic.game.trueorfalse.dto;
+package com.ssafy.meshroom.backend.domain.topic.game.initialquiz.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllTFInfosResponse {
-    List<TFInfoResponse> allTFInfos;
+public class AllIniQuizInfosResponse {
+    List<IniQuizInfoResponse> alliIniQuizInfos;
 
 }
