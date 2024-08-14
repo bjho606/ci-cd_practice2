@@ -8,16 +8,12 @@
     answer: Number,
   })
 
-  const store = useTOFStore()
-  const expanded = ref({})
+const store = useTOFStore()
+  
+const correctRate = computed(() => {
+  return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
+})
 
-  const correctRate = computed(() => {
-    return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
-  })
-
-  const toggleList = (choice) => {
-    expanded.value[choice] = !expanded.value[choice]
-  }
 </script>
 
 <template>
@@ -43,38 +39,6 @@
       <div class="correctRate-div">정답률: {{ correctRate * 100 }}%</div>
     </div>
   </v-container>
-
-  <!-- <v-container>
-    <v-row>
-      <v-col v-for="i in 4" :key="i" cols="6">
-        <v-card
-          class="mx-5 card-border"
-          prepend-avatar="../../../../src/assets/image/thinking_face.svg"
-          :title="`${store.statements[i-1]}-${store.chosenArray[i].length}명`"
-        />
-      </v-col>
-    </v-row>
-    <v-card v-for="i in 4" :key="i">
-      <v-card-title>
-        <v-icon :icon="`mdi-numeric-${i}-circle-outline`" v-show="answer!==i"></v-icon>
-        <v-icon :icon="`mdi-numeric-${i}-circle-outline`" color="red" v-show="answer===i"></v-icon>
-        {{ store.statements[i-1] }} - {{ store.chosenArray[i].length }}명
-        <span @click="toggleList(i)">
-          {{ expanded[i] ? '▲' : '▼' }}
-        </span>
-      </v-card-title>
-      <v-expand-transition>
-        <v-card-text v-if="expanded[i]">
-          <ul>
-            <li v-for="nickname in store.chosenArray[i]" :key="nickname">
-              {{ nickname }}
-            </li>
-          </ul>
-        </v-card-text>
-      </v-expand-transition>
-      <v-divider class="border-opacity-55"></v-divider>
-    </v-card>
-  </v-container> -->
 
 </template>
 
@@ -130,7 +94,7 @@ li {
 }
 
 .correct-card {
-  background-color: rgba(46, 226, 46, 0.54);
+  background-color: #24A319;
 }
 
 .selected-card {
