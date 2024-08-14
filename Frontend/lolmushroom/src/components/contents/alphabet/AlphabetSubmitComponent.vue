@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref, watch } from 'vue';
+  import { onMounted, reactive, ref, watch } from 'vue';
   import { useRouter } from 'vue-router' 
   import { useSessionStore } from '@/stores/sessionStore'
   import { useAlphabetStore } from '@/stores/alphabetStore'
@@ -12,7 +12,11 @@
   const sessionStore = useSessionStore()
   const userStore = useUserStore()
   const quizWord = ref('');
-  const showAlter = ref('')
+  const showAlert = reactive({
+    blank: false,
+    korean: false,
+  })
+  // const showAlter = ref('')
 
   // 세션에 참가한 유저 정보를 요청하는 함수
   const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
@@ -22,12 +26,28 @@
   const categoryName = await contentsAPI.getCategory(sessionStore.subSessionId)
   console.log('내 퀴즈 카테고리는: ', categoryName)
 
+
+  // 영문이나 숫자가 들어가 있으면 거른다. 
+  const validateQuizWord = (word) => {
+      const regex = /^[가-힣]+$/;
+      if (regex.test(word)) {
+        return false
+      } else {
+        return true
+      }
+    }
+
   // 퀴즈를 제출하는 함수
   const submitQuizWord = async () => {
     if (quizWord.value === '') {
-      showAlter.value = true; return
+      showAlert.value = true; return
+    } else if (validateQuizWord(quizWord.value)) {
+      quizWord.value = ''
+      showAlert.blank = false
+      showAlert.korean = true
+      return
     } else {
-      showAlter.value = false
+      showAlert.value = false
       const object = {
         ovToken: userStore.ovToken,
         categoryName: categoryName['data']['result']['categoryName'],
@@ -78,7 +98,8 @@
   </div>
   <div class="playContainer">
     <div>
-      <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlter" class="warning-alert"/>
+      <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert.blank" class="warning-alert"/>
+      <v-alert title="초성 게임!" text="온전한 한국어 단어로 적어주세요." type="warning" v-if="showAlert.korean" class="warning-alert"/>
     </div>
     <div class="userInput">
       <div class="emojiField"></div><input v-html="quizWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요 !" v-model="quizWord" @keyup.enter="submitQuizWord()"/>

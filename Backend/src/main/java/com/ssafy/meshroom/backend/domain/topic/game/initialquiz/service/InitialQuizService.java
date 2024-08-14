@@ -79,7 +79,7 @@ public class InitialQuizService {
     public Response<AllIniQuizInfosResponse> getAllIniQuizInfos(String sessionId) {
         List<InitialQuizInfo> initialQuizInfoList = initialQuizRepository.findAllBySessionId(sessionId)
                 .orElseThrow(() -> new RuntimeException("해당 세션ID이 없습니다."));
-        log.info("true or false info : " + initialQuizInfoList.stream().toString());
+        log.info("initial quiz info : " + initialQuizInfoList.stream().toString());
 
         List<IniQuizInfoResponse> allIniQuizInfos = initialQuizInfoList.stream()
                 .map(IniQuizInfoResponse::from)
