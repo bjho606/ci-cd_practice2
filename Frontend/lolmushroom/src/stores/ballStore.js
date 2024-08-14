@@ -66,8 +66,7 @@ export const useBallStore = defineStore('ballStore', {
     },
     getTotalBalls: (state) => {
       const totalBalls = []
-      state.ballMap.forEach((size, sessionId) => {
-        totalBalls.push({
+      
       state.ballMap.forEach((size, sessionId) => {
         totalBalls.push({
           sessionId,
@@ -76,7 +75,6 @@ export const useBallStore = defineStore('ballStore', {
         })
       })
       return totalBalls.sort((a, b) => b.size - a.size)
-      return totalBalls
     }
   }
 })

@@ -16,7 +16,7 @@ import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
 import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
-
+import BallGrowResult from '@/components/contents/BallGrow/BallGrowResult.vue'
 const routes = [
   {
     path: '/',
@@ -55,7 +55,7 @@ const routes = [
             path: 'alphabet',
             name: 'AlphabetSubmitComponent',
             component: AlphabetSubmitComponent
-          }
+          },
         ]
       },
       {
@@ -67,6 +67,11 @@ const routes = [
             path: '',
             name: 'BallGrowContainer',
             component: BallGrowContainer
+          },
+          {
+            path: 'result',
+            name: 'BallGrowResult',
+            component: BallGrowResult
           }
         ]
       }
