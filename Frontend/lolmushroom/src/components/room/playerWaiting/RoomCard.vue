@@ -9,6 +9,13 @@ import UserGroup from './UserGroup.vue'
 
 const sessionStore = useSessionStore()
 const userStore = useUserStore()
+const isUserStarted = computed(() => userStore.isStarted)
+const isGroupTeamLeader = computed(() => {
+  return sessionStore.subSessionId === props.room.sessionId && userStore.isTeamLeader
+})
+const isGroupMember = computed(() => {
+  return sessionStore.subSessionId === props.room.sessionId
+})
 const props = defineProps({
   room: Object
 })
@@ -21,20 +28,18 @@ const handleChangeNameClick = () => {
 }
 const handleJoinOrLeaveClick = () => {
   emits('onJoinOrLeave')
+  if (isGroupTeamLeader.value && props.room.isReady) {
+    emits('onReady')
+  }
 }
-
-const isGroupTeamLeader = computed(() => {
-  return sessionStore.subSessionId === props.room.sessionId && userStore.isTeamLeader
-})
-const isGroupMember = computed(() => {
-  return sessionStore.subSessionId === props.room.sessionId
-})
 </script>
 
 <template>
   <div class="group-card">
     <div :class="['group-info', { 'group-info--strong-border': isGroupMember }]">
+      <!-- ReadyButton과 JoinButton을 isUserStarted가 false일 때만 표시 -->
       <ReadyButton
+        v-if="!isUserStarted"
         :isReady="room.isReady"
         :isGroupTeamLeader="isGroupTeamLeader"
         @onClick="handleReadyClick"
@@ -44,7 +49,11 @@ const isGroupMember = computed(() => {
         :isGroupMember="isGroupMember"
         @onClick="handleChangeNameClick"
       />
-      <JoinButton :isGroupMember="isGroupMember" @onClick="handleJoinOrLeaveClick" />
+      <JoinButton
+        v-if="!isUserStarted"
+        :isGroupMember="isGroupMember"
+        @onClick="handleJoinOrLeaveClick"
+      />
     </div>
     <UserGroup :users="room.users" :groupName="room.groupName" />
   </div>
