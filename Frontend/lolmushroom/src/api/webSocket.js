@@ -351,7 +351,19 @@ const addManagerGameSubscription = (sessionId, contentsId, onEventReceived) => {
   }
 }
 
-const unsubscribe = (sessionId) => {
+const unsubscribeInput = (targetInput) => {
+  const key = targetInput
+  if (subscriptionMap.has(key)) {
+    const subscription = subscriptionMap.get(key)
+    subscription.unsubscribe()
+    console.log(`Unsubscribed from Contents ${targetInput}`)
+    subscriptionMap.delete(key)
+  } else {
+    console.error(`No subscription found for session ${targetInput}`)
+  }
+}
+
+const unsubscribeSession = (sessionId) => {
   const sessionKey = `session-${sessionId}`
   if (subscriptionMap.has(sessionKey)) {
     const subscription = subscriptionMap.get(sessionKey)
@@ -458,7 +470,8 @@ export default {
   disconnect,
   sendMessage,
   sendClickData,
-  unsubscribe,
+  unsubscribeInput,
+  unsubscribeSession,
   unsubscribeGame,
   sendSubmitData,
   sendAnswerData,

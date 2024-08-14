@@ -1,9 +1,10 @@
 <script setup>
 import { computed } from 'vue'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useRoomStore } from '@/stores/roomStore'
 import EachWait from './EachWait.vue'
 import EachTOF from './EachTOF.vue'
-import EachQuiz from './EachQuiz.vue'
+import EachAlpha from './EachAlpha.vue'
 import EachBall from './EachBall.vue'
 
 const props = defineProps({
@@ -14,7 +15,16 @@ const props = defineProps({
 
 // Store access
 const roomStore = useRoomStore()
-const rooms = computed(() => roomStore.getRooms)
+const contentsStore = useContentsStore()
+const rooms = computed(() => {
+  return roomStore.getRooms.map((room, index) => {
+    const groupState = contentsStore.currentGroupState[index]
+    return {
+      ...room,
+      gameEnd: groupState && groupState.isFinish
+    }
+  })
+})
 </script>
 
 <template>
@@ -30,9 +40,12 @@ const rooms = computed(() => roomStore.getRooms)
           <div class="group-count">{{ room.occupants }} / {{ room.capacity }}</div>
         </div>
         <EachWait v-if="!currentContents" :room="room" />
-        <EachTOF v-if="currentContents === '1'" :room="room" />
-        <EachQuiz v-if="currentContents === '4'" :room="room" />
-        <EachBall v-if="currentContents === '7'" :room="room" />
+        <div v-if="room.gameEnd">게임 종료</div>
+        <v-else>
+          <EachTOF v-if="currentContents === '1'" :room="room" />
+          <EachAlpha v-if="currentContents === '4'" :room="room" />
+          <EachBall v-if="currentContents === '7'" :room="room" />
+        </v-else>
       </div>
       <div v-else class="inactive-content">
         <div class="inactive-icon">✖</div>

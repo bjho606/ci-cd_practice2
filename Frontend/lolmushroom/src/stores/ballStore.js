@@ -18,7 +18,7 @@ export const useBallStore = defineStore('ballStore', {
     initSocketConnection(sessionId, subSessionId, groups) {
       groups.forEach((group) => {
         this.groupNameMap.set(group.sessionId, group.groupName)
-        this.ballMap.set(group.sessionId, 20)
+        this.ballMap.set(group.sessionId, 100)
       })
       this.userGroup = this.currentGroup = subSessionId
       console.log(this.currentGroup)

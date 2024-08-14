@@ -111,7 +111,8 @@ export const useContentsStore = defineStore('contents', {
     getTotalDuration: (state) => state.totalDuration,
     getCurrentContentsId: (state) => state.currentContentsId,
     getContentsSequence: (state) => state.contentsSequence,
-    getRouteMapping: (state) => state.routeMapping
+    getRouteMapping: (state) => state.routeMapping,
+    getSocketMapping: (state) => state.socketMapping
   },
   persist: {
     key: 'contents-store',

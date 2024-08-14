@@ -70,7 +70,7 @@ const createSubSessionHandler = async (sessionId) => {
 const handleLeaveSession = async (sessionId) => {
   try {
     await sessionAPI.getSubSessionQuit(sessionId)
-    webSocketAPI.unsubscribe(sessionId) // subSession webSocket에도 구독을 제거함.
+    webSocketAPI.unsubscribeSession(sessionId) // subSession webSocket에도 구독을 제거함.
     userStore.setTeamLeader(false) // 팀장이 나갈 가능성에 대한 처리
     sessionStore.setSubSessionId(null) // sessionStore에서 SubSessionId가 없앤다.
     chatStore.setCurrentMode('All') // ChatStore의 Mode를 'All'로 변환한다.

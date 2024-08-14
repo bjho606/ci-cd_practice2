@@ -1,24 +1,26 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useAlphabetStore } from '@/stores/alphabetStore'
+import { useBallStore } from '@/stores/ballStore'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import { useContentsStore } from '@/stores/contentsStore'
 import { useTOFStore } from '@/stores/tofStore'
-import { useMushroomStore } from '@/stores/mushroomStore'
 import Swal from 'sweetalert2'
 import webSocketAPI from '@/api/webSocket'
 import contentsAPI from '@/api/contents'
-import WatchWaiting from '@/components/room/eachroom/adminWatchWaiting.vue'
+import adminWatchWaiting from '@/components/room/eachroom/adminWatchWaiting.vue'
 import ManagerHeader from './ManagerHeader.vue'
 import ManagerFooter from './ManagerFooter.vue'
 import FooterStart from './FooterStart.vue'
 import FooterShare from './FooterShare.vue'
 
+const alphabetStore = useAlphabetStore()
+const ballStore = useBallStore()
 const roomStore = useRoomStore()
 const contentsStore = useContentsStore()
 const sessionStore = useSessionStore()
 const TOFStore = useTOFStore()
-const mushroomStore = useMushroomStore()
 const showShareFooter = ref(true)
 
 const currentContents = computed(() => contentsStore.getCurrentContentsId)
@@ -50,7 +52,7 @@ const callNextContents = async (isStart) => {
  * IMP 2. 진행자는 현재 Contents의 상황을 Watch하면서, ContentsId에 따라 Rendering이 달라진다.
  * IMP 2.1 하위 Component는 v-if에 따라 보여주는 정보가 다르게 되고, 받는 정보가 달라진다.
  */
-const socketMapping = contentsStore.socketMapping
+const socketMapping = computed(() => contentsStore.getSocketMapping)
 watch(currentContents, (newContentsId, oldContentsId) => {
   if (oldContentsId) {
     webSocketAPI.unsubscribeGame(socketMapping[oldContentsId])
@@ -60,8 +62,11 @@ watch(currentContents, (newContentsId, oldContentsId) => {
       case '1':
         TOFStore.initSocketConnection(sessionStore.sessionId, groups.value)
         break
+      case '4':
+        alphabetStore.initSocketConnection(sessionStore.sessionId, groups.value)
+        break
       case '7':
-        mushroomStore.initSocketConnection(
+        ballStore.initSocketConnection(
           sessionStore.sessionId,
           sessionStore.subSessionId,
           groups.value
@@ -96,7 +101,7 @@ const startGame = () => {
 <template>
   <div class="room-waiting">
     <ManagerHeader />
-    <WatchWaiting :currentContents="currentContents" />
+    <adminWatchWaiting :currentContents="currentContents" />
     <ManagerFooter>
       <template v-slot:start>
         <FooterStart @start-game="startGame" />
