@@ -13,10 +13,24 @@
   const { VITE_OPENVIDU_URL } = import.meta.env;
   const { VITE_OPENVIDU_SECRET } = import.meta.env;
 
+  const mic = ref(true)
+  const video = ref(true)
 
   const userStore = useUserStore()
   const sessionStore = useSessionStore()
   const store = useTOFStore()
+
+  const toggleMic = () => {
+    mic.value = !mic.value
+    console.log('마이크 껐다 켜기')
+  }
+
+  const toggleVideo = () => {
+    video.value = !video.value
+    console.log('비디오 껐다 켜기')
+  }
+
+
 
   const state = reactive({
     // OpenVidu 관련 상태 관리
@@ -64,7 +78,7 @@
     // --- 4) 유효한 토큰으로 세션에 연결함 ---
     // const token = await getToken(sessionStore.subSessionId)
     const token = userStore.userOvToken
-    state.session.connect(token, { clientData: userStore.userNickname })
+    state.session.connect(token, { clientData: userStore.userName })
       .then(() => {
         // --- 5) Get your own camera stream with the desired properties ---
         const pub = state.OV.initPublisher(undefined, {
@@ -78,11 +92,11 @@
           mirror: false, // Whether to mirror your local video or not
         })
 
-        // 웹캠을 보여주고 퍼블리셔를 저장하는 메인 비디오를 설정하고 Set the main video in the page to display our webcam and store our Publisher
+        // 웹캠을 보여주고 퍼블리셔를 저장하는 메인 비디오를 설정
         state.mainStreamManager = pub
         state.publisher = pub
         
-        // --- 6) Publish your stream ---
+        // --- 6) 스트림 발행 ---
         state.session.publish(state.publisher)
       })
       .catch((error) => {
@@ -108,6 +122,20 @@
   const updateMainVideoStreamManager = (stream) => {
     if (state.mainStreamManager === stream) return
     state.mainStreamManager = stream
+
+    state.subscribers.forEach(subscriber => {
+      if (subscriber === state.mainStreamManager) {
+        subscriber.publishAudio(true)
+      } else {
+        subscriber.publishAudio(false)
+      }
+    })
+
+    if (state.publisher === state.mainStreamManager) {
+      state.publisher.publishAudio(true)
+    } else {
+      state.publisher.publishAudio(false)
+    }
   }
 
   watch(() => store.targetUserToken, (newToken) => {
@@ -142,6 +170,13 @@
     </div>
     <div id="main-video" class="col-md-6">
       <UserVideo :stream-manager="state.mainStreamManager" />
+      <div v-if="store.targetUserToken === userStore.userOvToken">
+        <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
+        <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
+        <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
+        <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
+      </div>
+      {{ store.targetUserToken }}
     </div>
     <div id="video-container" class="col-md-6" style="display: none;">
       <UserVideo :stream-manager="state.publisher"/>
