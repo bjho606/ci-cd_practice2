@@ -205,7 +205,6 @@ onMounted(async () => {
                   <v-card
                     class="mx-5 card-border"
                     v-bind="props"
-                    prepend-avatar="../../../../src/assets/image/thinking_face.svg"
                     :title="statement"
                     :color="getCardColor(i + 1, isHovering)"
                     hover
@@ -228,6 +227,7 @@ onMounted(async () => {
       <div v-else>
         <TOFResultComponent
           :target-nick-name="allStatements[index].username"
+          :selected-answer="selectedAnswer"
           :answer="answer"
           class="mt-5"
           width="500"
@@ -237,6 +237,7 @@ onMounted(async () => {
     <div v-else>
       <TOFResultComponent
         :target-nick-name="allStatements[index].username"
+        :selected-answer="selectedAnswer"
         :answer="answer"
         class="mt-5"
         width="500"
@@ -306,7 +307,6 @@ onMounted(async () => {
 .next-button {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
 }
 
 .keynote-speecher {
