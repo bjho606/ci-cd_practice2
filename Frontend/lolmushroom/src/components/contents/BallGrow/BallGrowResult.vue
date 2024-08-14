@@ -1,18 +1,19 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted , ref} from 'vue'
 import BallContent from './BallContent.vue'
 import { useBallStore } from '@/stores/ballStore';
 
 const ballStore = useBallStore();
 
 // Sample data
-// const allBalls = ref([
-//   { sessionId: '1', groupName: 'Group A', size: 30 },
-//   { sessionId: '2', groupName: 'Group B', size: 50 },
-//   { sessionId: '3', groupName: 'Group C', size: 40 }
-// ])
 
-const allBalls = ballStore.getTotalBalls;
+const allBalls = ref([
+  { sessionId: '1', groupName: 'Group A', size: 30 },
+  { sessionId: '2', groupName: 'Group B', size: 50 },
+  { sessionId: '3', groupName: 'Group C', size: 40 }
+])
+
+// const allBalls = ballStore.getTotalBalls;
 
 const winnerGroup = computed(() => {
   return allBalls.value.reduce((max, group) => (group.size > max.size ? group : max), allBalls.value[0])
