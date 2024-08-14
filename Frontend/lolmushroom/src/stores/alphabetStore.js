@@ -18,8 +18,8 @@ export const useAlphabetStore = defineStore('alphabet', {
     setTotalUser (userCount) {
       this.totalUserCount = userCount
     },
-    addChosenData(user, chosen) {
-      this.chosenArray[chosen].push(user)
+    submitUserClear() {
+      this.submitUserCount = 0
     }
   },
 })

@@ -31,6 +31,7 @@
   const onWordReceived = () => {
     store.submitUserIncrease()
     if (store.submitUserCount === store.totalUserCount) {
+      store.submitUserClear()
         router.push('alphabetContent')
       }
   }

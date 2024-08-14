@@ -122,7 +122,7 @@ const addSubscriptions = (
         addProgressSubscription(sessionId, onProgressReceived)
         break
       case 'finish':
-        addFinishSubscription(sessionId, onFinishReceived)
+        addFinishSubscription(subSessionId, onFinishReceived)
         break
       case 'game':
         addGameSubscription(sessionId, contentsId, onEventReceived)
@@ -210,13 +210,14 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
   }
 }
 
-const addFinishSubscription = (sessionId, onFinishReceived) => {
+// 진행자가 콘텐츠 종료를 구독하는 함수
+const addFinishSubscription = (subSessionId, onFinishReceived) => {
   const finishKey = 'finsih'
   if (!subscriptionMap.has(finishKey)) {
     const finishSubscription = stompClient.subscribe(
-      `/subscribe/contents/${sessionId}/finish`,
+      `/subscribe/contents/finish/${subSessionId}`,
       (message) => {
-        console.log('Received event from Contents Subscribe', message.body)
+        console.log('Received event from Finish Subscribe', message.body)
         if (onFinishReceived) {
           onFinishReceived(JSON.parse(message.body))
         }
@@ -296,7 +297,7 @@ const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceiv
   const guessKey = contentsId
   console.log(`/subscribe/game/ini-quiz/${contentsId}/${sessionId}/${subSessionId}`)
   if (!subscriptionMap.has(guessKey)) {
-    const finishSubscription = stompClient.subscribe(
+    const guessSubscription = stompClient.subscribe(
       `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
       (event) => {
         console.log(`Received event from Subscribe - 다른 사람`, event.body)
@@ -305,7 +306,7 @@ const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceiv
         }
       }
     )
-    subscriptionMap.set(guessKey, finishSubscription)
+    subscriptionMap.set(guessKey, guessSubscription)
   }
 }
 
@@ -414,14 +415,14 @@ const sendClickData = (destination, click) => {
   }
 }
 
-// 진술서 작성 완료 시, 제출 여부를 전송하는 Code
+// 진술서 작성 완료 시, 제출 여부를 전송하는
+// 초성 게임에서 작성 단어를 전송
 const sendSubmitData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
       body: data
     })
-    console.log('진술서에 제출 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }

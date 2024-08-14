@@ -7,7 +7,7 @@
 
   import contentsAPI from '@/api/contents';
   import webSocketAPI from '@/api/webSocket';
-  import CountDownComponent from '@/components/common/CountDownComponent.vue'
+  import CountDownComponent from '@/components/contents/CountDownComponent.vue'
 
   const router = useRouter()
   const store = useAlphabetStore()
@@ -98,17 +98,19 @@
   watch(index, (newIndex, oldIndex) => {
     if (newIndex < store.totalUserCount) {
       turn.ownerOvToken =  alliIniQuizInfos[newIndex]['ovToken']
-    } else {
-      router.push({
-      name: 'roomwaiting',
-      params: {
-        sessionId: sessionStore.sessionId,
-        subSessionId: sessionStore.subSessionId
-      }
-    })
+      return
+    } else if (turn.ownerOvToken === userStore.userOvToken) {
+      contentsAPI.finishContents(sessionStore.subSessionId)
     }
-
+    router.push({
+    name: 'roomwaiting',
+    params: {
+      sessionId: sessionStore.sessionId,
+      subSessionId: sessionStore.subSessionId
+    }
   })
+  })
+  
   onMounted(async () => {
     console.log('초성 게임 연결 중..')
     // 세션 연결
