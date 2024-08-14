@@ -26,7 +26,7 @@ public class ContentsController {
     }
 
     @GetMapping("/next/{isStart}")
-    public ResponseEntity<Response<ContentsOrderSubscribe>> nextContents(@PathVariable boolean isStart) {
+    public ResponseEntity<Response<ContentsOrderSubscribe>> nextContents(@PathVariable("isStart") boolean isStart) {
         return ResponseEntity.status(HttpStatus.OK).body(contentsOrderService.nextContents(isStart));
     }
 
@@ -37,7 +37,7 @@ public class ContentsController {
     }
 
     @PostMapping("/finish/{subSessionId}")
-    public ResponseEntity<Response<ContentsOrderSubscribe>> finishSubSession(@PathVariable String subSessionId) {
+    public ResponseEntity<Response<ContentsOrderSubscribe>> finishSubSession(@PathVariable("subSessionId") String subSessionId) {
         Response<ContentsOrderSubscribe> response = contentsOrderService.finishSubSession(subSessionId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
