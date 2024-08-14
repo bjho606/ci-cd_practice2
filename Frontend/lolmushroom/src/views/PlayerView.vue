@@ -8,7 +8,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import SetName from '@/components/room/playerWaiting/setName.vue'
+import SetName from '@/components/room/playerWaiting/SetName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
 const route = useRoute()
@@ -139,39 +139,38 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- IMP : PlayerView의 RouterView 요소들 -->
   <div class="contents-container">
     <div class="main-content">
       <RouterView />
     </div>
+    <!-- IMP : NickName Modal -->
+    <SetName
+      :show="showNameModal"
+      @update:show="showNameModal = $event"
+      @name-saved="userFlowHandler"
+    />
     <div class="sub-content">
       <ChatScreen />
     </div>
   </div>
-  <!-- IMP : NickName Modal -->
-  <SetName
-    :show="showNameModal"
-    @update:show="showNameModal = $event"
-    @name-saved="userFlowHandler"
-  />
 </template>
 
 <style scoped>
 .contents-container {
   background-color: #fff2f7;
-  height: 100%;
+  height: 100vh; /* 전체 화면 높이 설정 */
   display: flex;
   flex-direction: column;
+  position: relative; /* 자식 요소의 absolute 위치 설정을 위해 relative 설정 */
+  overflow-y: hidden;
 }
 
 .main-content {
-  height: 93%;
+  height: 100%; /* 100% 높이 설정 */
 }
 
 .sub-content {
-  height: 5%;
-  display: flex;
-  flex-direction: flext-start;
-  margin-left: 0.5%;
+  position: absolute;
+  bottom: 0;
 }
 </style>
