@@ -17,7 +17,6 @@ export default {
     return axios.get(`${API_URL}/contents/reload`).then(success).catch(failure)
   },
   finishContents(subSessionId, success, failure) {
-    console.log('보내기 완료')
     // IMP Team Leader : Team이 현재 Contents를 종료했음을 알린다.
     return axios.post(`${API_URL}/contents/finish/${subSessionId}`).then(success).catch(failure)
   },

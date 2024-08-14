@@ -40,7 +40,7 @@
   turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
 
   // 정답을 발행
-  const publishAnswer = () => {
+  const publishGuess =  () => {
     if (guessWord.value === '') {
       showAlert.value = true
     } else {
@@ -81,36 +81,39 @@
     guessWords.value.push(wordData)
     
     // 만약 정답이 나오면
-    if (result === true) {
+    if (result === true && ovToken !== turn.ownerOvToken) {
       turn.answer = submittedWord
       turn.winner = userName
       isCorrected.value = true
       guessWords.value = []
-      // 3초 후에 isCorrected를 false로 변경하고 index 증가
-      setTimeout(() => {
-        isCorrected.value = false
-        index.value += 1
-      }, 3000)
+      index.value += 1
     } 
   }
 
   // index 값이 증가할 때마다 관련 값 갱신
-  watch(index, (newIndex, oldIndex) => {
-    if (newIndex < store.totalUserCount) {
+  watch(index, async (newIndex, oldIndex) => {
+    if (newIndex < alliIniQuizInfos.length) {
       turn.ownerOvToken =  alliIniQuizInfos[newIndex]['ovToken']
+      // 3초 후에 isCorrected를 false로 변경하고 index 증가
+      setTimeout(() => {
+        isCorrected.value = false
+      }, 3000)
       return
+
     } else if (turn.ownerOvToken === userStore.userOvToken) {
-      contentsAPI.finishContents(sessionStore.subSessionId)
-    }
-    router.push({
-    name: 'roomwaiting',
-    params: {
-      sessionId: sessionStore.sessionId,
-      subSessionId: sessionStore.subSessionId
+      await contentsAPI.finishContents(sessionStore.subSessionId)
+      router.push({
+        name: 'mainSession',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
+    } else {
+      router.push({
+        name: 'mainSession',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
     }
   })
-  })
-  
+
   onMounted(async () => {
     console.log('초성 게임 연결 중..')
     // 세션 연결
@@ -142,11 +145,11 @@
       </div>
       <div class="userInput">
         <div class="emojiField2"></div>
-        <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
+        <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishGuess()">
       </div>
       <div>
       </div>
-      <button class="submit" @click="publishAnswer()">
+      <button class="submit" @click="publishGuess()">
         정답 맞추기
       </button>
       <!-- 침여자의 답변 렌더링 -->

@@ -23,10 +23,8 @@
   // 세션에 참가한 유저 정보를 요청하는 함수
   const response = await sessionAPI.getSubSessionInfo(sessionStore.sessionId, sessionStore.subSessionId)
   store.setTotalUser(response['data']['result']['currentUserCount'])
-  console.log('총 인원수', store.totalUserCount)
 
   const categoryName = await contentsAPI.getCategory(sessionStore.subSessionId)
-  console.log('내 퀴즈 카테고리는: ', categoryName)
 
   const onWordReceived = () => {
     store.submitUserIncrease()

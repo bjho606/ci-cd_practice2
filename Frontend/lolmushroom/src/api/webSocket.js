@@ -282,7 +282,7 @@ const addWordSubscription = (subSessionId, onEndReceived) => {
     const wordSubscription = stompClient.subscribe(
       `/subscribe/game/ini-quiz/word/${subSessionId}`,
       (event) => {
-        console.log(`Received event from Subscribe - 초성 문제`, event.body)
+        console.log('Received event from word')
         if (onEndReceived) {
           onEndReceived(JSON.parse(event.body))
         }
@@ -300,7 +300,7 @@ const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceiv
     const guessSubscription = stompClient.subscribe(
       `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
       (event) => {
-        console.log(`Received event from Subscribe - 다른 사람`, event.body)
+        console.log('Received event from guess')
         if (onEventReceived) {
           onEventReceived(JSON.parse(event.body))
         }
