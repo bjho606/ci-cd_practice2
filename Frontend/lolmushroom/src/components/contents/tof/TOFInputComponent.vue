@@ -1,13 +1,15 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useUserStore } from '@/stores/userStore'
 import { useTOFStore } from '@/stores/tofStore'
 import { useSessionStore } from '@/stores/sessionStore'
-import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
 import contentsAPI from '@/api/contents'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
+import ContentsLoading from '@/components/contents/ContentsLoading.vue'
+import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
@@ -15,7 +17,10 @@ const router = useRouter()
 const userStore = useUserStore()
 const store = useTOFStore()
 const sessionStore = useSessionStore()
+const contentsStore = useContentsStore()
 const showAlter = ref()
+const showLoading = ref(false)
+const contentsInfo = contentsStore.contents[0]
 
 const statements = reactive({
   firstTrue: '',
@@ -120,10 +125,23 @@ onMounted(async () => {
     onEventReceived: onSubmitEvent,
     subscriptions: ['question']
   })
+
+  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  if (!hasShownLoading) {
+    showLoading.value = true
+    localStorage.setItem('hasShownLoading', 'true')
+
+    setTimeout(() => {
+      showLoading.value = false
+    }, 5000) // 5초 동안 모달을 표시
+  }
 })
 </script>
 
 <template>
+  <v-dialog v-model="showLoading" persistent max-width="1000">
+    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+  </v-dialog>
   <!-- 진술을 제출했을 때 -->
   <v-container fluid v-if="!isSubmit" style="width: 70%" class="my-5">
     <div class="progress-linear-container">

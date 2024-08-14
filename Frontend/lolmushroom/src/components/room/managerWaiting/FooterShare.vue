@@ -2,26 +2,25 @@
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/sessionStore'
 
-
 const router = useRouter()
 const sessionStore = useSessionStore()
-const sessioncodeUrl = router.resolve({
+
+const shareSession = async () => {
+  console.log('세션 링크 공유하기 버튼 클릭됨')
+  sessionStore.setSessionUrl(sessionStore.getSessionId)
+  const sessioncodeUrl = router.resolve({
     name: 'sessioncode',
     query: {
       sessionUrl: sessionStore.getSessionUrl
     }
   }).href
-
-const shareCode = () => {
   window.open(sessioncodeUrl, '_blank', 'width=1200,height=800')
 }
-
-
 </script>
 
 <template>
   <div class="share-session">
-    <v-btn class="share-session-btn" icon  @click="shareCode()">
+    <v-btn class="share-session-btn" @click="shareSession">
       <v-icon class="share-icon" icon="mdi-share" />
       공유
     </v-btn>

@@ -7,9 +7,8 @@ import ListItem from './_1ListItem.vue'
 const contentsStore = useContentsStore()
 const groupedContents = computed(() => contentsStore.getGroupedContents)
 
-
 const pickContents = (item) => {
-  if(item.isActive){
+  if (item.isActive) {
     contentsStore.setPickedContents(item)
   }
 }
@@ -18,6 +17,10 @@ const addContents = (item) => {
   if (item.isActive) {
     contentsStore.addContent(item)
   }
+}
+
+const isItemSelected = (item) => {
+  return contentsStore.selectedContents.includes(item)
 }
 </script>
 
@@ -31,7 +34,7 @@ const addContents = (item) => {
           v-for="item in category.items"
           :key="item._id"
           :item="item"
-          :is-active="item.isActive"
+          :isItemSelected="isItemSelected(item)"
           @pick="pickContents"
           @add="addContents"
         >
@@ -66,7 +69,5 @@ const addContents = (item) => {
   margin-bottom: 10px;
 }
 
-
 /* css about Hover things */
-
 </style>

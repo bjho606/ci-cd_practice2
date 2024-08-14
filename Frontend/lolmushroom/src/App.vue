@@ -18,7 +18,7 @@ const fetchContents = async () => {
     if (response.data.isSuccess) {
       console.log(response.data)
       contentsStore.setContents(response.data.result.contents)
-
+      contentsStore.setPickedContents(response.data.result.contents['0'])
     }
   } catch (error) {
     console.log('Error Getting Meshroom Contents', error)

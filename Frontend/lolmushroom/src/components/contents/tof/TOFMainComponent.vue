@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useTOFStore } from '@/stores/tofStore'
@@ -10,14 +11,14 @@ import webSocketAPI from '@/api/webSocket'
 import ButtonComponent from '@/components/common/ButtonComponent.vue'
 import ProgressBar from '@/components/common/OtherUserWaitingComponent.vue'
 import OpenViduComponent from '@/components/contents/tof/openvidu/OpenViduComponent.vue'
-import CountDownComponent from '@/components/common/CountDownComponent.vue'
 import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 import TOFResultComponent from '@/components/contents/tof/TOFResultComponent.vue'
 import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue'
-// import ResultOverlayComponent from '@/components/common/ResultOverlayComponent.vue';
+import CountDownComponent from '@/components/contents/CountDownComponent.vue'
 
 const store = useTOFStore()
 const router = useRouter()
+const contentsStore = useContentsStore()
 const userStore = useUserStore()
 const sessionStore = useSessionStore()
 const counting = ref(true)
@@ -125,19 +126,13 @@ const onNextReceived = (_event) => {
     timeUp('')
   } else {
     router.push({
-      name: 'roomwaiting',
+      name: 'mainSession',
       params: {
         sessionId: sessionStore.sessionId,
         subSessionId: sessionStore.subSessionId
       }
     })
   }
-}
-
-const onEndReceived = (event) => {
-  console.log('완료')
-  // const { sessionId } = event
-  // router.push({ name: 'roomwaiting', params: { sessionId } });
 }
 
 const getCardColor = (key, isHovering) => {
@@ -164,6 +159,21 @@ watch(index, (newIndex, oldIndex) => {
   }
 })
 
+watch(
+  () => contentsStore.currentGroupState,
+  (newState) => {
+    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
+
+    if (group && group.isFinish) {
+      router.push({
+        name: 'mainSession',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
+    }
+  },
+  { deep: true } // Ensure the watcher detects nested changes within the array
+)
+
 onMounted(async () => {
   console.log('연결 좀...')
   webSocketAPI.connect({
@@ -172,8 +182,7 @@ onMounted(async () => {
     contentsName: 'tf',
     onEventReceived: onAnswerReceived,
     onNextReceived: onNextReceived,
-    onEndReceived: onEndReceived,
-    subscriptions: ['answer', 'next', 'end']
+    subscriptions: ['answer', 'next']
   })
 })
 </script>

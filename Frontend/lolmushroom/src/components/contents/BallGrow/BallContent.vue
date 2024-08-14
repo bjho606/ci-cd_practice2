@@ -1,30 +1,27 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { useBallStore } from '@/stores/ballStore'
 import BlueBallComponent from '@/components/contents/BallGrow/BlueBallComponent.vue'
 import GreenBallComponent from '@/components/contents/BallGrow/GreenBallComponent.vue'
 
+const ballStore = useBallStore()
 const props = defineProps({
-  ball: Object,
   isMain: Boolean,
-  isGreen: Boolean
+  groupId: String
 })
 
-const ballSize = computed(() => props.ball.size)
-const _isMain = computed(() => props.isMain)
-const groupName = ref("그룹이름!!!");
-
-const _isGreen = computed(() => props.isGreen)
-
-const containerClass = computed(() => (_isMain.value ? 'main-container' : 'sub-container'))
-const ballClass = computed(() => (_isMain.value ? 'main-ball' : 'group-ball'))
+const isMine = computed(() => ballStore.getIsMyBall(props.groupId))
+const groupName = computed(() => ballStore.getCurrentGroupName(props.groupId))
+const currentSize = computed(() => ballStore.getBallSize(props.groupId))
+const containerClass = computed(() => (props.isMain ? 'main-container' : 'sub-container'))
 </script>
 
 <template>
   <div :class="containerClass">
     <div class="ball-name">{{ groupName }}</div>
     <div class="ball-container">
-      <GreenBallComponent v-if="_isGreen" :class="ballClass" :health="ballSize" :isMain="_isMain"/>
-      <BlueBallComponent v-else :class="ballClass" :health="ballSize" :isMain="_isMain"/>
+      <GreenBallComponent v-if="isMine" :health="currentSize" :isMain="isMain" />
+      <BlueBallComponent v-else :health="currentSize" :isMain="isMain" />
     </div>
   </div>
 </template>
@@ -36,7 +33,7 @@ const ballClass = computed(() => (_isMain.value ? 'main-ball' : 'group-ball'))
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FFF2F7;
+  background-color: #fff2f7;
   border: 1px solid black;
   border-radius: 20px;
 }

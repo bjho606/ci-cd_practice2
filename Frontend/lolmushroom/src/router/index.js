@@ -3,7 +3,7 @@ import MakeSessionView from '@/views/MakeSessionView.vue'
 import RoomWatching from '@/components/room/managerWaiting/RoomWatching.vue'
 import MultiRoom from '@/components/room/MultiRoom.vue'
 import ManagerWaiting from '@/components/room/ManagerWaiting.vue'
-import PlayerSetting from '@/components/room/playerWaiting/PlayerSetting.vue'
+import PlayerMain from '@/components/room/playerWaiting/PlayerMain.vue'
 import RoomWaiting from '@/components/room/RoomWaiting.vue'
 import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
@@ -43,7 +43,7 @@ const routes = [
     path: '/:sessionId',
     component: PlayerView,
     children: [
-      { path: '', name: 'mainSession', component: PlayerSetting },
+      { path: '', name: 'mainSession', component: PlayerMain },
       { path: ':subSessionId/roomwaiting', name: 'roomwaiting', component: RoomWaiting },
       {
         path: ':subSessionId/GroupSessionView',

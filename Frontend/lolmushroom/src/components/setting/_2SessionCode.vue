@@ -7,8 +7,16 @@ const sessionStore = useSessionStore()
 const sessionURL = computed(() => sessionStore.getSessionUrl)
 
 const copyToClipboard = () => {
-  navigator.clipboard.writeText(sessionURL.value)
+  navigator.clipboard
+    .writeText(sessionURL.value)
+    .then(() => {
+      alert('🔗 링크 복사 완료! 이제 붙여넣기만 하면 마법이 일어납니다! ✨')
+    })
+    .catch(() => {
+      alert('😅 어이쿠! 복사에 실패했어요. 다시 시도해 주세요.')
+    })
 }
+
 const closeWindow = () => {
   window.close()
 }
@@ -22,7 +30,7 @@ const closeWindow = () => {
         <h3 class="title">QR코드를 공유하세요</h3>
         <qrcode-vue :value="sessionURL" :size="150" level="H" />
         <div class="text-over-line">
-          <p class="subtext">방링크도 공유할 수 있어요</p>
+          <p class="subtext">방링크를 공유할 수 있어요</p>
         </div>
         <div class="link-container">
           <input v-model="sessionURL" class="link-input" readonly />
@@ -43,7 +51,7 @@ const closeWindow = () => {
 
 <style scoped>
 .code-page {
-  height: 90vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
