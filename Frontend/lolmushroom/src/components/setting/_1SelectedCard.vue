@@ -25,12 +25,12 @@ const onRemoveClick = () => {
 .content-card {
   position: relative;
   width: 120px;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 1px solid rgb(196, 196, 196);
   transition: transform 0.2s;
 }
 
@@ -38,19 +38,7 @@ const onRemoveClick = () => {
   transform: scale(1.02);
 }
 
-.thumbnail {
-  width: 90%;
-  height: auto;
-  border-radius: 5px;
-}
-
-.content-info {
-  display: flex;
-  font-size: 11px;
-  margin-top: 5px;
-  justify-content: center;
-}
-
+/* 기본적으로 삭제 버튼 숨김 */
 .delete-btn {
   position: absolute;
   top: -7px;
@@ -66,5 +54,24 @@ const onRemoveClick = () => {
   line-height: 24px;
   text-align: center;
   padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* content-card가 hover 상태일 때 삭제 버튼 표시 */
+.content-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.thumbnail {
+  width: 90%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.content-info {
+  display: flex;
+  font-size: 11px;
+  justify-content: center;
 }
 </style>

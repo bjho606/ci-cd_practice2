@@ -23,8 +23,8 @@ const onAddClick = () => {
 
 <template>
   <div class="item-content" @click="onPickClick">
-    <v-icon class="item-icon">{{ item.icon }}</v-icon>
-    <span class="item-text">
+    <span style="font-weight: bolder; margin-right: 2%;">🕸</span>
+    <span class="item-text" style="font-weight: bolder">
       {{ item.contentTitle }}
     </span>
     <span v-if="isItemSelected" class="selected-text">선택 완료</span>
@@ -41,11 +41,10 @@ const onAddClick = () => {
   <v-dialog v-model="isDialogVisible" max-width="350">
     <v-card>
       <v-card-title class="headline justify-center">
-        <v-icon left color="green darken-2">mdi-leaf</v-icon>
-        잠시만요!
+        <h2>🚧 잠시만요! 🚧</h2>
       </v-card-title>
       <v-card-text class="text-center">
-        🌱 이 컨텐츠는 아직 준비 중이에요. <br />조금만 기다려 주세요!
+        <h3>이 컨텐츠는 아직 공사 중입니다. <br />조금만 기다려 주세요!</h3>
       </v-card-text>
       <v-card-actions class="justify-center">
         <v-btn color="green darken-2" text @click="isDialogVisible = false"> 확인 </v-btn>
@@ -58,7 +57,7 @@ const onAddClick = () => {
 .item-content {
   display: flex;
   align-items: center;
-  background-color: #b3d879;
+  background-color: #abed93;
   border-radius: 20px;
   padding: 10px 20px;
   margin-bottom: 10px;
@@ -104,8 +103,8 @@ const onAddClick = () => {
 }
 
 .item-add.disabled {
-  background-color: #e0e0e0;
-  color: #a0a0a0;
+  background-color: #727272;
+  color: #ffffff;
   cursor: not-allowed;
 }
 
@@ -113,4 +112,14 @@ const onAddClick = () => {
   background-color: #e0e0e0;
   color: #a0a0a0;
 }
+
+.headline {
+  margin-top: 4%;
+  text-align: center;
+}
+
+.justify-center{
+  margin-bottom: 5%;
+}
+
 </style>
