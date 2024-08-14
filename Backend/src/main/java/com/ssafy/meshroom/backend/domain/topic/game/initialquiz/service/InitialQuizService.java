@@ -79,7 +79,7 @@ public class InitialQuizService {
     public Response<AllIniQuizInfosResponse> getAllIniQuizInfos(String sessionId) {
         List<InitialQuizInfo> initialQuizInfoList = initialQuizRepository.findAllBySessionId(sessionId)
                 .orElseThrow(() -> new RuntimeException("해당 세션ID이 없습니다."));
-        log.info("true or false info : " + initialQuizInfoList.stream().toString());
+        log.info("initial quiz info : " + initialQuizInfoList.stream().toString());
 
         List<IniQuizInfoResponse> allIniQuizInfos = initialQuizInfoList.stream()
                 .map(IniQuizInfoResponse::from)
@@ -90,11 +90,13 @@ public class InitialQuizService {
         );
     }
 
-    public boolean isGuessWordCorrect(String mainSessionId, String subSessionId, String guessWord) {
-        String redisKey = "ini-quiz:" + subSessionId;
+    public boolean isGuessWordCorrect(String mainSessionId, String subSessionId, String ownerOvToken, String guessWord) {
+        String redisKey = "iq-" + subSessionId + "-" + ownerOvToken;
         String answerWord = wordRedisTemplate.opsForValue().get(redisKey);
 
         if (answerWord == null || guessWord == null) return false;
+
+        log.info("answer : " + answerWord + " / received : " + guessWord);
 
         boolean result = answerWord.equals(guessWord);
 
