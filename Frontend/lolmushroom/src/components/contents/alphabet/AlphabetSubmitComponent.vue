@@ -51,7 +51,7 @@
       const object = {
         ovToken: userStore.userOvToken,
         categoryName: categoryName['data']['result']['categoryName'],
-        quizWord: quizWord.value,
+        quizWord: quizWord.value.trim(),
       }
       const response = await contentsAPI.createQuizWord(sessionStore.sessionId, sessionStore.subSessionId, object)
       console.log(response)

@@ -38,15 +38,26 @@
       const data = {
         ovToken: userStore.userOvToken,
         userName: userStore.userName,
-        guessWord: guessWord.value
+        guessWord: guessWord.value.trim()
       }
       webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
       guessWord.value = ''
     }
   }
 
+  // 랜덤 색상 생성 함수
+  const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
   // 다른 사용자의 정답을 구독
   const onAnswerReceived = (event) => {
+    console.log(event, '정답 찾기')
     const { ovToken, result, submittedWord, userName } = event
     const wordData = {
       word: submittedWord,
@@ -54,7 +65,8 @@
       left: Math.random(),
       // 10% ~ 90% 사이의 랜덤 위치
       initialTop: Math.random() * 80 + 10 + '%', 
-      initialLeft: Math.random() * 80 + 10 + '%'
+      initialLeft: Math.random() * 80 + 10 + '%',
+      color: generateRandomColor()
     }
     guessWords.value.push(wordData)
     
@@ -111,7 +123,8 @@
               '--initial-top': wordData.initialTop,
              '--initial-left': wordData.initialLeft,
              '--random-top': wordData.top,
-             '--random-left': wordData.left
+             '--random-left': wordData.left,
+             color: wordData.color
             }">
         <h1>{{ wordData.word }}</h1>
       </div>
