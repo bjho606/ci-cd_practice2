@@ -135,12 +135,6 @@ const onNextReceived = (_event) => {
   }
 }
 
-const onEndReceived = (event) => {
-  console.log('완료')
-  // const { sessionId } = event
-  // router.push({ name: 'roomwaiting', params: { sessionId } });
-}
-
 const getCardColor = (key, isHovering) => {
   if (selectedAnswer.value === key) {
     return '#24A319'
@@ -188,8 +182,7 @@ onMounted(async () => {
     contentsName: 'tf',
     onEventReceived: onAnswerReceived,
     onNextReceived: onNextReceived,
-    onEndReceived: onEndReceived,
-    subscriptions: ['answer', 'next', 'end']
+    subscriptions: ['answer', 'next']
   })
 })
 </script>

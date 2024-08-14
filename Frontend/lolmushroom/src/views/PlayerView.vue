@@ -8,7 +8,7 @@ import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
-import SetName from '@/components/room/playerWaiting/SetName.vue'
+import SetName from '@/components/room/playerWaiting/setName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
 
 const route = useRoute()
@@ -63,6 +63,9 @@ const onSessionEventReceived = (message) => {
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
 }
+const onFinishEventReceived = (message) => {
+  contentsStore.fetchCurrentContentsState(message)
+}
 
 /**
  * IMP 3. PlayerView에 처음 들어왔을 때, Session의 상태를 가져오는 getSessionInfo API 호출
@@ -95,7 +98,8 @@ const userFlowHandler = async () => {
     onMessageReceived: onMainSessionMessageReceived,
     onEventReceived: onSessionEventReceived,
     onProgressReceived: onProgressEventReceived,
-    subscriptions: ['chat', 'session', 'progress']
+    onFinishReceived: onFinishEventReceived,
+    subscriptions: ['chat', 'session', 'progress', 'finish']
   })
 }
 
@@ -116,7 +120,8 @@ onMounted(() => {
       onMessageReceived: onMainSessionMessageReceived,
       onEventReceived: onSessionEventReceived,
       onProgressReceived: onProgressEventReceived,
-      subscriptions: ['chat', 'session', 'progress']
+      onFinishReceived: onFinishEventReceived,
+      subscriptions: ['chat', 'session', 'progress', 'finish']
     })
 
     /**

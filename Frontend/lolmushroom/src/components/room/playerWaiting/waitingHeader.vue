@@ -47,7 +47,7 @@ const props = defineProps({
 }
 .second {
   background-color: #ceffbc;
-  font-size: x-large;
+  font-size: large;
 }
 .third {
   border-radius: 0px 5px 5px 0px;

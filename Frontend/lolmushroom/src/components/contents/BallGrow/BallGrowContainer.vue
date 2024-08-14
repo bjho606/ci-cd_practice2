@@ -3,10 +3,15 @@ import { onMounted, computed } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import watingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
+
+
+import WaitingHeader from '@/components/room/playerWaiting/waitingHeader.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 
+const firstDescription = "공 키우기"
+const secondDescription = "우리 그룹의 공을 최대한 크게 만드세요!"
+const thirdDescription = "Tip: 클릭 대신 스페이스바를 누를 수 있답니다 !"
 const roomStore = useRoomStore()
 const ballStore = useBallStore()
 const sessionStore = useSessionStore()
@@ -32,15 +37,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <watingHeader />
+  <WaitingHeader :first-description="firstDescription" :second-description="secondDescription" :third-description="thirdDescription"/>
   <div class="main-container">
     <div class="content-container">
-      <div class="left-container">
+      <!-- <div class="left-container">
         <BallMain />
       </div>
       <div class="right-container">
         <BallGroup />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
