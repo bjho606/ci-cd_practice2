@@ -139,7 +139,7 @@ public class InitialQuizEventHandler {
                                                            IniQuizAnswerRequestSignal iniQuizAnswerRequestSignal) {
         log.info("guess quiz signal received : " + mainSessionId + "/" + subSessionId + " - " + iniQuizAnswerRequestSignal.toString());
 
-        boolean guessResult = initialQuizService.isGuessWordCorrect(mainSessionId, subSessionId, iniQuizAnswerRequestSignal.getGuessWord());
+        boolean guessResult = initialQuizService.isGuessWordCorrect(mainSessionId, subSessionId, iniQuizAnswerRequestSignal.getOwnerOvToken(), iniQuizAnswerRequestSignal.getGuessWord());
 
         IniQuizAnswerResponseSignal iniQuizAnswerResponseSignal = new IniQuizAnswerResponseSignal();
         iniQuizAnswerResponseSignal.setOvToken(iniQuizAnswerRequestSignal.getOvToken());
