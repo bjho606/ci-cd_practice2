@@ -116,7 +116,7 @@ const onAnswerReceived = (event) => {
   }
 }
 
-const onNextReceived = (_event) => {
+const onNextReceived = async (_event) => {
   if (index.value < store.totalUserCount - 1) {
     selectedAnswer.value = null
     isSubmitAnswer.value = false
@@ -124,14 +124,8 @@ const onNextReceived = (_event) => {
     store.submitUserCount = 0
     index.value++
     timeUp('')
-  } else {
-    router.push({
-      name: 'mainSession',
-      params: {
-        sessionId: sessionStore.sessionId,
-        subSessionId: sessionStore.subSessionId
-      }
-    })
+  } else if (store.targetUserToken === userStore.userOvToken) {
+    await contentsAPI.finishContents(sessionStore.subSessionId)
   }
 }
 
@@ -158,21 +152,6 @@ watch(index, (newIndex, oldIndex) => {
     }
   }
 })
-
-watch(
-  () => contentsStore.currentGroupState,
-  (newState) => {
-    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
-
-    if (group && group.isFinish) {
-      router.push({
-        name: 'mainSession',
-        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-      })
-    }
-  },
-  { deep: true } // Ensure the watcher detects nested changes within the array
-)
 
 onMounted(async () => {
   console.log('연결 좀...')

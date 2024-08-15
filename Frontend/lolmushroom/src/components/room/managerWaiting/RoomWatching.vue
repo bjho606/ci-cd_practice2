@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useBallStore } from '@/stores/ballStore'
 import { useContentsStore } from '@/stores/contentsStore'
@@ -16,6 +17,7 @@ import ManagerFooter from './ManagerFooter.vue'
 import FooterStart from './FooterStart.vue'
 import FooterShare from './FooterShare.vue'
 
+const router = useRouter()
 const alphabetStore = useAlphabetStore()
 const ballStore = useBallStore()
 const contentsStore = useContentsStore()
@@ -55,12 +57,16 @@ const callNextContents = async (isStart) => {
  * IMP 2.1 하위 Component는 v-if에 따라 보여주는 정보가 다르게 되고, 받는 정보가 달라진다.
  */
 const socketMapping = computed(() => contentsStore.getSocketMapping)
+const routeMapping = computed(() => contentsStore.getRouteMapping)
 watch(currentContents, (newContentsId, oldContentsId) => {
   if (oldContentsId) {
     webSocketAPI.unsubscribeGame(socketMapping.value[oldContentsId])
   }
   if (newContentsId) {
     switch (newContentsId) {
+      case '0':
+        router.push({ name: 'Ending' })
+        break
       case '1':
         TOFStore.initSocketConnection(sessionStore.sessionId, groups.value)
         break

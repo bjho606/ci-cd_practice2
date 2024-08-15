@@ -21,6 +21,7 @@ export const useContentsStore = defineStore('contents', {
     totalDuration: 0,
 
     routeMapping: {
+      0: 'Ending',
       1: 'TOF',
       2: null,
       3: null,

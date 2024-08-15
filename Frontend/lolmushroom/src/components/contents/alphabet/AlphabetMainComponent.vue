@@ -1,20 +1,12 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
-import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
 import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
-import ContentsLoading from '../ContentsLoading.vue'
 import CountDownComponent from '@/components/contents/CountDownComponent.vue'
 
-const router = useRouter()
 const userStore = useUserStore()
-const contentsStore = useContentsStore()
-const contentsInfo = contentsStore.contents[3]
-const showLoading = ref(false)
-
 const sessionStore = useSessionStore()
 const isTimeUp = ref()
 const counting = ref(true)
@@ -105,18 +97,8 @@ watch(index, async (newIndex) => {
       isCorrected.value = false
     }, 3000)
     return
-  } else if (turn.ownerOvToken === userStore.userOvToken) {
+  } else if (turn.ownerOvToken === userStore.userOvToken)
     await contentsAPI.finishContents(sessionStore.subSessionId)
-    router.push({
-      name: 'mainSession',
-      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-    })
-  } else {
-    router.push({
-      name: 'mainSession',
-      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-    })
-  }
 })
 
 onMounted(async () => {
@@ -128,15 +110,6 @@ onMounted(async () => {
     onEventReceived: onGuessReceived,
     subscriptions: ['guess']
   })
-  const hasShownLoading = localStorage.getItem('hasShownLoading')
-  if (!hasShownLoading) {
-    showLoading.value = true
-    localStorage.setItem('hasShownLoading', 'true')
-
-    setTimeout(() => {
-      showLoading.value = false
-    }, 5000) // 5초 동안 모달을 표시
-  }
 })
 </script>
 
@@ -144,9 +117,6 @@ onMounted(async () => {
   <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
-  <v-dialog v-model="showLoading" persistent max-width="1200">
-    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
-  </v-dialog>
   <div class="container" v-show="isTimeUp && !isCorrected">
     <div class="statusContainer">
       <div class="info">

@@ -14,6 +14,7 @@ import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
 import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
+import EndPage from '@/components/contents/EndPage.vue'
 
 const routes = [
   {
@@ -61,6 +62,11 @@ const routes = [
         ]
       }
     ]
+  },
+  {
+    path: '/Ending',
+    name: 'Ending',
+    component: EndPage
   }
 ]
 
