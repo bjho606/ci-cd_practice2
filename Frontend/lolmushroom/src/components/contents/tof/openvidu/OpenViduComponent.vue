@@ -14,10 +14,11 @@
 
   const mic = ref(true)
   const video = ref(true)
-
+  const videoContainer = ref(null)
   const userStore = useUserStore()
   const sessionStore = useSessionStore()
   const store = useTOFStore()
+  const ovToken = ref(null)
 
   const state = reactive({
     // OpenVidu 관련 상태 관리
@@ -28,8 +29,10 @@
     subscribers: [],
   })
 
-  // Join form 관리
-  const mySessionId = ref('SessionA')   // 방 이름을 session에
+  const assignVideoId = (subscriber) => {
+    const userId = subscriber.stream.connection.data
+    subscriber.element.id = userId
+  }
 
   const joinSession = async () => {
     // --- 1) OpenVidu 객체 얻기 ---
@@ -46,9 +49,13 @@
     // 스트림이 받아질 때..
     state.session.on('streamCreated', ({ stream }) => {
       console.log('Stream created:', stream);  // 스트림 생성 로그
-      const subscriber = state.session.subscribe(stream);
+      // 비디오는 이 때 렌더링
+      const subscriber = state.session.subscribe(stream, 'video-container');
+      ovToken.value = stream.connection.data
       console.log('Subscriber added:', subscriber);  // 구독자 추가 로그
       state.subscribers.push(subscriber);
+
+      // assignVideoId(subscriber);
     })
 
     // 스트림이 파괴될 때...
@@ -69,12 +76,12 @@
     // --- 4) 유효한 토큰으로 세션에 연결함 ---
     // const token = await getToken(sessionStore.subSessionId)
     const token = userStore.userOvToken
-    state.session.connect(token, { clientData: userStore.userName })
+    state.session.connect(token, { clientData: userStore.userOvToken })
       .then(() => {
         console.log('Session connected successfully');
   
         // --- 5) 속성과 함께 카메라 정의 ---
-        const pub = state.OV.initPublisher(undefined, {
+        const pub = state.OV.initPublisher('video-container', {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
           publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
@@ -88,6 +95,8 @@
         // 웹캠을 보여주고 퍼블리셔를 저장하는 메인 비디오를 설정
         state.mainStreamManager = pub
         state.publisher = pub
+        
+        ovToken.value = userStore.userOvToken
         
         // --- 6) 스트림 발행 ---
         state.session.publish(state.publisher)
@@ -112,63 +121,83 @@
     window.removeEventListener('beforeunload', leaveSession)
   }
 
-  const updateMainVideoStreamManager = (stream) => {
-    if (state.mainStreamManager === stream) return
-    state.mainStreamManager = stream
-
-    // 
-    state.subscribers.forEach(subscriber => {
-      if (subscriber === state.mainStreamManager) {
-        subscriber.publishAudio(true)
-      } else {
-        subscriber.publishAudio(false)
-      }
-    })
-
-    if (state.publisher === state.mainStreamManager) {
-      state.publisher.publishAudio(true)
-    } else {
-      state.publisher.publishAudio(false)
-    }
-  }
-
   watch(() => store.targetUserToken, (newToken) => {
-    const targetStream = state.subscribers.find(
-      sub => {
-        sub.stream.connection.data === `"${newToken}"`
+    // console.log(store.targetUserToken, newToken, '이규석')
+    // const userVideo = document.querySelector('UserVideo');
+    // if (userVideo.id === newToken) {
+    //   userVideo.style.display = 'block';  // 해당 UserVideo를 표시
+    // } else {
+    //   userVideo.style.display = 'none';  // UserVideo를 숨김
+    // }
+
+    const videos = videoContainer.value.querySelectorAll('video');
+    videos.forEach((video) => {
+      console.log(video.id)
+      if (video.id === newToken) {
+        video.style.display = 'block';  // 해당 video를 표시
+      } else {
+        video.style.display = 'none';  // 다른 video는 숨김
       }
-    );
-    
-    if (targetStream) {
-      updateMainVideoStreamManager(targetStream);
-    }
+    });
   });
 
   const toggleMic = () => {
     mic.value = !mic.value
     state.publisher.publishAudio(mic.value)
+
+    state.subscribers.forEach(subscriber => {
+      subscriber.subscribeToAudio(mic.value)
+    })
   }
 
   const toggleVideo = () => {
     video.value = !video.value
+    // 여기에 내 비디오만 변화하도록 수정한다.
     state.publisher.publishVideo(video.value)
 
     state.subscribers.forEach(subscriber => {
       subscriber.subscribeToVideo(video.value)
     })
-
-    if (video.value) {
-      state.mainStreamManager = state.publisher
-    } else {
-      state.mainStreamManager = null
-    }
   }
 
+const extractWebSocketURL = (data) => {
+  const regex = /wss:\/\/[^\s"]+/;
+  const match = data.match(regex);
+  return match ? match[0] : null;
+}
 
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
-    window.addEventListener('beforeunload', leaveSession)
-    joinSession()
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          const newVideos = mutation.addedNodes;
+          newVideos.forEach((node) => {
+            if (node.tagName === 'VIDEO') {
+              ovToken.value = extractWebSocketURL(ovToken.value)
+              node.id = ovToken.value;
+              ovToken.value = ''
+              
+              console.log(node.id, '이게 사람id')
+              console.log(store.targetUserToken, '이게 토큰')
+              // 렌더링 완료 후 store.targetUserToken 값과 id가 일치하는 비디오만 표시
+              if (node.id === store.targetUserToken) {
+                node.style.display = 'block';  // 해당 video를 표시
+              } else {
+                node.style.display = 'none';  // 다른 video는 숨김
+              }
+            }
+          });
+        }
+      });
+    });
+
+  observer.observe(videoContainer.value, { childList: true });
+
+  window.addEventListener('beforeunload', leaveSession)
+  joinSession()
+
   })
 
   // 컴포넌트가 언마운트될 때 실행
@@ -179,12 +208,7 @@
 
 <template>
   <div id="session">
-    <div id="session-header">
-      <!-- <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession"
-        value="Leave session" /> -->
-    </div>
     <div id="main-video" class="col-md-6">
-      <UserVideo :stream-manager="state.mainStreamManager" />
       <div class="d-flex">
         <div v-if="store.targetUserToken === userStore.userOvToken"> 
           <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
@@ -194,10 +218,9 @@
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
-    <div id="video-container" class="col-md-6">
-      <UserVideo :stream-manager="state.publisher"/>
-      <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
+    <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
+    <div id="video-container" class="col-md-6" ref="videoContainer">
+      <!-- <UserVideo :stream-manager="state.mainStreamManager" /> -->
     </div>
   </div>
 </template>

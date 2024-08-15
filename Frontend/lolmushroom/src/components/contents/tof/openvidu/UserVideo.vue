@@ -1,7 +1,9 @@
 <script setup>
   import { computed } from 'vue';
   import OvVideo from './OvVideo.vue';
+  import { useUserStore } from '@/stores/userStore';
 
+  const userStore = useUserStore()
   // props 선언
   const props = defineProps({
     streamManager: Object,
@@ -22,7 +24,7 @@
 
 <template>
   <div v-if="props.streamManager" class="d-flex" style="justify-content: center;">
-    <ov-video :stream-manager="props.streamManager"/>
+    <ov-video :stream-manager="props.streamManager" :id="userStore.userOvToken"/>
     <div><p>{{ clientData }}</p></div>
   </div>
 </template>

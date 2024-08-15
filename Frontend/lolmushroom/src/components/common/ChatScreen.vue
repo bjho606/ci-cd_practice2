@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useChatStore } from '@/stores/chatStore'
 import avatarImg from '@/assets/image/chatIcon.png'
+import chat from '@/assets/image/chat.jpg'
 import webSocketAPI from '@/api/webSocket'
 import { useRoomStore } from '@/stores/roomStore'
 
@@ -77,7 +78,7 @@ const sendMessage = () => {
       <v-card min-width="300" min-height="300" max-height="500" overflow-y: auto>
         <v-list>
           <v-list-item
-            prepend-avatar="src/assets/image/chat.jpg"
+            :prepend-avatar="chat"
             :subtitle="currentSubtitle"
             :title="currentTitle"
           >
