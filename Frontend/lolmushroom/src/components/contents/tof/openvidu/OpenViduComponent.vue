@@ -46,17 +46,21 @@
 
     // 스트림이 받아질 때..
     state.session.on('streamCreated', ({ stream }) => {
-      const subscriber = state.session.subscribe(stream)
-      state.subscribers.push(subscriber)
+      console.log('Stream created:', stream);  // 스트림 생성 로그
+      const subscriber = state.session.subscribe(stream);
+      console.log('Subscriber added:', subscriber);  // 구독자 추가 로그
+      state.subscribers.push(subscriber);
     })
 
     // 스트림이 파괴될 때...
     state.session.on('streamDestroyed', ({ stream }) => {
-      const index = state.subscribers.indexOf(stream.streamManager, 0)
+      console.log('Stream destroyed:', stream);  // 스트림 파괴 로그
+      const index = state.subscribers.indexOf(stream.streamManager, 0);
       if (index >= 0) {
-        state.subscribers.splice(index, 1)
-      }
-    })
+        state.subscribers.splice(index, 1);
+        console.log('Subscriber removed at index:', index);  // 구독자 제거 로그
+        }
+      })
 
     // 모든 비동기 에러에 대해...
     state.session.on('exception', ({ exception }) => {
@@ -68,7 +72,9 @@
     const token = userStore.userOvToken
     state.session.connect(token, { clientData: userStore.userName })
       .then(() => {
-        // --- 5) Get your own camera stream with the desired properties ---
+        console.log('Session connected successfully');
+  
+        // --- 5) 속성과 함께 카메라 정의 ---
         const pub = state.OV.initPublisher(undefined, {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
@@ -146,10 +152,15 @@
   const toggleVideo = () => {
     video.value = !video.value
     state.publisher.publishVideo(video.value)
-    if (state.mainStreamManager) {
-      state.mainStreamManager = ''
-    } else {
+
+    state.subscribers.forEach(subscriber => {
+      subscriber.subscribeToVideo(video.value)
+    })
+
+    if (video.value) {
       state.mainStreamManager = state.publisher
+    } else {
+      state.mainStreamManager = null
     }
   }
 
@@ -182,9 +193,9 @@
         <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
-      {{ store.targetUserToken }}
     </div>
-    <div id="video-container" class="col-md-6" style="display: none;">
+    <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
+    <div id="video-container" class="col-md-6">
       <UserVideo :stream-manager="state.publisher"/>
       <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
     </div>
