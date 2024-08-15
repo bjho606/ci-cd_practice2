@@ -83,7 +83,7 @@ const onSubmitEvent = (_data, _sessionId) => {
 // 모든 사람이 준비되었을 때 TOF main으로 이동하는 함수
 const goToTOFMain = () => {
   if (store.submitUserCount === store.totalUserCount) {
-    store.submitUserCount = 0
+    store.submitUserClear()
     router.push({ name: 'TOFContent' })
   }
 }
@@ -308,9 +308,5 @@ v-text-field {
 .warning-alert {
   display: flex;
   justify-content: center;
-}
-
-* {
-  background: #e7ffde;
 }
 </style>

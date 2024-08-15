@@ -174,12 +174,14 @@
     </div>
     <div id="main-video" class="col-md-6">
       <UserVideo :stream-manager="state.mainStreamManager" />
-      <div v-if="store.targetUserToken === userStore.userOvToken">
-        <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
-        <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
+      <div class="d-flex">
+        <div v-if="store.targetUserToken === userStore.userOvToken"> 
+          <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
+          <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
+        </div>
+        <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
+        <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
-      <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
-      <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       {{ store.targetUserToken }}
     </div>
     <div id="video-container" class="col-md-6" style="display: none;">

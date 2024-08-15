@@ -251,6 +251,7 @@ onMounted(() => {
 
 .main-content {
   height: 100%; /* 100% 높이 설정 */
+  background: #E7FFDE;
 }
 
 .sub-content {
