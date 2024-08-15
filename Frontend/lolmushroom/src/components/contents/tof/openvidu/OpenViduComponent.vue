@@ -194,8 +194,8 @@
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    <div id="video-container" class="col-md-6" style="display: none;">
-    <!-- <div id="video-container" class="col-md-6"> -->
+    <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
+    <div id="video-container" class="col-md-6">
       <UserVideo :stream-manager="state.publisher"/>
       <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
     </div>
