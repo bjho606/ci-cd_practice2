@@ -151,7 +151,7 @@ onMounted(async () => {
         <input
           v-html="guessWord"
           class="inputText"
-          placeholder="카테고리에 관한 입력을 해주세요!"
+          :placeholder="turn.ownerOvToken === userStore.userOvToken ? '정답을 입력 해주세요.' : '힌트를 줄 수 있습니다.'"
           v-model="guessWord"
           @keyup.enter="publishGuess()"
         />
