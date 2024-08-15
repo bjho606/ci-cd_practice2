@@ -69,7 +69,7 @@ onMounted(() => {
       clearInterval(intervalId)
     }
   }, 1000)
-  window.addEventListener('keyup', handleKeydown)
+  window.addEventListener('keyup', handleKeyup)
 })
 
 onBeforeUnmount(() => {

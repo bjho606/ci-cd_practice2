@@ -1,15 +1,14 @@
+<!-- eslint-disable no-undef -->
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useBallStore } from '@/stores/ballStore'
 import BallContent from './BallContent.vue'
 
-
-const allBalls = ballStore.getTotalBalls;
-
+const ballStore = useBallStore()
+const allBalls = computed(() => ballStore.getTotalBalls)
 const winnerGroup = computed(() => {
-  return allBalls.value.reduce(
-    (max, group) => (group.size > max.size ? group : max),
-    allBalls.value[0]
-  )
+  console.log(allBalls.value)
+  return allBalls.value[0]
 })
 
 function firework() {
@@ -58,7 +57,7 @@ onMounted(() => {
 <template>
   <div class="results-container">
     <div class="result-header"><h1>우승 그룹!</h1></div>
-    <BallContent :ball="winnerGroup.size" :is-main="true" :is-green="false" />
+    <BallContent :isMain="true" :groupId="winnerGroup.sessionId" />
   </div>
 </template>
 
