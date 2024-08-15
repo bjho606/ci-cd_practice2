@@ -42,17 +42,17 @@ const props = defineProps({
 }
 .first {
   border-radius: 5px 0px 0px 5px;
-  background-color: #90ff77;
+  background-color: #74C69D;
   font-size: x-large;
   font-weight: bold;
 }
 .second {
-  background-color: #ceffbc;
+  background-color: #95D5B2;
   font-size: large;
 }
 .third {
   border-radius: 0px 5px 5px 0px;
-  background-color: #e7ffde;
+  background-color: #B7E4C7;
   font-size: small;
 }
 .content-wrapper {

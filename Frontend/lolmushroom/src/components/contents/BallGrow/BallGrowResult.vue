@@ -72,4 +72,8 @@ onMounted(() => {
   box-sizing: border-box;
   padding: 20px;
 }
+
+.result-header{
+  margin-bottom: 2%;
+}
 </style>

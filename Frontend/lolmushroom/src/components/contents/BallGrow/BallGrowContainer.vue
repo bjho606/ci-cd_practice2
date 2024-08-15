@@ -87,7 +87,7 @@ onMounted(() => {
 
 <style scoped>
 .main-container {
-  background-color: #e7ffde;
+  background-color: #D8F3DC;
   align-items: center;
   height: 100%; /* 화면 전체 높이를 차지 */
   /* 드래그블 방지 */

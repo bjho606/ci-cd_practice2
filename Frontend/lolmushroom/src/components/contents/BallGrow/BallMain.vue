@@ -38,9 +38,11 @@ const addClickEffect = (event) => {
 }
 
 // ballClick을 할 시 ballStore로 데이터를 전송한다.
-const onBallClick = () => {
+const onBallClick = (event) => {
+  addClickEffect(event)
   ballStore.onBallClick(sessionStore.sessionId, currentGroup.value)
 }
+
 // 다시 자신의 공으로 돌아온다.
 const onReturnClick = () => {
   ballStore.onReturnClick()
@@ -57,7 +59,7 @@ const handleKeyup = (event) => {
       const audio = new Audio(swooshSound)
       audio.play()
     }
-    onBallClick()
+    onBallClick(event)
   }
 }
 
@@ -78,8 +80,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="center-wrapper" @click="addClickEffect">
-    <v-btn class="remainTime">남은 시간: {{ RemainTime }}초</v-btn>
+  <div class="center-wrapper">
+    <div class="remainTime">남은 시간 : {{ RemainTime }} 초</div>
     <BallContent :isMain="true" :groupId="currentGroup" @click="onBallClick" />
     <v-btn v-if="!isMine" class="backToMyGroup" @click="onReturnClick">내 그룹으로 돌아가기</v-btn>
     <div
@@ -88,7 +90,7 @@ onBeforeUnmount(() => {
       class="click-effect"
       :style="{ left: `${effect.x - 50}px`, top: `${effect.y - 50}px` }"
     >
-      <v-img :src="spark"></v-img>
+      <v-img :src="spark" @click="onBallClick" />
     </div>
   </div>
 </template>
@@ -127,12 +129,16 @@ onBeforeUnmount(() => {
 }
 
 .remainTime {
-  background-color: #90ff77;
+  background-color: #C5DDD6;
   width: 300px;
-  height: 60px !important;
-  margin-bottom: 20px;
+  height: 60px;
+  margin-bottom: 10%;
   border-radius: 20px;
   border: 1px black solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px; /* 글씨 크기 조정 */
 }
 
 .myBallContainer {
@@ -157,5 +163,10 @@ onBeforeUnmount(() => {
   justify-content: center;
   align-items: center;
   height: 40vh;
+}
+
+/* 이미지의 클릭 이벤트만 허용하고 부모 div는 무시하게 설정 */
+.v-img {
+  pointer-events: auto;
 }
 </style>
