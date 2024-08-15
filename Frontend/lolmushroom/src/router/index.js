@@ -16,6 +16,7 @@ import SessionCode from '@/components/setting/_2SessionCode.vue'
 import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
 import EndPage from '@/components/contents/EndPage.vue'
 
+import BallGrowResult from '@/components/contents/BallGrow/BallGrowResult.vue'
 const routes = [
   {
     path: '/',
@@ -58,6 +59,11 @@ const routes = [
             path: '',
             name: 'BallGrowContainer',
             component: BallGrowContainer
+          },
+          {
+            path: 'result',
+            name: 'BallGrowResult',
+            component: BallGrowResult
           }
         ]
       }

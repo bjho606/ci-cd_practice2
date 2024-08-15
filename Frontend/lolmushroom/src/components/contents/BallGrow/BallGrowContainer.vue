@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useBallStore } from '@/stores/ballStore'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
@@ -9,15 +10,16 @@ import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 
+const router = useRouter()
+const roomStore = useRoomStore()
 const ballStore = useBallStore()
 const contentsStore = useContentsStore()
-const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
-const contentsInfo = contentsStore.contents[6]
-const showLoading = ref(false)
 const firstDescription = '공 키우기'
 const secondDescription = '우리 그룹의 공을 최대한 크게 만드세요!'
 const thirdDescription = 'Tip: 클릭 대신 스페이스바를 누를 수 있답니다 !'
+const contentsInfo = contentsStore.contents[6]
+const showLoading = ref(false)
 
 /**
  * IMP Session Socket을 통해 활성화된 Group을 받아오고 Ball 개수 결정
@@ -29,6 +31,21 @@ const activeGroups = computed(() => {
   }))
 })
 
+watch(
+  () => contentsStore.currentGroupState,
+  (newState) => {
+    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
+    if (group && group.isFinish) {
+      router.push({
+        name: 'BallGrowResult',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
+    }
+  },
+  { deep: true }
+)
+
+// socket 연결
 onMounted(() => {
   ballStore.initSocketConnection(
     sessionStore.sessionId,

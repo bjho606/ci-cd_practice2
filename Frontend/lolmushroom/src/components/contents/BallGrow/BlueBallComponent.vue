@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
+import swooshSound from '@/assets/swoosh.mp3'
 const isBouncing = ref(false)
 const handleClick = () => {
   bounce()
@@ -7,8 +8,10 @@ const handleClick = () => {
 }
 
 function playSound() {
-  const audio = new Audio('./src/assets/swoosh.mp3')
-  audio.play()
+  const audio = new Audio(swooshSound)
+  audio.play().catch((error) => {
+    console.error('Audio playback failed:', error)
+  })
 }
 
 function bounce() {
