@@ -46,6 +46,7 @@ const getSessionConnection = async (sessionId, userName) => {
       console.log('subSession과 Connection을 성공적으로 만들어 냈습니다.')
       console.log('WebSocket 연결을 진행해 드릴게요:) Group Chatting을 즐기세요!')
       sessionStore.setSubSessionId(sessionId)
+      userStore.userOvToken = response.data.result['ovToken']
       webSocketAPI.connect({
         sessionId: sessionStore.getSubSessionId,
         onMessageReceived: onSubSessionMessageReceived,

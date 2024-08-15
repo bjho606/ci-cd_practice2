@@ -178,6 +178,13 @@ watch(
   (newState) => {
     const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
     if (group && group.isFinish) {
+      if (currentContents.value === '7') {
+        router.push({
+          name: 'BallGrowResult',
+          params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+        })
+        return
+      }
       router.push({
         name: 'mainSession',
         params: { sessionId: sessionStore.sessionId }
@@ -251,7 +258,7 @@ onMounted(() => {
 
 .main-content {
   height: 100%; /* 100% 높이 설정 */
-  background: #E7FFDE;
+  background: #e7ffde;
 }
 
 .sub-content {

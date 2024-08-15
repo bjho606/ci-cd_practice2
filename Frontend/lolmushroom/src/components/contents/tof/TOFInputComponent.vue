@@ -5,6 +5,7 @@ import { useContentsStore } from '@/stores/contentsStore'
 import { useUserStore } from '@/stores/userStore'
 import { useTOFStore } from '@/stores/tofStore'
 import { useSessionStore } from '@/stores/sessionStore'
+import TOF_Contents from '@/assets/TOF_Contents.png'
 import contentsAPI from '@/api/contents'
 import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
@@ -18,8 +19,13 @@ const store = useTOFStore()
 const sessionStore = useSessionStore()
 const contentsStore = useContentsStore()
 const showAlter = ref()
-const showLoading = ref(false)
+/**
+ * IMP : Loading Info
+ */
 const contentsInfo = contentsStore.contents[0]
+const instructionsText =
+  '1. 자기소개 4가지를 적으세요<br>2. 단, 1개는 거짓말이어야 합니다 !<br>3. 이제 다른 사람의 거짓말을 찾아봅시다 '
+const showLoading = ref(false)
 
 const statements = reactive({
   firstTrue: '',
@@ -125,21 +131,22 @@ onMounted(async () => {
     subscriptions: ['question']
   })
 
-  const hasShownLoading = localStorage.getItem('hasShownLoading_TOF')
-  if (!hasShownLoading) {
-    showLoading.value = true
-    localStorage.setItem('hasShownLoading_TOF', 'true')
-
-    setTimeout(() => {
-      showLoading.value = false
-    }, 5000) // 5초 동안 모달을 표시
-  }
+  showLoading.value = true
+  setTimeout(() => {
+    showLoading.value = false
+  }, 5000) // 5초 동안 모달을 표시
 })
 </script>
 
 <template>
   <v-dialog v-model="showLoading" persistent max-width="1200">
-    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+    <ContentsLoading
+      :contentsInfo="contentsInfo"
+      :contentsImage="TOF_Contents"
+      :instructionsText="instructionsText"
+      :time="'5'"
+      :countText="'초 후에 시작합니다!'"
+    />
   </v-dialog>
   <!-- 진술을 제출했을 때 -->
   <v-container fluid v-if="!isSubmit" style="width: 70%" class="my-5">
