@@ -14,3 +14,6 @@
 <template>
   <video autoplay />
 </template>
+
+<style scoped>
+</style>

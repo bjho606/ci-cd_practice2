@@ -6,12 +6,13 @@ let subscriptionMap = new Map() // 구독을 관리할 Map 객체
 
 const connect = ({
   sessionId,
+  subSessionId,
   contentsId,
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
+  onFinishReceived,
   onNextReceived,
-  onEndReceived,
   onConnect,
   onError,
   subscriptions // 추가된 파라미터: 구독할 리스트
@@ -23,12 +24,13 @@ const connect = ({
     // 기존 연결 상태에서 새 구독 추가
     addSubscriptions(
       sessionId,
+      subSessionId,
       contentsId,
       onMessageReceived,
       onEventReceived,
       onProgressReceived,
+      onFinishReceived,
       onNextReceived,
-      onEndReceived,
       subscriptions
     )
 
@@ -49,12 +51,13 @@ const connect = ({
       // 구독 설정 및 Join 메시지 전송 (필요한 경우에만)
       addSubscriptions(
         sessionId,
+        subSessionId,
         contentsId,
         onMessageReceived,
         onEventReceived,
         onProgressReceived,
+        onFinishReceived,
         onNextReceived,
-        onEndReceived,
         subscriptions
       )
 
@@ -87,19 +90,20 @@ const connect = ({
 
 const addSubscriptions = (
   sessionId,
+  subSessionId,
   contentsId,
   onMessageReceived,
   onEventReceived,
   onProgressReceived,
+  onFinishReceived,
   onNextReceived,
-  onEndReceived,
   subscriptions
 ) => {
   if (!stompClient || !stompClient.connected) {
     console.error('STOMP client is not connected')
     return
   }
-  
+
   if (!subscriptions || subscriptions.length === 0) {
     console.warn('No subscriptions provided')
     return
@@ -117,20 +121,29 @@ const addSubscriptions = (
       case 'progress':
         addProgressSubscription(sessionId, onProgressReceived)
         break
+      case 'finish':
+        addFinishSubscription(sessionId, onFinishReceived)
+        break
       case 'game':
         addGameSubscription(sessionId, contentsId, onEventReceived)
         break
+      case 'manageGame':
+        addManagerGameSubscription(sessionId, contentsId, onEventReceived)
+        break
       case 'question':
-        addQuestionSubscription(sessionId, onEventReceived)
+        addQuestionSubscription(sessionId, subSessionId, onEventReceived)
         break
       case 'answer':
-        addAnswerSubscription(sessionId, onEventReceived)
+        addAnswerSubscription(subSessionId, onEventReceived)
         break
       case 'next':
-        addNextSubscription(sessionId, onNextReceived)
+        addNextSubscription(sessionId, subSessionId, onNextReceived)
         break
-      case 'end':
-        addFinishSubscription(onEndReceived)
+      case 'word':
+        addWordSubscription(subSessionId, onEventReceived)
+        break
+      case 'guess':
+        addGuessSubscription(sessionId, subSessionId, onEventReceived)
         break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
@@ -197,12 +210,29 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
   }
 }
 
+// 진행자가 콘텐츠 종료를 구독하는 함수 => 이거 아님..
+const addFinishSubscription = (sessionId, onFinishReceived) => {
+  const finishKey = 'finsih'
+  if (!subscriptionMap.has(finishKey)) {
+    const finishSubscription = stompClient.subscribe(
+      `/subscribe/contents/${sessionId}/finish`,
+      (message) => {
+        console.log('Received event from Finish Subscribe', message.body)
+        if (onFinishReceived) {
+          onFinishReceived(JSON.parse(message.body))
+        }
+      }
+    )
+    subscriptionMap.set(finishKey, finishSubscription)
+  }
+}
+
 // 진술서 구독 시 내용 전달받기
-const addQuestionSubscription = (sessionId, onEventReceived) => {
+const addQuestionSubscription = (sessionId, subSessionId, onEventReceived) => {
   const questionKey = 'question'
   if (!subscriptionMap.has(questionKey)) {
     const gameSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/question/${sessionId}`,
+      `/subscribe/game/tf/question/${sessionId}/${subSessionId}`,
       (event) => {
         console.log('Received event from Subscribe - 진술서 작성')
         if (onEventReceived) {
@@ -214,11 +244,11 @@ const addQuestionSubscription = (sessionId, onEventReceived) => {
   }
 }
 
-const addAnswerSubscription = (sessionId, onEventReceived) => {
+const addAnswerSubscription = (subSessionId, onEventReceived) => {
   const answerKey = 'answer'
   if (!subscriptionMap.has(answerKey)) {
     const contentsSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/answer/${sessionId}`,
+      `/subscribe/game/tf/answer/${subSessionId}`,
       (event) => {
         console.log('Received event from Subscribe - 답변')
         if (onEventReceived) {
@@ -230,11 +260,11 @@ const addAnswerSubscription = (sessionId, onEventReceived) => {
   }
 }
 
-const addNextSubscription = (sessionId, onNextReceived) => {
+const addNextSubscription = (sessionId, subSessionId, onNextReceived) => {
   const nextKey = 'next'
   if (!subscriptionMap.has(nextKey)) {
     const contentsSubscription = stompClient.subscribe(
-      `/subscribe/game/tf/next/${sessionId}`,
+      `/subscribe/game/tf/next/${sessionId}/${subSessionId}`,
       (event) => {
         console.log('Received event fromSubscribe - 다음 발표자', event.body)
         if (onNextReceived) {
@@ -246,22 +276,39 @@ const addNextSubscription = (sessionId, onNextReceived) => {
   }
 }
 
-const addFinishSubscription = (onEndReceived) => {
-  const finishKey = 'finish'
-  if (!subscriptionMap.has(finishKey)) {
-    const finishSubscription = stompClient.subscribe(
-      '/subscribe/game/tf/finish/',
+const addWordSubscription = (subSessionId, onEndReceived) => {
+  const wordKey = 'word'
+  if (!subscriptionMap.has(wordKey)) {
+    const wordSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/word/${subSessionId}`,
       (event) => {
-        console.log(`Received event from Subscribe - 컨텐츠 종료`, event.body)
+        console.log('Received event from word')
         if (onEndReceived) {
           onEndReceived(JSON.parse(event.body))
         }
       }
     )
-    subscriptionMap.set(finishKey, finishSubscription)
+    subscriptionMap.set(wordKey, wordSubscription)
   }
 }
 
+// 초성 게임 단어 제출 및 다른 사람의 예측 단어 구독
+const addGuessSubscription = (sessionId, subSessionId, onEventReceived) => {
+  const guessKey = 'guess'
+  console.log(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`)
+  if (!subscriptionMap.has(guessKey)) {
+    const guessSubscription = stompClient.subscribe(
+      `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
+      (event) => {
+        console.log('Received event from guess')
+        if (onEventReceived) {
+          onEventReceived(JSON.parse(event.body))
+        }
+      }
+    )
+    subscriptionMap.set(guessKey, guessSubscription)
+  }
+}
 
 /**
  * IMP : ContentsId을 통해 구독을 하기 때문에, DB를 수정해야 하는 일이 생길 수 있음.
@@ -271,12 +318,9 @@ const addFinishSubscription = (onEndReceived) => {
  */
 const addGameSubscription = (sessionId, contentsId, onEventReceived) => {
   const gameKey = `game-${contentsId}`
-  console.log('Mushroom Grow Game에 입장했습니다.')
+  console.log(`${contentsId} Contents에 입장했습니다.`)
 
   if (!subscriptionMap.has(gameKey)) {
-    console.log(stompClient)
-    console.log(sessionId)
-    console.log(contentsId)
     const gameSubscription = stompClient.subscribe(
       `/subscribe/game/${contentsId}/${sessionId}`,
       (event) => {
@@ -290,15 +334,57 @@ const addGameSubscription = (sessionId, contentsId, onEventReceived) => {
   }
 }
 
-const unsubscribe = (sessionId) => {
+const addManagerGameSubscription = (sessionId, contentsId, onEventReceived) => {
+  const gameKey = `game-${contentsId}`
+  console.log(`${contentsId} Contents에 입장했습니다.`)
+
+  if (!subscriptionMap.has(gameKey)) {
+    const gameSubscription = stompClient.subscribe(
+      `/subscribe/manage/game/${contentsId}/${sessionId}`,
+      (event) => {
+        console.log(`Received event from ${contentsId} Subscribe`)
+        if (onEventReceived) {
+          onEventReceived(JSON.parse(event.body))
+        }
+      }
+    )
+    subscriptionMap.set(gameKey, gameSubscription)
+  }
+}
+
+const unsubscribeInput = (targetInput) => {
+  const key = targetInput
+  if (subscriptionMap.has(key)) {
+    const subscription = subscriptionMap.get(key)
+    subscription.unsubscribe()
+    console.log(`Unsubscribed from Contents ${targetInput}`)
+    subscriptionMap.delete(key)
+  } else {
+    console.error(`No subscription found for Contents ${targetInput}`)
+  }
+}
+
+const unsubscribeSession = (sessionId) => {
   const sessionKey = `session-${sessionId}`
   if (subscriptionMap.has(sessionKey)) {
     const subscription = subscriptionMap.get(sessionKey)
     subscription.unsubscribe()
     console.log(`Unsubscribed from session ${sessionId}`)
-    subscriptionMap.delete(sessionKey) // Map에서 해당 구독 삭제
+    subscriptionMap.delete(sessionKey)
   } else {
     console.error(`No subscription found for session ${sessionId}`)
+  }
+}
+
+const unsubscribeGame = (contentsId) => {
+  const gameKey = `game-${contentsId}`
+  if (subscriptionMap.has(gameKey)) {
+    const subscription = subscriptionMap.get(gameKey)
+    subscription.unsubscribe()
+    console.log(`Unsubscribed from Contents ${contentsId}`)
+    subscriptionMap.delete(gameKey)
+  } else {
+    console.error(`No subScription found for Contents ${contentsId}`)
   }
 }
 
@@ -341,14 +427,14 @@ const sendClickData = (destination, click) => {
   }
 }
 
-// 진술서 작성 완료 시, 제출 여부를 전송하는 Code
+// 진술서 작성 완료 시, 제출 여부를 전송하는
+// 초성 게임에서 작성 단어를 전송
 const sendSubmitData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
       body: data
     })
-    console.log('진술서에 제출 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }
@@ -356,18 +442,18 @@ const sendSubmitData = (destination, data) => {
 
 // 진술 선택 완료시, 제출 유저와 제출 문항 전달
 const sendAnswerData = (destination, data) => {
+  console.log(destination)
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
       body: JSON.stringify(data)
     })
-    console.log('진술 선택 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }
 }
 
-// 한 참여자의 발표 종료 시 
+// 한 참여자의 발표 종료 시
 const sendNextData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
@@ -380,27 +466,15 @@ const sendNextData = (destination, data) => {
   }
 }
 
-// 콘텐츠 종료시 
-const sendFinishData = (destination, data) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({
-      destination: destination,
-      body: JSON.stringify(data)
-    })
-    console.log('컨텐츠 종료')
-  } else {
-    console.error('WebSocket is not Connected')
-  }
-}
-
 export default {
   connect,
   disconnect,
   sendMessage,
   sendClickData,
-  unsubscribe,
+  unsubscribeInput,
+  unsubscribeSession,
+  unsubscribeGame,
   sendSubmitData,
   sendAnswerData,
-  sendNextData,
-  sendFinishData,
+  sendNextData
 }

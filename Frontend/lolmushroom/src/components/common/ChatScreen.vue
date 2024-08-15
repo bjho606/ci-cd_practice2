@@ -2,17 +2,19 @@
 import { ref, computed } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useChatStore } from '@/stores/chatStore'
-import avatarImg from '@/assets/origbig.png'
+import avatarImg from '@/assets/image/chatIcon.png'
 import webSocketAPI from '@/api/webSocket'
 import { useRoomStore } from '@/stores/roomStore'
 
 const menu = ref(false)
+const text = ref('')
+const showModal = ref(false)
 const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const roomStore = useRoomStore()
-const text = ref('')
-const subSessionId = sessionStore.getSubSessionId
 
+const subSessionId = computed(() => sessionStore.getSubSessionId)
+const subSessionInfo = computed(() => roomStore.getGroupInfoBySessionId(subSessionId.value))
 /**
  * * 1. 사용자에게 보이는 채팅의 내용은 currentMode에 따라 다르다.
  * IMP 1.1 'All' Mode : mainSessionMessages
@@ -23,12 +25,10 @@ const currentMessages = computed(() => {
   return isMainMode.value ? chatStore.mainSessionMessages : chatStore.subSessionMessages
 })
 const currentTitle = computed(() =>
-  isMainMode.value ? '전체 그룹의 재잘재잘' : '우리 그룹의 재잘재잘'
+  isMainMode.value ? '전체 그룹의 재잘재잘' : `${subSessionInfo.value.groupName} 그룹의 재잘재잘`
 )
 const currentSubtitle = computed(() =>
-  isMainMode.value
-    ? roomStore.getTotalUserCount + '명'
-    : roomStore.getGroupInfoBySessionId(subSessionId).occupants + '명'
+  isMainMode.value ? roomStore.getTotalUserCount + '명' : subSessionInfo.value.occupants + '명'
 )
 
 /**
@@ -38,11 +38,13 @@ const currentSubtitle = computed(() =>
 
 const toggleMode = () => {
   if (chatStore.currentMode === 'All') {
-    chatStore.setCurrentMode('Group')
-    console.log(isMainMode.value)
+    if (subSessionId.value) {
+      chatStore.setCurrentMode('Group')
+    } else {
+      showModal.value = true // Show modal if subSession info is not found
+    }
   } else {
     chatStore.setCurrentMode('All')
-    console.log(isMainMode.value)
   }
 }
 
@@ -75,7 +77,7 @@ const sendMessage = () => {
       <v-card min-width="300" min-height="300" max-height="500" overflow-y: auto>
         <v-list>
           <v-list-item
-            prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+            prepend-avatar="src/assets/image/chat.jpg"
             :subtitle="currentSubtitle"
             :title="currentTitle"
           >
@@ -118,6 +120,20 @@ const sendMessage = () => {
         </v-card-actions>
       </v-card>
     </v-menu>
+
+    <!-- Modal for No Group Chat Info -->
+    <v-dialog v-model="showModal" max-width="500">
+      <v-card class="text-center">
+        <v-card-title class="headline">그룹 채팅 불가</v-card-title>
+        <v-card-text>
+          아직 그룹에 소속되지 않아, 우리 그룹의 채팅이 준비되지 않았어요. 대신 전체 채팅에서 모두와
+          이야기 나눠보세요! 금방 새로운 대화가 열릴지도 몰라요 🌱
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-btn color="primary" @click="showModal = false">알겠어요!</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 

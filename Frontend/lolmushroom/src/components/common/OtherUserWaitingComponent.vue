@@ -14,17 +14,25 @@
 
 <template>
   <!-- 컨텐츠 진행 중 다른 사용자를 기다리는 컴포넌트 -->
-  <img src="../../assets/joker.gif" alt="joker" style="display: block;">
+  <img src="../../assets/joker.gif" alt="joker" class="waiting-icon">
+  <h2 style="color: black">다른 참여자가 제출을 끝낼 때까지 잠시만 기다려 주세요!</h2>
   <v-progress-linear
-  color="black"
-  indeterminate
-  :height="12"
-  />
-  <h2 style="color: black">다른 사람을 잠시 기다려 주시기 바랍니다.</h2>
-  <h2>{{ props.current }} / {{ props.total }}</h2>
+    bg-color="#FFFFFF"
+    color="#24A319"
+    height="30"
+    :max="props.total"
+    min="0"
+    :model-value="props.current"
+    rounded
+    style="border: #000000 2px solid"
+    >
+      <strong style="color: #000000;">{{ props.current }} / {{ props.total }}</strong>
+  </v-progress-linear>
 </template>
 
 
 <style scoped>
-
+  .waiting-icon {
+    text-align: center
+  }
 </style>

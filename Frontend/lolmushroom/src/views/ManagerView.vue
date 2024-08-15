@@ -44,6 +44,9 @@ const onSessionEventReceived = (message) => {
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
 }
+const onFinishEventReceived = (message) => {
+  contentsStore.setContentsFinish(message)
+}
 
 /**
  * IMP 3. Manager가 ManagerView에 들어왔을 때 호출되어야 하는 CallBack에 대한 정리 CallBack()
@@ -57,7 +60,8 @@ const managerFlowHandler = async () => {
     sessionId: sessionStore.sessionId,
     onEventReceived: onSessionEventReceived,
     onProgressReceived: onProgressEventReceived,
-    subscriptions: ['session', 'progress']
+    onFinishReceived: onFinishEventReceived,
+    subscriptions: ['session', 'progress', 'finish']
   })
 }
 
@@ -70,8 +74,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- * Manager의 RouterView -->
   <RouterView />
 </template>
-
-<style scoped></style>

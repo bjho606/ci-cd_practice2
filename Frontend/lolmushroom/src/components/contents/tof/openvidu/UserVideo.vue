@@ -29,8 +29,8 @@
 </script>
 
 <template>
-  <div v-if="streamManager">
-    <ov-video :stream-manager="streamManager" />
+  <div v-if="streamManager" class="d-flex" style="justify-content: center;">
+    <ov-video :stream-manager="streamManager"/>
      <!-- 이거 닉네임 수정 로직 구현해야 함 -->
     <!-- <div><p>{{ clientData }}</p></div> -->
   </div>

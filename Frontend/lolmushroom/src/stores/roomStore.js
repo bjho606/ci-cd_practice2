@@ -14,11 +14,11 @@ import { defineStore } from 'pinia'
  */
 export const useRoomStore = defineStore('room', {
   state: () => ({
-    activeButtonIndex: 0,
     maxUserCount: 0,
     currentUserCount: 0,
     url: '',
-    roomCount: 10,
+    roomCount: 0,
+    maxRoomCount: 10,
     rooms: Array.from({ length: 10 }, () => ({
       sessionId: '',
       groupName: '',
@@ -26,7 +26,8 @@ export const useRoomStore = defineStore('room', {
       occupants: 0,
       users: [],
       isReady: false,
-      buttonClicked: false
+      teamLeaderId: '',
+      isActive: false
     }))
   }),
   actions: {
@@ -43,18 +44,24 @@ export const useRoomStore = defineStore('room', {
           groupName: group.groupName,
           capacity: group.maxUserCount,
           occupants: group.currentUserCount,
-          users: group.users,
+          users: group.username,
           isReady: group.isReady,
-          buttonClicked: true
+          teamLeaderId: group.teamLeaderId,
+          isActive: true
         }
         this.activeButtonIndex = index + 1
       })
+    },
+
+    setButtonClicked(index) {
+      if (index >= 0 && index < this.rooms.length) {
+        this.rooms[index].isActive = true
+      }
     }
   },
   getters: {
     getRooms: (state) => state.rooms,
-    getActiveRooms: (state) => state.rooms.filter((room) => room.buttonClicked),
-    getActiveButtonIndex: (state) => state.activeButtonIndex,
+    getActiveRooms: (state) => state.rooms.filter((room) => room.isActive),
     getTotalUserCount: (state) => state.currentUserCount,
     getTotalMaxUserCount: (state) => state.maxUserCount,
     getGroupInfoBySessionId: (state) => (sessionId) => {
