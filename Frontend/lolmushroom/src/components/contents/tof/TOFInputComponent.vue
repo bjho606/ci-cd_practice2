@@ -10,6 +10,8 @@ import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
 import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
+
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -142,6 +144,11 @@ onMounted(async () => {
   </v-dialog>
   <!-- 진술을 제출했을 때 -->
   <v-container fluid v-if="!isSubmit" style="width: 70%" class="my-5">
+    <WaitingHeader
+      first-description="진실 혹은 거짓"
+      second-description="진실 3개와 거짓 1개로 나를 소개해 보세요!"
+      third-description="카메라가 켜지면 자신을 소개해 보세요."
+    />
     <div class="progress-linear-container">
       <v-progress-linear
         bg-color="#FFFFFF"
@@ -302,5 +309,9 @@ v-text-field {
 .warning-alert {
   display: flex;
   justify-content: center;
+}
+
+*{
+  background: #E7FFDE;
 }
 </style>

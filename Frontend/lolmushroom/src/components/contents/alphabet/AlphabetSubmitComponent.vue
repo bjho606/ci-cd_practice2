@@ -9,6 +9,8 @@ import ContentsLoading from '../ContentsLoading.vue'
 import sessionAPI from '@/api/session'
 import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
+
 
 const router = useRouter()
 const store = useAlphabetStore()
@@ -110,6 +112,11 @@ onMounted(async () => {
     <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
   </v-dialog>
   <div class="container">
+    <WaitingHeader
+      first-description="초성 맞추기"
+      second-description="초성을 토대로 단어를 맞춰보세요!"
+      third-description="순서는 랜덤이랍니다!"
+    />
     <div class="statusContainer">
       <div class="progress-bar">
         <v-progress-linear
