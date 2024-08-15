@@ -147,7 +147,7 @@ const changeRoomName = async (index) => {
           @onJoinOrLeave="handleRoomClick(index)"
         />
       </v-container>
-      <v-container v-if="activeRooms.length < roomStore.maxRoomCount" class="group-container">
+      <v-container v-if="activeRooms.length < roomStore.maxRoomCount" class="add-group-container">
         <AddGroupButton @createGroup="handleRoomClick(activeRooms.length)" />
       </v-container>
     </div>
@@ -172,6 +172,7 @@ const changeRoomName = async (index) => {
 
 .group-container {
   max-width: 250px;
+  height: 250px;
   flex-shrink: 0;
 }
 </style>

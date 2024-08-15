@@ -7,18 +7,39 @@ const handleCreateGroupClick = () => {
 
 <template>
   <v-btn
-    min-width="150px"
     varient="elevated"
-    :style="{ backgroundColor: '#CEFFBC' }"
     class="add-group-button"
     @click="handleCreateGroupClick"
   >
-    그룹 새로 만들기
+    <div class="add_container">
+      <div class="add_btn">+</div>
+      <div class="add_text">그룹 만들기</div>
+    </div>
   </v-btn>
 </template>
 
 <style scoped>
 .add-group-button {
-  margin-top: 45px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 60px;
+  background-color: #D9D9D9;
+  padding: 10px;
+  margin-top: 35px;
 }
+.add_container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.add_btn {
+  font-size: 2em;
+  font-weight: bold;
+}
+.add_text {
+  margin-top: 3px;
+}
+
 </style>

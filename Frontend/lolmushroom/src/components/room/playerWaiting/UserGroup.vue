@@ -26,7 +26,7 @@ const props = defineProps({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .user-container {
