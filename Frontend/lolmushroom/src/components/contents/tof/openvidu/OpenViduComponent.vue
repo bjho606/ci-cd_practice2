@@ -132,7 +132,6 @@
 
     const videos = videoContainer.value.querySelectorAll('video');
     videos.forEach((video) => {
-      console.log(video.id)
       if (video.id === newToken) {
         video.style.display = 'block';  // 해당 video를 표시
       } else {
@@ -177,10 +176,7 @@ const extractWebSocketURL = (data) => {
             if (node.tagName === 'VIDEO') {
               ovToken.value = extractWebSocketURL(ovToken.value)
               node.id = ovToken.value;
-              ovToken.value = ''
               
-              console.log(node.id, '이게 사람id')
-              console.log(store.targetUserToken, '이게 토큰')
               // 렌더링 완료 후 store.targetUserToken 값과 id가 일치하는 비디오만 표시
               if (node.id === store.targetUserToken) {
                 node.style.display = 'block';  // 해당 video를 표시
