@@ -1,6 +1,5 @@
 <script setup>
-  import { computed, defineComponent } from 'vue';
-  import { useUserStore } from '@/stores/userStore'
+  import { computed } from 'vue';
   import OvVideo from './OvVideo.vue';
 
   // props 선언
@@ -8,30 +7,23 @@
     streamManager: Object,
   });
 
-  // 컴포넌트 등록
-  defineComponent({
-    components: {
-      OvVideo,
-    },
+  const getConnectionData = () => {
+    console.log('Connection Data:', props.streamManager.stream.connection.data);
+    const { connection } = props.streamManager.stream
+    return connection.data;
+  };
+
+  const clientData = computed(() => {
+    const { clientData } = getConnectionData();
+    return clientData;
   });
-
-  // const getConnectionData = () => {
-  //   console.log(props.streamManager.stream, '이규석')
-  //   const { connection } = props.streamManager.stream
-  //   return JSON.parse(connection.data);
-  // };
-
-  // const clientData = computed(() => {
-  //   const { clientData } = getConnectionData();
-  //   return clientData;
-  // });
 
 </script>
 
 <template>
-  <div v-if="streamManager" class="d-flex" style="justify-content: center;">
-    <ov-video :stream-manager="streamManager"/>
-     <!-- 이거 닉네임 수정 로직 구현해야 함 -->
-    <!-- <div><p>{{ clientData }}</p></div> -->
+  <div v-if="props.streamManager" class="d-flex" style="justify-content: center;">
+    <ov-video :stream-manager="props.streamManager"/>
+    <div><p>{{ clientData }}</p></div>
   </div>
 </template>
+
