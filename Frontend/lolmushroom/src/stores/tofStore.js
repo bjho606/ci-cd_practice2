@@ -57,6 +57,9 @@ export const useTOFStore = defineStore('tof', {
     },
     addChosenData(user, chosen) {
       this.chosenArray[chosen].push(user)
+    },
+    submitUserClear() {
+      this.submitUserCount = 0
     }
   },
   getters: {
