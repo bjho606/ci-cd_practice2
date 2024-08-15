@@ -13,9 +13,9 @@
     - 여러 다운로드 가능한 파일들 중에서, 꼭 'Binary 파일'로 받을 것!
     - ex) Scala 2.12 or Scala 2.13
     
-    ![Untitled](Kafka%20%E1%84%8F%E1%85%B5%E1%84%82%E1%85%B3%E1%86%AB%20%E1%84%87%E1%85%A5%E1%86%B8%205967ef4e6f8440c5bf652311fcfaad97/Untitled.png)
+    ![Untitled](Untitled.png)
     
-ㄴ
+
 ### 실행
 
 - zookeeper 와 kafka 실행
