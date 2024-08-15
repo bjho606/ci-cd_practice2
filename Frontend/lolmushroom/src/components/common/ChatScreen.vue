@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useChatStore } from '@/stores/chatStore'
-import avatarImg from '@/assets/origbig.png'
+import avatarImg from '@/assets/image/chatIcon.png'
 import webSocketAPI from '@/api/webSocket'
 import { useRoomStore } from '@/stores/roomStore'
 

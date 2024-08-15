@@ -2,15 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import BallContent from './BallContent.vue'
 
-// Sample data
 
-const allBalls = ref([
-  { sessionId: '1', groupName: 'Group A', size: 30 },
-  { sessionId: '2', groupName: 'Group B', size: 50 },
-  { sessionId: '3', groupName: 'Group C', size: 40 }
-])
-
-// const allBalls = ballStore.getTotalBalls;
+const allBalls = ballStore.getTotalBalls;
 
 const winnerGroup = computed(() => {
   return allBalls.value.reduce(

@@ -5,6 +5,7 @@ import hitSound from '@/assets/hit.mp3'
 const handleClick = () => {
   bounce()
   playSound()
+
 }
 
 function playSound() {
@@ -13,8 +14,8 @@ function playSound() {
     console.error('Audio playback failed:', error)
   })
 }
-
 const isBouncing = ref(false)
+
 
 function bounce() {
   if (!isBouncing.value) {
@@ -65,6 +66,7 @@ const transform = computed(() => {
   const scaleFactor = size.value / originalWidth
   return `matrix(${scaleFactor} 0 0 ${scaleFactor} 0 0)`
 })
+defineExpose({ handleClick })
 </script>
 
 <style scoped>
@@ -101,6 +103,7 @@ const transform = computed(() => {
 .health {
   font-size: xx-large;
   position: absolute;
+  color: white;
 }
 </style>
 
