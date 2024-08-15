@@ -79,14 +79,14 @@ public class ContentsOrderService {
                     contentsId = li.get(i + 1).getContentsId();
                     sequence = li.get(i + 1).getSequence();
                 } else {
-                    contentsId = "null";
+                    contentsId = "0";
                     sequence = -1L;
                 }
                 break;
             }
         }
 
-        if (!contentsId.equals("null")) {
+        if (!contentsId.equals("0")) {
             Contents nowContent = contentsRepository.findById(contentsId).orElseThrow(NoSuchElementException::new);
 
             if (nowContent.getTimeOut() > 0) {
