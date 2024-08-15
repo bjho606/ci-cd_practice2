@@ -28,14 +28,12 @@ defineProps({
       <div class="title">{{ title }}</div>
     </div>
     <div class="content-wrapper">
-      <div class="content-image">{{ contentsImage }}</div>
+      <img class="content-image" :src="contentsImage" />
       <div class="instructions">
         <button class="btn">{{ buttonText }}</button>
         <div class="instructions-text">
           <h3>플레이 방법</h3>
-          <p>
-            {{ instructionsText }}
-          </p>
+          <p v-html="instructionsText"></p>
         </div>
       </div>
     </div>
@@ -43,7 +41,6 @@ defineProps({
 </template>
 
 <style scoped>
-/* 전체 컨테이너 설정 */
 .content-loading-container {
   display: flex;
   flex-direction: column;
@@ -54,7 +51,6 @@ defineProps({
   box-sizing: border-box;
 }
 
-/* 헤더를 상단에 고정 */
 .header {
   display: flex;
   align-items: center;
@@ -62,17 +58,17 @@ defineProps({
   padding: 10px;
   border-radius: 10px;
   width: 200px;
-  max-width: 1200px;
+  max-width: 1000px;
   position: fixed;
   top: 20px;
-  left: 10%;
+  left: 9%;
   z-index: 1000;
   box-sizing: border-box;
 }
 
 .emoji {
   font-size: 24px;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .title {
@@ -80,24 +76,21 @@ defineProps({
   font-weight: bold;
 }
 
-/* 콘텐츠 영역의 레이아웃 설정 */
 .content-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-  max-width: 1500px;
-  margin-top: 80px; /* 헤더 높이만큼 여백 추가 */
-  padding: 20px;
+  max-width: 1000px;
+  margin-top: 80px;
+  padding: 10px;
   box-sizing: border-box;
-  flex-grow: 1;
 }
 
-/* 콘텐츠 이미지 설정 */
 .content-image {
   width: 65%;
   height: 100%;
-  max-height: 500px;
+  max-height: 350px;
   background-color: #e0e0e0;
   border-radius: 10px;
   display: flex;
@@ -107,7 +100,6 @@ defineProps({
   color: #555;
 }
 
-/* 오른쪽의 플레이 방법 및 협동 버튼 설정 */
 .instructions {
   display: flex;
   flex-direction: column;
@@ -132,10 +124,9 @@ defineProps({
   color: white;
   font-size: 16px;
   display: inline-block;
-  background-color: #66bb6a; /* 기본 배경색 */
+  background-color: #66bb6a;
 }
 
-/* h3와 p 태그의 스타일 구분 */
 .instructions-text h3 {
   color: #ffffff;
   background-color: #24a319;
@@ -145,8 +136,8 @@ defineProps({
 }
 
 .instructions-text p {
-  color: #000000; /* 흰색 */
-  background-color: #90ff77; /* 파란색 배경 */
+  color: #000000;
+  background-color: #90ff77;
   padding: 10px;
   border-radius: 0 0 10px 10px;
   margin: 0;

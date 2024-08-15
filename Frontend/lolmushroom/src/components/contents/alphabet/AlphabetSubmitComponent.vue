@@ -5,6 +5,7 @@ import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useUserStore } from '@/stores/userStore'
+import Alphabet_Contents from '@/assets/Alphabet_Contents.png'
 import ContentsLoading from '../ContentsLoading.vue'
 import sessionAPI from '@/api/session'
 import contentsAPI from '@/api/contents'
@@ -15,8 +16,6 @@ const router = useRouter()
 const store = useAlphabetStore()
 const sessionStore = useSessionStore()
 const contentsStore = useContentsStore()
-const contentsInfo = contentsStore.contents[3]
-const showLoading = ref(false)
 const userStore = useUserStore()
 const quizWord = ref('')
 const isDisabled = ref(false)
@@ -24,7 +23,13 @@ const showAlert = reactive({
   blank: false,
   korean: false
 })
-// const showAlter = ref('')
+/**
+ * IMP : Loading Info
+ */
+const contentsInfo = contentsStore.contents[3]
+const instructionsText =
+  '1. 출제자가 되어 단어를 제출해보세요<br>2. 다른 참여자들은 단어를 맞추면 됩니다<br>3. 다른 사람들보다 빨리 많이 맞혀봅시다!'
+const showLoading = ref(false)
 
 // 세션에 참가한 유저 정보를 요청하는 함수
 const response = await sessionAPI.getSubSessionInfo(
@@ -91,14 +96,11 @@ onMounted(async () => {
     onEventReceived: onWordReceived,
     subscriptions: ['word']
   })
-  const hasShownLoading = localStorage.getItem('hasShownLoading_AlphaBet')
-  if (!hasShownLoading) {
-    showLoading.value = true
-    localStorage.setItem('hasShownLoading_AlphaBet', 'true')
-    setTimeout(() => {
-      showLoading.value = false
-    }, 5000) // 5초 동안 모달을 표시
-  }
+
+  showLoading.value = true
+  setTimeout(() => {
+    showLoading.value = false
+  }, 5000) // 5초 동안 모달을 표시
 })
 </script>
 
@@ -107,7 +109,13 @@ onMounted(async () => {
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
   <v-dialog v-model="showLoading" persistent max-width="1200">
-    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+    <ContentsLoading
+      :contentsInfo="contentsInfo"
+      :contentsImage="Alphabet_Contents"
+      :instructionsText="instructionsText"
+      :time="'5'"
+      :countText="'초 후에 시작합니다!'"
+    />
   </v-dialog>
   <div class="container">
     <WaitingHeader

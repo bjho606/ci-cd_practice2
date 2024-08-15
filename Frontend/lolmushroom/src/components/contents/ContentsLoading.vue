@@ -1,5 +1,5 @@
 <script setup>
-import CountDownComponent from './CountDownComponent.vue'
+import LoadingCountDown from './LoadingCountDown.vue'
 import ContentsInfo from './ContentsInfo.vue'
 
 const props = defineProps({
@@ -7,29 +7,33 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  contentsImage: {
+    type: String,
+    required: true
+  },
+  instructionsText: {
+    type: String,
+    required: true
+  },
   time: {
-    // CountDown Number
     type: String,
     required: true
   },
   countText: {
-    // CountDown Text
     type: String,
     required: true
   }
 })
 const title = props.contentsInfo.contentTitle
 const buttonText = props.contentsInfo.category
-const contentImage = props.contentsInfo.imgUrl
-const instructionsText = props.contentsInfo.description
 </script>
 
 <template>
   <ContentsInfo
     :title="title"
     :buttonText="buttonText"
-    :contentImage="contentImage"
+    :contentsImage="contentsImage"
     :instructionsText="instructionsText"
   />
-  <CountDownComponent :time="time" :text="countText" />
+  <LoadingCountDown :time="time" :text="countText" />
 </template>
