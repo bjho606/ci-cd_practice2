@@ -57,7 +57,7 @@ const validateQuizWord = (word) => {
 const submitQuizWord = async () => {
   if (quizWord.value === '') {
     showAlert.blank = true
-    showAlert.korean = true
+    showAlert.korean = false
     return
   } else if (validateQuizWord(quizWord.value)) {
     quizWord.value = ''
