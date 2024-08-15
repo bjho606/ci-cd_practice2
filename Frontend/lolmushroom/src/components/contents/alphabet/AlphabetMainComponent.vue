@@ -1,116 +1,118 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
-import { useSessionStore } from '@/stores/sessionStore'
-import { useUserStore } from '@/stores/userStore'
-import contentsAPI from '@/api/contents'
-import webSocketAPI from '@/api/webSocket'
-import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+  import { onMounted, reactive, ref, watch } from 'vue'
+  import { useSessionStore } from '@/stores/sessionStore'
+  import { useUserStore } from '@/stores/userStore'
+  import contentsAPI from '@/api/contents'
+  import webSocketAPI from '@/api/webSocket'
+  import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+  import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
-const userStore = useUserStore()
-const sessionStore = useSessionStore()
-const isTimeUp = ref()
-const counting = ref(true)
-const showAlert = ref()
-const index = ref(0)
-const guessWord = ref('')
-const guessWords = ref([])
-// const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
-const isCorrected = ref()
 
-const turn = reactive({
-  ownerOvToken: '',
-  answer: '',
-  winner: ''
-})
+  const userStore = useUserStore()
+  const sessionStore = useSessionStore()
+  const isTimeUp = ref()
+  const counting = ref(true)
+  const showAlert = ref()
+  const index = ref(0)
+  const guessWord = ref('')
+  const guessWords = ref([])
+  // const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
+  const isCorrected = ref()
 
-// 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
-const timeUp = (bool) => {
-  isTimeUp.value = bool
-  counting.value = !bool
-}
-
-// 모든 문제를 가져옴
-const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
-const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
-turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
-
-// 정답을 발행
-const publishGuess = () => {
-  if (guessWord.value === '') {
-    showAlert.value = true
-  } else {
-    const data = {
-      ownerOvToken: turn.ownerOvToken,
-      ovToken: userStore.userOvToken,
-      userName: userStore.userName,
-      guessWord: guessWord.value.trim()
-    }
-    webSocketAPI.sendAnswerData(
-      `/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`,
-      data
-    )
-    guessWord.value = ''
-  }
-}
-
-// 랜덤 색상 생성 함수
-const generateRandomColor = () => {
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)]
-  }
-  return color
-}
-
-// 다른 사용자의 정답을 구독
-const onGuessReceived = (event) => {
-  const { ovToken, result, submittedWord, userName } = event
-  const wordData = {
-    word: submittedWord,
-    top: Math.random(),
-    left: Math.random(),
-    // 10% ~ 90% 사이의 랜덤 위치
-    initialTop: Math.random() * 80 + 10 + '%',
-    initialLeft: Math.random() * 80 + 10 + '%',
-    color: generateRandomColor(),
-    ovToken: ovToken
-  }
-  guessWords.value.push(wordData)
-
-  // 만약 정답이 나오면
-  if (result === true && ovToken !== turn.ownerOvToken) {
-    turn.answer = submittedWord
-    turn.winner = userName
-    isCorrected.value = true
-    guessWords.value = []
-    index.value += 1
-  }
-}
-
-// index 값이 증가할 때마다 관련 값 갱신
-watch(index, async (newIndex) => {
-  if (newIndex < alliIniQuizInfos.length) {
-    turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
-    // 3초 후에 isCorrected를 false로 변경하고 index 증가
-    setTimeout(() => {
-      isCorrected.value = false
-    }, 3000)
-    return
-  } else if (turn.ownerOvToken === userStore.userOvToken)
-    await contentsAPI.finishContents(sessionStore.subSessionId)
-})
-
-onMounted(async () => {
-  console.log('초성 게임 연결 중..')
-  // 세션 연결
-  webSocketAPI.connect({
-    sessionId: sessionStore.sessionId,
-    subSessionId: sessionStore.subSessionId,
-    onEventReceived: onGuessReceived,
-    subscriptions: ['guess']
+  const turn = reactive({
+    ownerOvToken: '',
+    answer: '',
+    winner: ''
   })
-})
+
+  // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
+  const timeUp = (bool) => {
+    isTimeUp.value = bool
+    counting.value = !bool
+  }
+
+  // 모든 문제를 가져옴
+  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
+  const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
+  turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
+
+  // 정답을 발행
+  const publishGuess = () => {
+    if (guessWord.value === '') {
+      showAlert.value = true
+    } else {
+      const data = {
+        ownerOvToken: turn.ownerOvToken,
+        ovToken: userStore.userOvToken,
+        userName: userStore.userName,
+        guessWord: guessWord.value.trim()
+      }
+      webSocketAPI.sendAnswerData(
+        `/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`,
+        data
+      )
+      guessWord.value = ''
+    }
+  }
+
+  // 랜덤 색상 생성 함수
+  const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)]
+    }
+    return color
+  }
+
+  // 다른 사용자의 정답을 구독
+  const onGuessReceived = (event) => {
+    const { ovToken, result, submittedWord, userName } = event
+    const wordData = {
+      word: submittedWord,
+      top: Math.random(),
+      left: Math.random(),
+      // 10% ~ 90% 사이의 랜덤 위치
+      initialTop: Math.random() * 80 + 10 + '%',
+      initialLeft: Math.random() * 80 + 10 + '%',
+      color: generateRandomColor(),
+      ovToken: ovToken
+    }
+    guessWords.value.push(wordData)
+
+    // 만약 정답이 나오면
+    if (result === true && ovToken !== turn.ownerOvToken) {
+      turn.answer = submittedWord
+      turn.winner = userName
+      isCorrected.value = true
+      guessWords.value = []
+      index.value += 1
+    }
+  }
+
+  // index 값이 증가할 때마다 관련 값 갱신
+  watch(index, async (newIndex) => {
+    if (newIndex < alliIniQuizInfos.length) {
+      turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
+      // 3초 후에 isCorrected를 false로 변경하고 index 증가
+      setTimeout(() => {
+        isCorrected.value = false
+      }, 3000)
+      return
+    } else if (turn.ownerOvToken === userStore.userOvToken)
+      await contentsAPI.finishContents(sessionStore.subSessionId)
+  })
+
+  onMounted(async () => {
+    console.log('초성 게임 연결 중..')
+    // 세션 연결
+    webSocketAPI.connect({
+      sessionId: sessionStore.sessionId,
+      subSessionId: sessionStore.subSessionId,
+      onEventReceived: onGuessReceived,
+      subscriptions: ['guess']
+    })
+  })
 </script>
 
 <template>
@@ -118,6 +120,12 @@ onMounted(async () => {
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
   <div class="container" v-show="isTimeUp && !isCorrected">
+    <WaitingHeader
+      first-description="초성 맞추기"
+      second-description="초성을 토대로 단어를 맞춰보세요!"
+      third-description="순서는 랜덤이랍니다!"
+    />
+
     <div class="statusContainer">
       <div class="info">
         <div class="info-category"><h1>카테고리</h1></div>
@@ -136,7 +144,7 @@ onMounted(async () => {
         <input
           v-html="guessWord"
           class="inputText"
-          :placeholder="turn.ownerOvToken === userStore.userOvToken ? '정답을 입력 해주세요.' : '힌트를 줄 수 있습니다.'"
+          :placeholder="turn.ownerOvToken !== userStore.userOvToken ? '정답을 입력 해주세요.' : '힌트를 줄 수 있습니다.'"
           v-model="guessWord"
           @keyup.enter="publishGuess()"
         />

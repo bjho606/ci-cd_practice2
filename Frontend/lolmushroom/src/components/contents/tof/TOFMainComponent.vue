@@ -15,6 +15,8 @@ import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 import TOFResultComponent from '@/components/contents/tof/TOFResultComponent.vue'
 import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue'
 import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
+
 
 const store = useTOFStore()
 const router = useRouter()
@@ -168,6 +170,11 @@ onMounted(async () => {
 
 <template>
   <v-container v-show="isTimeUp" class="container">
+    <WaitingHeader
+      first-description="진실 혹은 거짓"
+      second-description="진실 3개와 거짓 1개로 나를 소개해 보세요!"
+      third-description="카메라가 켜지면 자신을 소개해 보세요."
+    />
     <div class="keynote-speecher">
       <div class="video-container">
         <OpenViduComponent />
