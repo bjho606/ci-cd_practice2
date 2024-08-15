@@ -1,9 +1,11 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useUserStore } from '@/stores/userStore'
+import ContentsLoading from '../ContentsLoading.vue'
 import sessionAPI from '@/api/session'
 import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
@@ -11,6 +13,9 @@ import webSocketAPI from '@/api/webSocket'
 const router = useRouter()
 const store = useAlphabetStore()
 const sessionStore = useSessionStore()
+const contentsStore = useContentsStore()
+const contentsInfo = contentsStore.contents[3]
+const showLoading = ref(false)
 const userStore = useUserStore()
 const quizWord = ref('')
 const isDisabled = ref(false)
@@ -85,6 +90,15 @@ onMounted(async () => {
     onEventReceived: onWordReceived,
     subscriptions: ['word']
   })
+  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  if (!hasShownLoading) {
+    showLoading.value = true
+    localStorage.setItem('hasShownLoading', 'true')
+
+    setTimeout(() => {
+      showLoading.value = false
+    }, 5000) // 5초 동안 모달을 표시
+  }
 })
 </script>
 
@@ -92,6 +106,9 @@ onMounted(async () => {
   <!-- <div class="header">
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
+  <v-dialog v-model="showLoading" persistent max-width="1200">
+    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+  </v-dialog>
   <div class="container">
     <div class="statusContainer">
       <div class="progress-bar">

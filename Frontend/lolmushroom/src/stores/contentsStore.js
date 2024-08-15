@@ -21,6 +21,7 @@ export const useContentsStore = defineStore('contents', {
     totalDuration: 0,
 
     routeMapping: {
+      0: 'Ending',
       1: 'TOF',
       2: null,
       3: null,
@@ -39,8 +40,7 @@ export const useContentsStore = defineStore('contents', {
       5: null,
       6: null,
       7: null,
-      8: null,
-      null: 'EndingPage'
+      8: null
     },
 
     currentContentsId: null,

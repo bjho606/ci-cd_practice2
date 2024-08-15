@@ -1,16 +1,11 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useSessionStore } from '@/stores/sessionStore'
-import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
-
 import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
 import CountDownComponent from '@/components/contents/CountDownComponent.vue'
 
-const router = useRouter()
-const store = useAlphabetStore()
 const userStore = useUserStore()
 const sessionStore = useSessionStore()
 const isTimeUp = ref()
@@ -94,7 +89,7 @@ const onGuessReceived = (event) => {
 }
 
 // index 값이 증가할 때마다 관련 값 갱신
-watch(index, async (newIndex, oldIndex) => {
+watch(index, async (newIndex) => {
   if (newIndex < alliIniQuizInfos.length) {
     turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
     // 3초 후에 isCorrected를 false로 변경하고 index 증가
@@ -102,18 +97,8 @@ watch(index, async (newIndex, oldIndex) => {
       isCorrected.value = false
     }, 3000)
     return
-  } else if (turn.ownerOvToken === userStore.userOvToken) {
+  } else if (turn.ownerOvToken === userStore.userOvToken)
     await contentsAPI.finishContents(sessionStore.subSessionId)
-    router.push({
-      name: 'mainSession',
-      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-    })
-  } else {
-    router.push({
-      name: 'mainSession',
-      params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-    })
-  }
 })
 
 onMounted(async () => {

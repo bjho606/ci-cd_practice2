@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MakeSessionView from '@/views/MakeSessionView.vue'
 import RoomWatching from '@/components/room/managerWaiting/RoomWatching.vue'
 import PlayerMain from '@/components/room/playerWaiting/PlayerMain.vue'
-import RoomWaiting from '@/components/room/RoomWaiting.vue'
 import ManagerView from '@/views/ManagerView.vue'
 import PlayerView from '@/views/PlayerView.vue'
 import GroupSessionView from '@/views/GroupSessionView.vue'
@@ -15,6 +14,7 @@ import StartPage from '@/components/setting/_0StartPage.vue'
 import CurationPage from '@/components/setting/_1CurationPage.vue'
 import SessionCode from '@/components/setting/_2SessionCode.vue'
 import BallGrowContainer from '@/components/contents/BallGrow/BallGrowContainer.vue'
+import EndPage from '@/components/contents/EndPage.vue'
 
 const routes = [
   {
@@ -62,6 +62,11 @@ const routes = [
         ]
       }
     ]
+  },
+  {
+    path: '/Ending',
+    name: 'Ending',
+    component: EndPage
   }
 ]
 

@@ -35,7 +35,7 @@ export const useAlphabetStore = defineStore('alphabet', {
     },
     fetchAlphaBetData(event) {
       const { sessionId, curStep, submitCount, finishCount } = event
-      const groupInfo = this.tofMap.get(sessionId)
+      const groupInfo = this.alphabetMap.get(sessionId)
       if (curStep === 1) {
         groupInfo.groupStep = curStep
         groupInfo.groupStepInfo = submitCount
@@ -43,7 +43,7 @@ export const useAlphabetStore = defineStore('alphabet', {
         groupInfo.groupStep = curStep
         groupInfo.groupStepInfo = finishCount
       }
-      this.tofMap.set(sessionId, groupInfo)
+      this.alphabetMap.set(sessionId, groupInfo)
     },
     submitUserIncrease() {
       this.submitUserCount++

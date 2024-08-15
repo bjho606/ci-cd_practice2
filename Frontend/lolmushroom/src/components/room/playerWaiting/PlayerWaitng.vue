@@ -1,9 +1,9 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { useChatStore } from '@/stores/chatStore'
+import { useUserStore } from '@/stores/userStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import { useUserStore } from '@/stores/userStore'
 import webSocketAPI from '@/api/webSocket'
 import sessionAPI from '@/api/session'
 import RoomCard from './RoomCard.vue'
@@ -13,6 +13,7 @@ const chatStore = useChatStore()
 const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
 const userStore = useUserStore()
+const isUserStarted = computed(() => userStore.isStarted)
 const rooms = computed(() => roomStore.getRooms)
 const activeRooms = computed(() => roomStore.getActiveRooms)
 const subSessionInfo = computed(() => roomStore.getGroupInfoBySessionId(sessionStore.subSessionId))
@@ -147,7 +148,10 @@ const changeRoomName = async (index) => {
           @onJoinOrLeave="handleRoomClick(index)"
         />
       </v-container>
-      <v-container v-if="activeRooms.length < roomStore.maxRoomCount" class="group-container">
+      <v-container
+        v-if="activeRooms.length < roomStore.maxRoomCount && !isUserStarted"
+        class="group-container"
+      >
         <AddGroupButton @createGroup="handleRoomClick(activeRooms.length)" />
       </v-container>
     </div>
