@@ -1,125 +1,117 @@
 <script setup>
-  import { onMounted, reactive, ref, watch } from 'vue';
-  import { useSessionStore } from '@/stores/sessionStore';
-  import { useAlphabetStore } from '@/stores/alphabetStore';
-  import { useUserStore } from '@/stores/userStore';
-  import { useRouter } from 'vue-router';
+import { onMounted, reactive, ref, watch } from 'vue'
+import { useSessionStore } from '@/stores/sessionStore'
+import { useUserStore } from '@/stores/userStore'
+import contentsAPI from '@/api/contents'
+import webSocketAPI from '@/api/webSocket'
+import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
-  import contentsAPI from '@/api/contents';
-  import webSocketAPI from '@/api/webSocket';
-  import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+const userStore = useUserStore()
+const sessionStore = useSessionStore()
+const isTimeUp = ref()
+const counting = ref(true)
+const showAlert = ref()
+const index = ref(0)
+const guessWord = ref('')
+const guessWords = ref([])
+// const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
+const isCorrected = ref()
 
-  const router = useRouter()
-  const store = useAlphabetStore()
-  const userStore = useUserStore()
-  const sessionStore = useSessionStore()
-  const isTimeUp = ref()
-  const counting = ref(true)
-  const showAlert = ref()
-  const index = ref(0)
-  const guessWord = ref('')
-  const guessWords = ref([])
-  // const areSubmitAnswer = computed(() => store.submitUserCount === store.totalUserCount)
-  const isCorrected = ref()
+const turn = reactive({
+  ownerOvToken: '',
+  answer: '',
+  winner: ''
+})
 
-  const turn = reactive({
-    ownerOvToken: '',
-    answer: '',
-    winner: '',
+// 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
+const timeUp = (bool) => {
+  isTimeUp.value = bool
+  counting.value = !bool
+}
+
+// 모든 문제를 가져옴
+const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
+const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
+turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
+
+// 정답을 발행
+const publishGuess = () => {
+  if (guessWord.value === '') {
+    showAlert.value = true
+  } else {
+    const data = {
+      ownerOvToken: turn.ownerOvToken,
+      ovToken: userStore.userOvToken,
+      userName: userStore.userName,
+      guessWord: guessWord.value.trim()
+    }
+    webSocketAPI.sendAnswerData(
+      `/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`,
+      data
+    )
+    guessWord.value = ''
+  }
+}
+
+// 랜덤 색상 생성 함수
+const generateRandomColor = () => {
+  const letters = '0123456789ABCDEF'
+  let color = '#'
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)]
+  }
+  return color
+}
+
+// 다른 사용자의 정답을 구독
+const onGuessReceived = (event) => {
+  const { ovToken, result, submittedWord, userName } = event
+  const wordData = {
+    word: submittedWord,
+    top: Math.random(),
+    left: Math.random(),
+    // 10% ~ 90% 사이의 랜덤 위치
+    initialTop: Math.random() * 80 + 10 + '%',
+    initialLeft: Math.random() * 80 + 10 + '%',
+    color: generateRandomColor(),
+    ovToken: ovToken
+  }
+  guessWords.value.push(wordData)
+
+  // 만약 정답이 나오면
+  if (result === true && ovToken !== turn.ownerOvToken) {
+    turn.answer = submittedWord
+    turn.winner = userName
+    isCorrected.value = true
+    guessWords.value = []
+    index.value += 1
+  }
+}
+
+// index 값이 증가할 때마다 관련 값 갱신
+watch(index, async (newIndex) => {
+  if (newIndex < alliIniQuizInfos.length) {
+    turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
+    // 3초 후에 isCorrected를 false로 변경하고 index 증가
+    setTimeout(() => {
+      isCorrected.value = false
+    }, 3000)
+    return
+  } else if (turn.ownerOvToken === userStore.userOvToken)
+    await contentsAPI.finishContents(sessionStore.subSessionId)
+})
+
+onMounted(async () => {
+  console.log('초성 게임 연결 중..')
+  // 세션 연결
+  webSocketAPI.connect({
+    sessionId: sessionStore.sessionId,
+    subSessionId: sessionStore.subSessionId,
+    onEventReceived: onGuessReceived,
+    subscriptions: ['guess']
   })
-
-  // 카운트 다운이 종료되면 Main화면을 렌더링하는 함수
-  const timeUp = (bool) => {
-    isTimeUp.value = bool
-    counting.value = !bool
-  }
-
-  // 모든 문제를 가져옴
-  const quizWords = await contentsAPI.getQuizWords(sessionStore.subSessionId)
-  const alliIniQuizInfos = quizWords['data']['result']['alliIniQuizInfos']
-  turn.ownerOvToken = alliIniQuizInfos[index.value]['ovToken']
-
-  // 정답을 발행
-  const publishAnswer = () => {
-    if (guessWord.value === '') {
-      showAlert.value = true
-    } else {
-      const data = {
-        ownerOvToken: turn.ownerOvToken,
-        ovToken: userStore.userOvToken,
-        userName: userStore.userName,
-        guessWord: guessWord.value.trim()
-      }
-      webSocketAPI.sendAnswerData(`/publish/game/ini-quiz/guess/${sessionStore.sessionId}/${sessionStore.subSessionId}`, data)
-      guessWord.value = ''
-    }
-  }
-
-  // 랜덤 색상 생성 함수
-  const generateRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-
-  // 다른 사용자의 정답을 구독
-  const onGuessReceived = (event) => {
-    const { ovToken, result, submittedWord, userName } = event
-    const wordData = {
-      word: submittedWord,
-      top: Math.random(),
-      left: Math.random(),
-      // 10% ~ 90% 사이의 랜덤 위치
-      initialTop: Math.random() * 80 + 10 + '%', 
-      initialLeft: Math.random() * 80 + 10 + '%',
-      color: generateRandomColor(),
-      ovToken: ovToken,
-    }
-    guessWords.value.push(wordData)
-    
-    // 만약 정답이 나오면
-    if (result === true) {
-      turn.answer = submittedWord
-      turn.winner = userName
-      isCorrected.value = true
-      guessWords.value = []
-      // 3초 후에 isCorrected를 false로 변경하고 index 증가
-      setTimeout(() => {
-        isCorrected.value = false
-        index.value += 1
-      }, 3000)
-    } 
-  }
-
-  // index 값이 증가할 때마다 관련 값 갱신
-  watch(index, (newIndex, oldIndex) => {
-    if (newIndex < store.totalUserCount) {
-      turn.ownerOvToken =  alliIniQuizInfos[newIndex]['ovToken']
-    } else {
-      router.push({
-      name: 'roomwaiting',
-      params: {
-        sessionId: sessionStore.sessionId,
-        subSessionId: sessionStore.subSessionId
-      }
-    })
-    }
-
-  })
-  onMounted(async () => {
-    console.log('초성 게임 연결 중..')
-    // 세션 연결
-    webSocketAPI.connect({
-          sessionId: sessionStore.sessionId,
-          subSessionId: sessionStore.subSessionId,
-          onEventReceived: onGuessReceived,
-          subscriptions: ['guess']
-        })
-  })
-
+})
 </script>
 
 <template>
@@ -127,10 +119,18 @@
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
   <div class="container" v-show="isTimeUp && !isCorrected">
+    <WaitingHeader
+      first-description="초성 맞추기"
+      second-description="초성을 토대로 단어를 맞춰보세요!"
+      third-description="순서는 랜덤이랍니다!"
+    />
+
     <div class="statusContainer">
       <div class="info">
-        <div class="info-category">카테고리</div>
-        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
+        <div class="info-category"><h1>카테고리</h1></div>
+        <div class="info-text">
+          <h1>{{ alliIniQuizInfos[index]['categoryName'] }}</h1>
+        </div>
       </div>
     </div>
     <div class="playContainer">
@@ -140,25 +140,36 @@
       </div>
       <div class="userInput">
         <div class="emojiField2"></div>
-        <input v-html="guessWord" class="inputText" placeholder="카테고리에 관한 입력을 해주세요!" v-model="guessWord" @keyup.enter="publishAnswer()">
+        <input
+          v-html="guessWord"
+          class="inputText"
+          :placeholder="
+            turn.ownerOvToken !== userStore.userOvToken
+              ? '정답을 입력 해주세요.'
+              : '힌트를 줄 수 있습니다.'
+          "
+          v-model="guessWord"
+          @keyup.enter="publishGuess()"
+        />
       </div>
-      <div>
-        <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert" class="warning-alert"/>
-      </div>
-      <button class="submit" @click="publishAnswer()">
-        정답 맞추기
-      </button>
+      <div></div>
+      <button class="submit" @click="publishGuess()">정답 맞추기</button>
       <!-- 침여자의 답변 렌더링 -->
-      <div v-for="wordData in guessWords" :key="wordData.ovToken"
-           class="moving-word"
-           :style="{
-              '--initial-top': wordData.initialTop,
-             '--initial-left': wordData.initialLeft,
-             '--random-top': wordData.top,
-             '--random-left': wordData.left,
-             color: wordData.color
-            }">
-        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 300%;">{{ wordData.word }}</h2>
+      <div
+        v-for="wordData in guessWords"
+        :key="wordData.ovToken"
+        class="moving-word"
+        :style="{
+          '--initial-top': wordData.initialTop,
+          '--initial-left': wordData.initialLeft,
+          '--random-top': wordData.top,
+          '--random-left': wordData.left,
+          color: wordData.color
+        }"
+      >
+        <h2 v-if="wordData.ovToken === turn.ownerOvToken" style="font-size: 200%">
+          {{ wordData.word }}
+        </h2>
         <h2 v-else>{{ wordData.word }}</h2>
       </div>
     </div>
@@ -166,38 +177,40 @@
 
   <v-container class="countdown-container" v-show="!isTimeUp">
     <div class="countdown-timer">
-      <CountDownComponent v-if="counting" time="2.5" text="집중해서 초성을 맞춰보세요!" @end-count-down="timeUp(true)"/>
+      <CountDownComponent
+        v-if="counting"
+        time="2.5"
+        text="집중해서 초성을 맞춰보세요!"
+        @end-count-down="timeUp(true)"
+      />
     </div>
-    
   </v-container>
 
   <div class="countdown-container" v-show="isCorrected">
-    <h1 class="countdown-number">
-      정답: {{ turn.answer }}
-    </h1>
-    <br>
-    <br>
+    <h1 class="countdown-number">정답: {{ turn.answer }}</h1>
+    <br />
+    <br />
     <div class="countdown-tooltip">
-      <h2 style="color: white;">정답자: {{ turn.winner }}</h2>
+      <h2 style="color: white">정답자: {{ turn.winner }}</h2>
     </div>
   </div>
 </template>
 
 <style scoped>
-.container{
+.container {
   display: flex;
   flex-direction: column;
-  background-color: #E7FFDE;
+  background-color: #e7ffde;
   height: 100%;
 }
-.header{
-  margin: 20px auto auto ;
+.header {
+  margin: 20px auto auto;
   width: 1856px;
   height: 94px;
   background-color: blueviolet;
 }
 
-.statusContainer{
+.statusContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -205,40 +218,43 @@
   margin-top: 20px;
 }
 
-.progress-bar{
+.progress-bar {
   width: 1000px;
   height: 69px;
   background-color: yellow;
 }
 
-.info{
+.info {
   display: flex;
-  width: 600px;
+  width: 700px;
   height: 60px;
   border-radius: 5px;
-  margin-top: 80px;
+  margin-top: 20px;
 }
-.info-category{
+.info-category {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 350px;
   border-radius: 10px 0 0 10px;
-  background-color: #CEFFBC;
+  background-color: #fcee59d5;
+  font-weight: bold;
+  letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
-.info-text{
+.info-text {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 550px;
   border-radius: 0 10px 10px 0;
-  background-color: #00FF00;
+  background-color: #d4d4d474;
+  font-weight: bold;
+  font-size: 40px;
+  letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  
 }
 .playContainer {
   margin-top: 10px;
@@ -250,8 +266,8 @@
   justify-content: space-around; /* 수평으로 가운데 정렬 */
 }
 
-.userInput{
-  width: 571px;
+.userInput {
+  width: 600px;
   height: 134px;
   border-radius: 20px;
   background-color: #fff;
@@ -259,21 +275,21 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 3px;
+  padding: 3px 15px;
 }
-
-.emojiField1{
+.emojiField1 {
   width: 60px;
   height: 60px;
   /* background-color: #1F4F16; */
-  background-image: url('../../../../src/assets/image/thinking_face.svg')
+  background-image: url('../../../../src/assets/image/thinking_face.svg');
+  margin-right: 10px;
 }
 
-.emojiField2{
+.emojiField2 {
   width: 60px;
   height: 60px;
-  /* background-color: #1F4F16; */
-  background-image: url('../../../../src/assets/image/smile_face.svg')
+  background-image: url('../../../../src/assets/image/smile_face.svg');
+  margin-right: 10px;
 }
 .initialBox {
   flex: 1;
@@ -292,7 +308,7 @@
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 16px; /* 원하는 폰트 크기로 조정 */
+  font-size: 25px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
 }
 
@@ -341,11 +357,11 @@
   -webkit-text-fill-color: inherit !important;
 }
 
-.submit{
+.submit {
   font-size: 32px;
   width: 292px;
   height: 94px;
-  background-color: #24A319;
+  background-color: #24a319;
   border-radius: 20px;
   color: #fff;
   display: flex;

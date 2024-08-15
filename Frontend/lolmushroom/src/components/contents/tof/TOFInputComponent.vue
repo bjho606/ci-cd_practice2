@@ -10,8 +10,7 @@ import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
 import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
-import ButtonComponent from '@/components/common/ButtonComponent.vue'
-import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -84,7 +83,7 @@ const onSubmitEvent = (_data, _sessionId) => {
 // 모든 사람이 준비되었을 때 TOF main으로 이동하는 함수
 const goToTOFMain = () => {
   if (store.submitUserCount === store.totalUserCount) {
-    store.submitUserCount = 0
+    store.submitUserClear()
     router.push({ name: 'TOFContent' })
   }
 }
@@ -126,10 +125,10 @@ onMounted(async () => {
     subscriptions: ['question']
   })
 
-  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  const hasShownLoading = localStorage.getItem('hasShownLoading_TOF')
   if (!hasShownLoading) {
     showLoading.value = true
-    localStorage.setItem('hasShownLoading', 'true')
+    localStorage.setItem('hasShownLoading_TOF', 'true')
 
     setTimeout(() => {
       showLoading.value = false
@@ -139,11 +138,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-dialog v-model="showLoading" persistent max-width="1000">
+  <v-dialog v-model="showLoading" persistent max-width="1200">
     <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
   </v-dialog>
   <!-- 진술을 제출했을 때 -->
   <v-container fluid v-if="!isSubmit" style="width: 70%" class="my-5">
+    <WaitingHeader
+      first-description="진실 혹은 거짓"
+      second-description="진실 3개와 거짓 1개로 나를 소개해 보세요!"
+      third-description="카메라가 켜지면 자신을 소개해 보세요."
+    />
     <div class="progress-linear-container">
       <v-progress-linear
         bg-color="#FFFFFF"

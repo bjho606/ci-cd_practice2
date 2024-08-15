@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useChatStore } from '@/stores/chatStore'
@@ -7,10 +7,10 @@ import { useUserStore } from '@/stores/userStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import sessionAPI from '@/api/session'
+import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
 import SetName from '@/components/room/playerWaiting/SetName.vue'
 import ChatScreen from '@/components/common/ChatScreen.vue'
-
 
 const route = useRoute()
 const router = useRouter()
@@ -64,11 +64,9 @@ const onSessionEventReceived = (message) => {
 }
 const onProgressEventReceived = (message) => {
   contentsStore.setCurrentContentsState(message)
-  console.log(sessionStore.subSessionId)
-  router.push({name: 'alphabet', params: {subSessionId: sessionStore.subSessionId}})
 }
 const onFinishEventReceived = (message) => {
-  contentsStore.fetchCurrentContentsState(message)
+  contentsStore.setContentsFinish(message)
 }
 
 /**
@@ -106,6 +104,88 @@ const userFlowHandler = async () => {
     subscriptions: ['chat', 'session', 'progress', 'finish']
   })
 }
+
+/**
+ * TODO : Team Leader는 Contents가 종료되면, 종료 Signal을 진행자에게 보낸다.
+ * @param sessionId
+ */
+const finishContents = async (sessionId) => {
+  try {
+    const response = await contentsAPI.finishContents(sessionId)
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 Contents를 종료했어요!')
+      console.log(response.data)
+    }
+  } catch (error) {
+    console.error('Error Finishing Contents', error)
+  }
+}
+
+/**
+ * IMP : Finish Event를 처리하는 Watcher => TeamLeader는 Group 종료 Signal을 날린다.
+ */
+const isFinish = computed(() => contentsStore.getContentsFinish)
+watch(isFinish, (newState) => {
+  if (newState && userStore.isTeamLeader) {
+    console.log('Contents를 종료합니다.')
+    finishContents(sessionStore.subSessionId)
+  }
+})
+
+/**
+ * IMP 적절한 ContentsID에 맞게 Routing을 해주는 Watcher
+ */
+const routeMapping = contentsStore.getRouteMapping
+const socketMapping = contentsStore.getSocketMapping
+const currentContents = computed(() => contentsStore.getCurrentContentsId)
+watch(currentContents, (newContentsId, oldContentsId) => {
+  if (oldContentsId) {
+    switch (oldContentsId) {
+      case '1':
+        webSocketAPI.unsubscribeInput('question')
+        webSocketAPI.unsubscribeInput('answer')
+        webSocketAPI.unsubscribeInput('next')
+        break
+      case '4':
+        webSocketAPI.unsubscribeInput('word')
+        webSocketAPI.unsubscribeInput('guess')
+        break
+      case '7':
+        webSocketAPI.unsubscribeGame(socketMapping[oldContentsId])
+        break
+      default:
+        console.warn(`Unknown subscription type: ${oldContentsId}`)
+    }
+  }
+  if (newContentsId && routeMapping[newContentsId]) {
+    userStore.setIsStarted()
+    contentsStore.setContentsFinish(null)
+    router.push({
+      name: routeMapping[newContentsId],
+      params: {
+        sessionId: sessionStore.sessionId,
+        subSessionId: sessionStore.subSessionId
+      }
+    })
+  }
+})
+
+/**
+ * IMP 적절한 Finish Signal에 맞게 RoomWaiting으로 보내주는 Watcher
+ */
+watch(
+  () => contentsStore.currentGroupState,
+  (newState) => {
+    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
+    if (group && group.isFinish) {
+      router.push({
+        name: 'mainSession',
+        params: { sessionId: sessionStore.sessionId }
+      })
+    }
+  },
+  { deep: true } // Ensure the watcher detects nested changes within the array
+)
 
 /**
  * IMP 5. Player가 PlayerView에 들어온 순간에 호출되어야 하는 CallBack()
@@ -171,6 +251,7 @@ onMounted(() => {
 
 .main-content {
   height: 100%; /* 100% 높이 설정 */
+  background: #E7FFDE;
 }
 
 .sub-content {

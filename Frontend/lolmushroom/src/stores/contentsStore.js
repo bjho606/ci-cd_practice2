@@ -21,6 +21,7 @@ export const useContentsStore = defineStore('contents', {
     totalDuration: 0,
 
     routeMapping: {
+      0: 'Ending',
       1: 'TOF',
       2: null,
       3: null,
@@ -28,19 +29,17 @@ export const useContentsStore = defineStore('contents', {
       5: null,
       6: null,
       7: 'BallGrowContainer',
-      8: null,
-      null: 'EndingPage'
+      8: null
     },
     socketMapping: {
       1: 'tf',
       2: null,
-      3: 'touch',
+      3: null,
       4: 'ini-quiz',
       5: null,
       6: null,
-      7: null,
-      8: null,
-      null: 'EndingPage'
+      7: 'touch',
+      8: null
     },
 
     currentContentsId: null,
@@ -77,7 +76,7 @@ export const useContentsStore = defineStore('contents', {
       }
     },
 
-    fetchCurrentContentsState(isFinish) {
+    setContentsFinish(isFinish) {
       this.currentContentState = isFinish
     },
 
@@ -111,7 +110,9 @@ export const useContentsStore = defineStore('contents', {
     getTotalDuration: (state) => state.totalDuration,
     getCurrentContentsId: (state) => state.currentContentsId,
     getContentsSequence: (state) => state.contentsSequence,
-    getRouteMapping: (state) => state.routeMapping
+    getContentsFinish: (state) => state.currentContentState,
+    getRouteMapping: (state) => state.routeMapping,
+    getSocketMapping: (state) => state.socketMapping
   },
   persist: {
     key: 'contents-store',

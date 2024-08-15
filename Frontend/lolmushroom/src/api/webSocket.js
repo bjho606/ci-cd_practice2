@@ -143,7 +143,7 @@ const addSubscriptions = (
         addWordSubscription(subSessionId, onEventReceived)
         break
       case 'guess':
-        addGuessSubscription(sessionId, subSessionId, contentsId, onEventReceived)
+        addGuessSubscription(sessionId, subSessionId, onEventReceived)
         break
       default:
         console.warn(`Unknown subscription type: ${subscription}`)
@@ -210,13 +210,14 @@ const addProgressSubscription = (sessionId, onProgressReceived) => {
   }
 }
 
+// 진행자가 콘텐츠 종료를 구독하는 함수 => 이거 아님..
 const addFinishSubscription = (sessionId, onFinishReceived) => {
   const finishKey = 'finsih'
   if (!subscriptionMap.has(finishKey)) {
     const finishSubscription = stompClient.subscribe(
       `/subscribe/contents/${sessionId}/finish`,
       (message) => {
-        console.log('Received event from Contents Subscribe', message.body)
+        console.log('Received event from Finish Subscribe', message.body)
         if (onFinishReceived) {
           onFinishReceived(JSON.parse(message.body))
         }
@@ -281,7 +282,7 @@ const addWordSubscription = (subSessionId, onEndReceived) => {
     const wordSubscription = stompClient.subscribe(
       `/subscribe/game/ini-quiz/word/${subSessionId}`,
       (event) => {
-        console.log(`Received event from Subscribe - 초성 문제`, event.body)
+        console.log('Received event from word')
         if (onEndReceived) {
           onEndReceived(JSON.parse(event.body))
         }
@@ -292,20 +293,20 @@ const addWordSubscription = (subSessionId, onEndReceived) => {
 }
 
 // 초성 게임 단어 제출 및 다른 사람의 예측 단어 구독
-const addGuessSubscription = (sessionId, subSessionId, contentsId, onEventReceived) => {
-  const guessKey = contentsId
-  console.log(`/subscribe/game/ini-quiz/${contentsId}/${sessionId}/${subSessionId}`)
+const addGuessSubscription = (sessionId, subSessionId, onEventReceived) => {
+  const guessKey = 'guess'
+  console.log(`/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`)
   if (!subscriptionMap.has(guessKey)) {
-    const finishSubscription = stompClient.subscribe(
+    const guessSubscription = stompClient.subscribe(
       `/subscribe/game/ini-quiz/guess/${sessionId}/${subSessionId}`,
       (event) => {
-        console.log(`Received event from Subscribe - 다른 사람`, event.body)
+        console.log('Received event from guess')
         if (onEventReceived) {
           onEventReceived(JSON.parse(event.body))
         }
       }
     )
-    subscriptionMap.set(guessKey, finishSubscription)
+    subscriptionMap.set(guessKey, guessSubscription)
   }
 }
 
@@ -351,13 +352,25 @@ const addManagerGameSubscription = (sessionId, contentsId, onEventReceived) => {
   }
 }
 
-const unsubscribe = (sessionId) => {
+const unsubscribeInput = (targetInput) => {
+  const key = targetInput
+  if (subscriptionMap.has(key)) {
+    const subscription = subscriptionMap.get(key)
+    subscription.unsubscribe()
+    console.log(`Unsubscribed from Contents ${targetInput}`)
+    subscriptionMap.delete(key)
+  } else {
+    console.error(`No subscription found for Contents ${targetInput}`)
+  }
+}
+
+const unsubscribeSession = (sessionId) => {
   const sessionKey = `session-${sessionId}`
   if (subscriptionMap.has(sessionKey)) {
     const subscription = subscriptionMap.get(sessionKey)
     subscription.unsubscribe()
     console.log(`Unsubscribed from session ${sessionId}`)
-    subscriptionMap.delete(sessionKey) // Map에서 해당 구독 삭제
+    subscriptionMap.delete(sessionKey)
   } else {
     console.error(`No subscription found for session ${sessionId}`)
   }
@@ -414,14 +427,14 @@ const sendClickData = (destination, click) => {
   }
 }
 
-// 진술서 작성 완료 시, 제출 여부를 전송하는 Code
+// 진술서 작성 완료 시, 제출 여부를 전송하는
+// 초성 게임에서 작성 단어를 전송
 const sendSubmitData = (destination, data) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: destination,
       body: data
     })
-    console.log('진술서에 제출 여부', data)
   } else {
     console.error('WebSocket is not Connected')
   }
@@ -458,7 +471,8 @@ export default {
   disconnect,
   sendMessage,
   sendClickData,
-  unsubscribe,
+  unsubscribeInput,
+  unsubscribeSession,
   unsubscribeGame,
   sendSubmitData,
   sendAnswerData,

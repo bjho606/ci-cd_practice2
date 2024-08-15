@@ -15,6 +15,8 @@ import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 import TOFResultComponent from '@/components/contents/tof/TOFResultComponent.vue'
 import TOFSideUserComponent from '@/components/contents/tof/TOFSideUserComponent.vue'
 import CountDownComponent from '@/components/contents/CountDownComponent.vue'
+import TOFAnswerComponent from './TOFAnswerComponent.vue'
+import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
 const store = useTOFStore()
 const router = useRouter()
@@ -116,7 +118,7 @@ const onAnswerReceived = (event) => {
   }
 }
 
-const onNextReceived = (_event) => {
+const onNextReceived = async (_event) => {
   if (index.value < store.totalUserCount - 1) {
     selectedAnswer.value = null
     isSubmitAnswer.value = false
@@ -124,14 +126,8 @@ const onNextReceived = (_event) => {
     store.submitUserCount = 0
     index.value++
     timeUp('')
-  } else {
-    router.push({
-      name: 'mainSession',
-      params: {
-        sessionId: sessionStore.sessionId,
-        subSessionId: sessionStore.subSessionId
-      }
-    })
+  } else if (store.targetUserToken === userStore.userOvToken) {
+    await contentsAPI.finishContents(sessionStore.subSessionId)
   }
 }
 
@@ -159,21 +155,6 @@ watch(index, (newIndex, oldIndex) => {
   }
 })
 
-watch(
-  () => contentsStore.currentGroupState,
-  (newState) => {
-    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
-
-    if (group && group.isFinish) {
-      router.push({
-        name: 'mainSession',
-        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
-      })
-    }
-  },
-  { deep: true } // Ensure the watcher detects nested changes within the array
-)
-
 onMounted(async () => {
   console.log('연결 좀...')
   webSocketAPI.connect({
@@ -189,50 +170,45 @@ onMounted(async () => {
 
 <template>
   <v-container v-show="isTimeUp" class="container">
+    <WaitingHeader
+      first-description="진실 혹은 거짓"
+      second-description="진실 3개와 거짓 1개로 나를 소개해 보세요!"
+      third-description="카메라가 켜지면 자신을 소개해 보세요."
+    />
     <div class="keynote-speecher">
       <div class="video-container">
         <OpenViduComponent />
       </div>
-      <div v-if="store.targetUserToken === userStore.userOvToken" class="next-button">
-        <v-btn text="발표 종료" @click.stop="targetUserUpdate()" color="#24A319" />
-      </div>
+    </div>
+    <div v-if="store.targetUserToken === userStore.userOvToken" class="next-button">
+      <v-btn text="발표 종료" @click.stop="targetUserUpdate()" color="#24A319" />
     </div>
 
+    <!-- 남의 발표 차례일 때 -->
     <div v-if="store.targetUserToken !== userStore.userOvToken">
+      <!-- 아직 정답을 고르지 않았다면 -->
       <div v-if="!isSubmitAnswer" class="mt-5">
-        <!-- 카드 컨테이너 -->
-        <v-container>
-          <v-row>
-            <v-col
-              v-for="(statement, i) in allStatements[index].statements"
-              :key="i"
-              @click="buttonActivate(i + 1)"
-              cols="6"
-            >
-              <v-hover>
-                <template v-slot:default="{ isHovering, props }">
-                  <v-card
-                    class="mx-5 card-border"
-                    v-bind="props"
-                    :title="statement"
-                    :color="getCardColor(i + 1, isHovering)"
-                    hover
-                  />
-                </template>
-              </v-hover>
-            </v-col>
-          </v-row>
-        </v-container>
+        <TOFAnswerComponent
+          :target-nick-name="allStatements[index].username"
+          :selected-answer="selectedAnswer"
+          :all-statements="allStatements"
+          :index="index"
+          @cardSelected="buttonActivate"
+          class="my-5"
+          width="500"
+        />
 
         <div class="button-container" v-if="selectedAnswer" @click="submitAnswer(selectedAnswer)">
-          <ButtonComponent text="선택하기" size="large" />
+          <ButtonComponent text="선택하기" size="x-large" />
         </div>
       </div>
 
+      <!-- 나는 골랐지만, 남들은 아직 안 골랐다면 -->
       <div v-else-if="isSubmitAnswer && !areSubmitAnswer" class="mt-5" width="500">
         <ProgressBar :current="store.submitUserCount" :total="store.totalUserCount - 1" />
       </div>
 
+      <!-- 모두 답을  -->
       <div v-else>
         <TOFResultComponent
           :target-nick-name="allStatements[index].username"
@@ -243,6 +219,8 @@ onMounted(async () => {
         />
       </div>
     </div>
+
+    <!-- 본인의 발표 차례일 때 -->
     <div v-else>
       <TOFResultComponent
         :target-nick-name="allStatements[index].username"
@@ -269,7 +247,8 @@ onMounted(async () => {
 <style scoped>
 .button-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: end;
+  margin: 16px;
 }
 
 .card-container {
@@ -282,7 +261,7 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 4;
+  flex: 1;
 }
 
 .text-black {
@@ -316,6 +295,7 @@ onMounted(async () => {
 .next-button {
   display: flex;
   justify-content: flex-end;
+  margin-right: 16px;
 }
 
 .keynote-speecher {

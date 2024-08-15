@@ -1,18 +1,29 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
+import { useSessionStore } from '@/stores/sessionStore'
+import { useRoomStore } from '@/stores/roomStore'
 import BallContent from './BallContent.vue'
+import spark from '@/assets/image/spark.png'
+import swooshSound from '@/assets/swoosh.mp3'
+import hitSound from '@/assets/hit.mp3'
 
+const props = defineProps({
+  timeOut: Number
+})
 const ballStore = useBallStore()
+const sessionStore = useSessionStore()
 const currentGroup = computed(() => ballStore.getCurrentGroup)
-const isMine = computed(() => ballStore.getIsMyBall(currentGroup))
+const isMine = computed(() => ballStore.getIsMyBall(currentGroup.value))
 
 /**
  * TODO Time에 대한 Value를 관리해야 한다.
  */
-const RemainTime = ref(0)
+const RemainTime = ref(props.timeOut)
 
-const nowClick = ref(false)
+/**
+ * IMP Ball에 대한 Effect 관리를 해야 한다.
+ */
 const clickEffects = ref([])
 const addClickEffect = (event) => {
   const effect = {
@@ -26,23 +37,58 @@ const addClickEffect = (event) => {
   }, 500)
 }
 
-const backToMyBall = () => {
-  nowClick.value = true
+// ballClick을 할 시 ballStore로 데이터를 전송한다.
+const onBallClick = () => {
+  ballStore.onBallClick(sessionStore.sessionId, currentGroup.value)
 }
+// 다시 자신의 공으로 돌아온다.
+const onReturnClick = () => {
+  ballStore.onReturnClick()
+}
+
+// 키보드 입력시에도 효과를 준다.
+const handleKeyup = (event) => {
+  if (event.code === 'Space') {
+    console.log(isMine)
+    if (isMine.value == true) {
+      const audio = new Audio(hitSound)
+      audio.play()
+    } else {
+      const audio = new Audio(swooshSound)
+      audio.play()
+    }
+    onBallClick()
+  }
+}
+
+onMounted(() => {
+  let intervalId = setInterval(() => {
+    if (RemainTime.value > 0) {
+      RemainTime.value -= 1
+    } else {
+      clearInterval(intervalId)
+    }
+  }, 1000)
+  window.addEventListener('keyup', handleKeyup)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keyup', handleKeyup)
+})
 </script>
 
 <template>
   <div class="center-wrapper" @click="addClickEffect">
     <v-btn class="remainTime">남은 시간: {{ RemainTime }}초</v-btn>
-    <BallContent :isMain="true" :groupId="currentGroup" />
-    <v-btn v-if="!isMine" class="backToMyGroup" @click="backToMyBall">내 그룹으로 돌아가기</v-btn>
+    <BallContent :isMain="true" :groupId="currentGroup" @click="onBallClick" />
+    <v-btn v-if="!isMine" class="backToMyGroup" @click="onReturnClick">내 그룹으로 돌아가기</v-btn>
     <div
       v-for="effect in clickEffects"
       :key="effect.id"
       class="click-effect"
       :style="{ left: `${effect.x - 50}px`, top: `${effect.y - 50}px` }"
     >
-      <v-img src="src/assets/image/spark.png"></v-img>
+      <v-img :src="spark"></v-img>
     </div>
   </div>
 </template>

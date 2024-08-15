@@ -20,8 +20,8 @@ const props = defineProps({
 })
 const title = props.contentsInfo.contentTitle
 const buttonText = props.contentsInfo.category
-const instructionsText = props.contentsInfo.description
 const contentImage = props.contentsInfo.imgUrl
+const instructionsText = props.contentsInfo.description
 </script>
 
 <template>

@@ -1,6 +1,10 @@
 <script setup>
 import { defineEmits } from 'vue'
-
+const props = defineProps({
+  buttonLabel: {
+    type: String
+  }
+})
 const emit = defineEmits(['start-game'])
 
 const startGame = () => {
@@ -10,8 +14,8 @@ const startGame = () => {
 
 <template>
   <button class="start-session-btn" @click="startGame">
-    <span class="start-session-text">컨텐츠 시작하기</span>
-    <v-icon class="start-session-icon" icon="mdi-chevron-right" style="color: black;" />
+    <span class="start-session-text">{{ buttonLabel }}</span>
+    <v-icon class="start-session-icon" icon="mdi-chevron-right" />
   </button>
 </template>
 

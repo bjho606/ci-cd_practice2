@@ -1,9 +1,9 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { useChatStore } from '@/stores/chatStore'
+import { useUserStore } from '@/stores/userStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
-import { useUserStore } from '@/stores/userStore'
 import webSocketAPI from '@/api/webSocket'
 import sessionAPI from '@/api/session'
 import RoomCard from './RoomCard.vue'
@@ -13,6 +13,7 @@ const chatStore = useChatStore()
 const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
 const userStore = useUserStore()
+const isUserStarted = computed(() => userStore.isStarted)
 const rooms = computed(() => roomStore.getRooms)
 const activeRooms = computed(() => roomStore.getActiveRooms)
 const subSessionInfo = computed(() => roomStore.getGroupInfoBySessionId(sessionStore.subSessionId))
@@ -70,7 +71,7 @@ const createSubSessionHandler = async (sessionId) => {
 const handleLeaveSession = async (sessionId) => {
   try {
     await sessionAPI.getSubSessionQuit(sessionId)
-    webSocketAPI.unsubscribe(sessionId) // subSession webSocket에도 구독을 제거함.
+    webSocketAPI.unsubscribeSession(sessionId) // subSession webSocket에도 구독을 제거함.
     userStore.setTeamLeader(false) // 팀장이 나갈 가능성에 대한 처리
     sessionStore.setSubSessionId(null) // sessionStore에서 SubSessionId가 없앤다.
     chatStore.setCurrentMode('All') // ChatStore의 Mode를 'All'로 변환한다.
@@ -147,7 +148,10 @@ const changeRoomName = async (index) => {
           @onJoinOrLeave="handleRoomClick(index)"
         />
       </v-container>
-      <v-container v-if="activeRooms.length < roomStore.maxRoomCount" class="group-container">
+      <v-container
+        v-if="activeRooms.length < roomStore.maxRoomCount && !isUserStarted"
+        class="add-group-container"
+      >
         <AddGroupButton @createGroup="handleRoomClick(activeRooms.length)" />
       </v-container>
     </div>
@@ -172,6 +176,7 @@ const changeRoomName = async (index) => {
 
 .group-container {
   max-width: 250px;
+  height: 250px;
   flex-shrink: 0;
 }
 </style>

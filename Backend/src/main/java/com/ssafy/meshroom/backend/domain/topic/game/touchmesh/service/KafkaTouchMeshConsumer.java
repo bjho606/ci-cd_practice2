@@ -29,11 +29,9 @@ public class KafkaTouchMeshConsumer {
     }
 
     private void updateMushroomSize(TouchDto touchEvent) {
-        String key = touchEvent.getSessionId();
-
+        String key = "touch-" + touchEvent.getSessionId();
         // Redis에셔 현재 크기 가져오기
         Integer currSize = redisTemplate.opsForValue().get(key);
-
         log.info("touch event type: " + touchEvent.getType());
 
         if (currSize == null) {
@@ -49,9 +47,8 @@ public class KafkaTouchMeshConsumer {
     }
 
     private void sendUpdateToClient(TouchDto touchEvent) throws JsonProcessingException {
-
-        Integer updatedSize = redisTemplate.opsForValue().get(touchEvent.getSessionId());
-
+        String key = "touch-" + touchEvent.getSessionId();
+        Integer updatedSize = redisTemplate.opsForValue().get(key);
         UpdatedMushroom updatedMushroom = new UpdatedMushroom();
         updatedMushroom.setMainSessionId(touchEvent.getMainSessionId());
         updatedMushroom.setSessionId(touchEvent.getSessionId());

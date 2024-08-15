@@ -8,12 +8,14 @@ const props = defineProps({
 
 <template>
   <div v-if="users.length > 0" class="user-list">
-    <v-btn v-for="user in users" :key="user" class="user-btn" min-width="180">
-      {{ groupName }}
-      <div>
+    <div v-for="user in users" :key="user" class="user-container" min-width="180">
+      <div class="user-groupname">
+        {{ groupName }}
+      </div>
+      <div class="user-name">
         {{ user }}
       </div>
-    </v-btn>
+    </div>
   </div>
 </template>
 
@@ -23,14 +25,37 @@ const props = defineProps({
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: 20px;
+  align-items: center;
+  margin-top: 40px;
 }
 
-.user-btn {
-  background-color: #ceffbc;
-  width: 100%;
+.user-container {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  background-color: #d4d4d474;
+  width: 90%;
   font-size: 12px;
-  padding: 5px 10px;
   margin-bottom: 10px;
+  border-radius: 20px;
 }
+
+.user-groupname {
+  flex: 2;
+  align-content: center;
+  text-align: center;
+  font-weight: bold;
+  background-color: #fcee59d5;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.user-name {
+  flex: 1;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+
 </style>

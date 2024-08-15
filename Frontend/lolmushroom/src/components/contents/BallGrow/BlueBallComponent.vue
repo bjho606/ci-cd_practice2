@@ -1,14 +1,18 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
+import swooshSound from '@/assets/swoosh.mp3'
 const isBouncing = ref(false)
+
 const handleClick = () => {
   bounce()
   playSound()
 }
 
 function playSound() {
-  const audio = new Audio('./src/assets/swoosh.mp3')
-  audio.play()
+  const audio = new Audio(swooshSound)
+  audio.play().catch((error) => {
+    console.error('Audio playback failed:', error)
+  })
 }
 
 function bounce() {
@@ -59,6 +63,8 @@ const transform = computed(() => {
   const scaleFactor = size.value / originalWidth
   return `matrix(${scaleFactor} 0 0 ${scaleFactor} 0 0)`
 })
+
+
 </script>
 
 <style scoped>
@@ -95,6 +101,7 @@ const transform = computed(() => {
 .health {
   font-size: xx-large;
   position: absolute;
+  color: white;
 }
 </style>
 <template>

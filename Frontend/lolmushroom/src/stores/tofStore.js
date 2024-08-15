@@ -42,8 +42,13 @@ export const useTOFStore = defineStore('tof', {
       console.log(event)
       const { sessionId, curStep, submitCount, finishCount } = event
       const groupInfo = this.tofMap.get(sessionId)
-      if (curStep == 1) groupInfo.groupStepInfo = submitCount
-      else groupInfo.groupStepInfo = finishCount
+      if (curStep === 1) {
+        groupInfo.groupStep = curStep
+        groupInfo.groupStepInfo = submitCount
+      } else {
+        groupInfo.groupStep = curStep
+        groupInfo.groupStepInfo = finishCount
+      }
       this.tofMap.set(sessionId, groupInfo)
     },
 
@@ -52,6 +57,9 @@ export const useTOFStore = defineStore('tof', {
     },
     addChosenData(user, chosen) {
       this.chosenArray[chosen].push(user)
+    },
+    submitUserClear() {
+      this.submitUserCount = 0
     }
   },
   getters: {

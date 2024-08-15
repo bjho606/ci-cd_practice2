@@ -12,15 +12,30 @@ const props = defineProps({
 // ballStore에서 데이터를 가져옴
 const ballStore = useBallStore()
 
-// 해당 room의 rank와 score를 ballStore에서 가져오는 computed 속성
-const rank = computed(() => ballStore.getRankByRoomId(props.room.id)) // 예시: 함수 이름은 실제 store에 맞게 변경
-const score = computed(() => ballStore.getScoreByRoomId(props.room.id)) // 예시: 함수 이름은 실제 store에 맞게 변경
+// sessionId, GroupName, score가 들어있는 Array => rank : ArrayIndex + 1
+const totalBalls = computed(() => ballStore.getTotalBalls)
+const userRankAndScore = computed(() => {
+  // room.sessionId와 같은 sessionId를 찾음
+  const userIndex = totalBalls.value.findIndex((ball) => ball.sessionId === props.room.sessionId)
+
+  if (userIndex !== -1) {
+    return {
+      rank: userIndex + 1, // 등수는 index + 1
+      score: totalBalls.value[userIndex].size // 점수는 해당 index의 score
+    }
+  } else {
+    return {
+      rank: 'N/A',
+      score: 'N/A'
+    }
+  }
+})
 </script>
 
 <template>
   <div class="room-info">
-    <div class="rank">등수 - {{ rank }}</div>
-    <div class="score">점수 - {{ score }}</div>
+    <div class="rank">등수: {{ userRankAndScore.rank }}</div>
+    <div class="score">점수: {{ userRankAndScore.score }}</div>
   </div>
 </template>
 

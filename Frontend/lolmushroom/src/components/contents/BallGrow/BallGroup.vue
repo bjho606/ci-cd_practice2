@@ -9,19 +9,31 @@ const totalBalls = computed(() => ballStore.getTotalBalls)
 const rows = computed(() => {
   return totalBalls.value.reduce((acc, item, index) => {
     if (index % 2 === 0) acc.push([])
-    acc[acc.length - 1].push(item)
+    acc[acc.length - 1].push({ ...item, rank: index + 1 })
     return acc
   }, [])
 })
+
+// 공 변경 하기
+const onChangeClick = (sessionId) => {
+  ballStore.onChangeClick(sessionId)
+}
 </script>
 
 <template>
   <div class="ball-group">
+    <transition-group name="slide" tag="div">
     <div v-for="(row, index) in rows" :key="index" class="row">
       <div v-for="ball in row" :key="ball.sessionId" class="ball-item">
-        <BallContent :groupId="ball.sessionId" :isMain="false" />
+        <BallContent
+          :groupId="ball.sessionId"
+          :rank="ball.rank" 
+          :isMain="false"
+          @click="onChangeClick(ball.sessionId)"
+        />
       </div>
     </div>
+  </transition-group>
   </div>
 </template>
 
@@ -42,5 +54,15 @@ const rows = computed(() => {
 
 .row:last-child .ball-item:last-child {
   margin-right: 0;
+}
+
+/* 슬라이딩 효과 */
+.slide-enter-active, .slide-leave-active {
+  transition: all 1s ease;
+}
+
+.slide-enter-from, .slide-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>

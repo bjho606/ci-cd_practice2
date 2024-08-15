@@ -1,17 +1,21 @@
 <script setup>
 import { computed, ref } from 'vue'
+import hitSound from '@/assets/hit.mp3'
 
 const handleClick = () => {
   bounce()
   playSound()
+
 }
 
 function playSound() {
-  const audio = new Audio('./src/assets/hit.mp3')
-  audio.play()
+  const audio = new Audio(hitSound)
+  audio.play().catch((error) => {
+    console.error('Audio playback failed:', error)
+  })
 }
-
 const isBouncing = ref(false)
+
 
 function bounce() {
   if (!isBouncing.value) {
@@ -62,6 +66,7 @@ const transform = computed(() => {
   const scaleFactor = size.value / originalWidth
   return `matrix(${scaleFactor} 0 0 ${scaleFactor} 0 0)`
 })
+defineExpose({ handleClick })
 </script>
 
 <style scoped>
@@ -98,6 +103,7 @@ const transform = computed(() => {
 .health {
   font-size: xx-large;
   position: absolute;
+  color: white;
 }
 </style>
 
