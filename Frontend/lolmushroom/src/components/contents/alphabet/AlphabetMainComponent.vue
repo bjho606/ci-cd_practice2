@@ -98,8 +98,11 @@ watch(index, async (newIndex) => {
       isCorrected.value = false
     }, 3000)
     return
-  } else if (turn.ownerOvToken === userStore.userOvToken)
-    await contentsAPI.finishContents(sessionStore.subSessionId)
+  } else if (turn.ownerOvToken === userStore.userOvToken){
+    setTimeout(async () => {
+      await contentsAPI.finishContents(sessionStore.subSessionId)
+    }, 3000);
+  }
 })
 
 onMounted(async () => {
