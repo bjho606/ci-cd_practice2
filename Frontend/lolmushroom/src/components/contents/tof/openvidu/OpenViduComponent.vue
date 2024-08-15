@@ -1,70 +1,70 @@
 <script setup>
-  import axios from 'axios'
-  import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
-  import { OpenVidu } from 'openvidu-browser'
-  import { useUserStore } from '@/stores/userStore'
-  import { useSessionStore } from '@/stores/sessionStore'
-  import { useTOFStore } from '@/stores/tofStore'
-  import UserVideo from './UserVideo.vue'
+import axios from 'axios'
+import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
+import { OpenVidu } from 'openvidu-browser'
+import { useUserStore } from '@/stores/userStore'
+import { useSessionStore } from '@/stores/sessionStore'
+import { useTOFStore } from '@/stores/tofStore'
+import UserVideo from './UserVideo.vue'
 
-  axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-  const { VITE_OPENVIDU_URL } = import.meta.env;
-  const { VITE_OPENVIDU_SECRET } = import.meta.env;
+const { VITE_OPENVIDU_URL } = import.meta.env
+const { VITE_OPENVIDU_SECRET } = import.meta.env
 
-  const mic = ref(true)
-  const video = ref(true)
+const mic = ref(true)
+const video = ref(true)
 
-  const userStore = useUserStore()
-  const sessionStore = useSessionStore()
-  const store = useTOFStore()
+const userStore = useUserStore()
+const sessionStore = useSessionStore()
+const store = useTOFStore()
 
-  const state = reactive({
-    // OpenVidu 관련 상태 관리
-    OV: null,
-    session: sessionStore.subSessionId,
-    mainStreamManager: null,
-    publisher: null,
-    subscribers: [],
+const state = reactive({
+  // OpenVidu 관련 상태 관리
+  OV: null,
+  session: sessionStore.subSessionId,
+  mainStreamManager: null,
+  publisher: null,
+  subscribers: []
+})
+
+// Join form 관리
+const mySessionId = ref('SessionA') // 방 이름을 session에
+
+const joinSession = async () => {
+  // --- 1) OpenVidu 객체 얻기 ---
+  state.OV = new OpenVidu(VITE_OPENVIDU_URL, VITE_OPENVIDU_SECRET)
+
+  // 통신 과정에서 많은 log를 남기게 되는데 필요하지 않은 log를 띄우지 않게 하는 모드
+  state.OV.enableProdMode()
+
+  // --- 2) 세션 초기화 ---
+  state.session = state.OV.initSession()
+
+  // --- 3) 세션에서 이벤트가 발생할 때 작업 ---
+
+  // 스트림이 받아질 때..
+  state.session.on('streamCreated', ({ stream }) => {
+    console.log('Stream created:', stream) // 스트림 생성 로그
+    const subscriber = state.session.subscribe(stream, 'video-container')
+    console.log('Subscriber added:', subscriber) // 구독자 추가 로그
+    state.subscribers.push(subscriber)
   })
 
-  // Join form 관리
-  const mySessionId = ref('SessionA')   // 방 이름을 session에
+  // 스트림이 파괴될 때...
+  state.session.on('streamDestroyed', ({ stream }) => {
+    console.log('Stream destroyed:', stream) // 스트림 파괴 로그
+    const index = state.subscribers.indexOf(stream.streamManager, 0)
+    if (index >= 0) {
+      state.subscribers.splice(index, 1)
+      console.log('Subscriber removed at index:', index) // 구독자 제거 로그
+    }
+  })
 
-  const joinSession = async () => {
-    // --- 1) OpenVidu 객체 얻기 ---
-    state.OV = new OpenVidu(VITE_OPENVIDU_URL, VITE_OPENVIDU_SECRET)
-
-    // 통신 과정에서 많은 log를 남기게 되는데 필요하지 않은 log를 띄우지 않게 하는 모드
-    state.OV.enableProdMode()
-
-    // --- 2) 세션 초기화 ---
-    state.session = state.OV.initSession()
-
-    // --- 3) 세션에서 이벤트가 발생할 때 작업 ---
-
-    // 스트림이 받아질 때..
-    state.session.on('streamCreated', ({ stream }) => {
-      console.log('Stream created:', stream);  // 스트림 생성 로그
-      const subscriber = state.session.subscribe(stream);
-      console.log('Subscriber added:', subscriber);  // 구독자 추가 로그
-      state.subscribers.push(subscriber);
-    })
-
-    // 스트림이 파괴될 때...
-    state.session.on('streamDestroyed', ({ stream }) => {
-      console.log('Stream destroyed:', stream);  // 스트림 파괴 로그
-      const index = state.subscribers.indexOf(stream.streamManager, 0);
-      if (index >= 0) {
-        state.subscribers.splice(index, 1);
-        console.log('Subscriber removed at index:', index);  // 구독자 제거 로그
-        }
-      })
-
-    // 모든 비동기 에러에 대해...
-    state.session.on('exception', ({ exception }) => {
-      console.warn(exception)
-    })
+  // 모든 비동기 에러에 대해...
+  state.session.on('exception', ({ exception }) => {
+    console.warn(exception)
+  })
 
     // --- 4) 유효한 토큰으로 세션에 연결함 ---
     // const token = await getToken(sessionStore.subSessionId)
@@ -99,73 +99,76 @@
       })
   }
 
-  const leaveSession = () => {
-    // --- 7) Leave the session by calling 'disconnect' method over the Session object ---
-    if (state.session) state.session.disconnect()
+const leaveSession = () => {
+  // --- 7) Leave the session by calling 'disconnect' method over the Session object ---
+  if (state.session) state.session.disconnect()
 
-    // Empty all properties...
-    state.session = null
-    state.mainStreamManager = null
-    state.publisher = null
-    state.subscribers = []
-    state.OV = null
+  // Empty all properties...
+  state.session = null
+  state.mainStreamManager = null
+  state.publisher = null
+  state.subscribers = []
+  state.OV = null
 
-    // Remove beforeunload listener
-    window.removeEventListener('beforeunload', leaveSession)
+  // Remove beforeunload listener
+  window.removeEventListener('beforeunload', leaveSession)
+}
+
+const updateMainVideoStreamManager = (stream) => {
+  if (state.mainStreamManager === stream) return
+  state.mainStreamManager = stream
+
+  //
+  state.subscribers.forEach((subscriber) => {
+    if (subscriber === state.mainStreamManager) {
+      subscriber.publishVideo(true)
+      subscriber.publishAudio(true)
+    } else {
+      subscriber.publishVideo(false)
+      subscriber.publishAudeo(false)
+    }
+  })
+
+  if (state.publisher === state.mainStreamManager) {
+    state.publisher.publishVideo(true)
+    state.publisher.publishAudeo(true)
+  } else {
+    state.publisher.publishVideo(false)
+    state.publisher.publishAudeo(false)
   }
+}
 
-  const updateMainVideoStreamManager = (stream) => {
-    if (state.mainStreamManager === stream) return
-    state.mainStreamManager = stream
-
-    // 
-    state.subscribers.forEach(subscriber => {
-      if (subscriber === state.mainStreamManager) {
-        subscriber.publishAudio(true)
-      } else {
-        subscriber.publishAudio(false)
-      }
+watch(
+  () => store.targetUserToken,
+  (newToken) => {
+    const targetStream = state.subscribers.find((sub) => {
+      sub.stream.connection.data === `${newToken}`
     })
 
-    if (state.publisher === state.mainStreamManager) {
-      state.publisher.publishAudio(true)
-    } else {
-      state.publisher.publishAudio(false)
-    }
-  }
-
-  watch(() => store.targetUserToken, (newToken) => {
-    const targetStream = state.subscribers.find(
-      sub => {
-        sub.stream.connection.data === `"${newToken}"`
-      }
-    );
-    
     if (targetStream) {
-      updateMainVideoStreamManager(targetStream);
-    }
-  });
-
-  const toggleMic = () => {
-    mic.value = !mic.value
-    state.publisher.publishAudio(mic.value)
-  }
-
-  const toggleVideo = () => {
-    video.value = !video.value
-    state.publisher.publishVideo(video.value)
-
-    state.subscribers.forEach(subscriber => {
-      subscriber.subscribeToVideo(video.value)
-    })
-
-    if (video.value) {
-      state.mainStreamManager = state.publisher
-    } else {
-      state.mainStreamManager = null
+      updateMainVideoStreamManager(targetStream)
     }
   }
+)
 
+const toggleMic = () => {
+  mic.value = !mic.value
+  state.publisher.publishAudio(mic.value)
+
+  state.subscribers.forEach((subscriber) => {
+    subscriber.subscribeToAudio(mic.value)
+  })
+}
+
+const toggleVideo = () => {
+  video.value = !video.value
+  // 여기에 내 비디오만 변화하도록 수정한다.
+  state.publisher.publishVideo(video.value)
+
+  state.subscribers.forEach((subscriber) => {
+    subscriber.subscribeToVideo(video.value)
+  })
+}
 
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
@@ -201,27 +204,28 @@
 
   })
 
-  // 컴포넌트가 언마운트될 때 실행
-  onBeforeUnmount(() => {
-    leaveSession()
-  })
+// 컴포넌트가 언마운트될 때 실행
+onBeforeUnmount(() => {
+  leaveSession()
+})
 </script>
 
 <template>
   <div id="session">
-    <div id="session-header">
-      <!-- <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession"
-        value="Leave session" /> -->
-    </div>
     <div id="main-video" class="col-md-6">
       <UserVideo :stream-manager="state.mainStreamManager" />
       <div class="d-flex">
-        <div v-if="store.targetUserToken === userStore.userOvToken"> 
-          <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()"/>
-          <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()"/>
+        <div v-if="store.targetUserToken === userStore.userOvToken">
+          <v-icon v-show="video" icon="mdi-video" size="x-large" @click="toggleVideo()" />
+          <v-icon v-show="!video" icon="mdi-video-off" size="x-large" @click="toggleVideo()" />
         </div>
-        <v-icon v-show="mic===true" icon="mdi-microphone" size="x-large" @click="toggleMic()"/>
-        <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
+        <v-icon v-show="mic === true" icon="mdi-microphone" size="x-large" @click="toggleMic()" />
+        <v-icon
+          v-show="mic === false"
+          icon="mdi-microphone-off"
+          size="x-large"
+          @click="toggleMic()"
+        />
       </div>
     </div>
     <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
