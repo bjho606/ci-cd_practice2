@@ -166,20 +166,30 @@ const extractWebSocketURL = (data) => {
 
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
+    
     const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        const newVideos = mutation.addedNodes;
-        newVideos.forEach((node) => {
-          if (node.tagName === 'VIDEO') {
-            ovToken.value = extractWebSocketURL(ovToken.value)
-            node.id = ovToken.value;
-            ovToken.value = ''
-          }
-        });
-      }
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          const newVideos = mutation.addedNodes;
+          newVideos.forEach((node) => {
+            if (node.tagName === 'VIDEO') {
+              ovToken.value = extractWebSocketURL(ovToken.value)
+              node.id = ovToken.value;
+              ovToken.value = ''
+              
+              console.log(node.id, '이게 사람id')
+              console.log(store.targetUserToken, '이게 토큰')
+              // 렌더링 완료 후 store.targetUserToken 값과 id가 일치하는 비디오만 표시
+              if (node.id === store.targetUserToken) {
+                node.style.display = 'block';  // 해당 video를 표시
+              } else {
+                node.style.display = 'none';  // 다른 video는 숨김
+              }
+            }
+          });
+        }
+      });
     });
-  });
 
   observer.observe(videoContainer.value, { childList: true });
 
@@ -206,7 +216,8 @@ const extractWebSocketURL = (data) => {
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    <div id="video-container" class="col-md-6" style="display: none;" ref="videoContainer">
+    <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
+    <div id="video-container" class="col-md-6" ref="videoContainer">
       <UserVideo :stream-manager="state.mainStreamManager" />
     </div>
   </div>
