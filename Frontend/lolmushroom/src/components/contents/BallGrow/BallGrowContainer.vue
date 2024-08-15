@@ -1,23 +1,27 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
+import { useUserStore } from '@/stores/userStore'
+import { useContentsStore } from '@/stores/contentsStore'
+import { useRouter } from 'vue-router'
+import contentsAPI from '@/api/contents'
 import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 
-const ballStore = useBallStore()
-const contentsStore = useContentsStore()
+const router = useRouter()
 const roomStore = useRoomStore()
+const ballStore = useBallStore()
+const userStore = useUserStore()
 const sessionStore = useSessionStore()
-const contentsInfo = contentsStore.contents[6]
-const showLoading = ref(false)
 const firstDescription = '공 키우기'
 const secondDescription = '우리 그룹의 공을 최대한 크게 만드세요!'
 const thirdDescription = 'Tip: 클릭 대신 스페이스바를 누를 수 있답니다 !'
+const showLoading = ref(false)
 
 /**
  * IMP Session Socket을 통해 활성화된 Group을 받아오고 Ball 개수 결정
@@ -29,6 +33,37 @@ const activeGroups = computed(() => {
   }))
 })
 
+/**
+ * 팀 리더가 컨텐츠 종료 시 종료 Signal을 진행자에게 보낸다.
+ *
+ */
+const finishContents = async (sessionId) => {
+  try {
+    const response = await contentsAPI.finishContents(sessionId)
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 Contents를 종료했어요!')
+      console.log(response.data)
+    }
+  } catch (error) {
+    console.error('Error Finishing Contents', error)
+  }
+}
+
+watch(
+  () => contentsStore.currentGroupState,
+  (newState) => {
+    const group = newState.find((group) => group.sessionId === sessionStore.subSessionId)
+    if (group && group.isFinish) {
+      router.push({
+        name: 'BallGrowResult',
+        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+      })
+    }
+  },
+  { deep: true } // Ensure the watcher detects nested changes within the array
+)
+
+// socket 연결
 onMounted(() => {
   ballStore.initSocketConnection(
     sessionStore.sessionId,

@@ -7,7 +7,7 @@ const handleClick = () => {
 }
 
 function playSound() {
-  const audio = new Audio('./src/assets/swoosh.mp3')
+  const audio = new Audio('@/src/assets/swoosh.mp3')
   audio.play()
 }
 
