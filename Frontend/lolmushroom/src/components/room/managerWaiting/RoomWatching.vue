@@ -129,7 +129,7 @@ const startNextGame = () => {
     <div class="header-container">
       <ManagerHeader />
     </div>
-    <WatchWaiting :currentContents="currentContents" />
+    <adminWatchWaiting :currentContents="currentContents" />
     <ManagerFooter>
       <template v-slot:start>
         <FooterStart
