@@ -199,7 +199,15 @@ onBeforeUnmount(() => {
         />
       </div>
     </div>
-    <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
-    <div id="video-container" class="col-md-6"></div>
+    {{ store.targetUserToken }}
+    <div id="video-container" class="col-md-6" style="display: none">
+      <!-- <div id="video-container" class="col-md-6"> -->
+      <UserVideo :stream-manager="state.publisher" />
+      <UserVideo
+        v-for="sub in state.subscribers"
+        :key="sub.stream.connection.connectionId"
+        :stream-manager="sub"
+      />
+    </div>
   </div>
 </template>
