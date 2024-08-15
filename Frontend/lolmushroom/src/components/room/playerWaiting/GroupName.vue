@@ -15,20 +15,24 @@ const handleClick = () => {
 </script>
 
 <template>
-  <v-btn class="group-name" @click="handleClick">
-    <v-img src="src/assets/image/autorenew.svg" class="icon" />
-    {{ groupName }}
-  </v-btn>
+  <div class="group-name-div">
+    <v-btn class="group-name" @click="handleClick">
+      <v-img src="src/assets/image/autorenew.svg" class="icon" />
+      {{ groupName }}
+    </v-btn>
+  </div>
 </template>
 
 <style scoped>
+.group-name-div {
+  width: 100%;
+}
 .group-name {
   background-color: #fff58a64;
   font-size: larger;
   font-weight: bold;
-  /* min-height: 100px; */
-  margin-bottom: 10px;
-  height: 100%;
+  /* height: 100%; */
+  height: 70px;
   width: 100%;
 }
 

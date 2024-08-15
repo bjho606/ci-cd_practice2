@@ -64,7 +64,7 @@ const handleJoinOrLeaveClick = () => {
 
 <style scoped>
 .group-card-div {
-  height: 100%;
+  max-height: 200px;
   width: 100%;
 }
 
@@ -72,6 +72,7 @@ const handleJoinOrLeaveClick = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
 }
@@ -80,13 +81,16 @@ const handleJoinOrLeaveClick = () => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-.group-ready-btn {
+/* .group-ready-btn {
+  min-height: 25px;
   flex: 1;
-}
-.group-name-btn {
+} */
+/* .group-name-btn {
+  max-height: 70px;
   flex: 3;
-}
-.group-join-btn {
+} */
+/* .group-join-btn {
+  min-height: 25px;
   flex: 1;
-}
+} */
 </style>

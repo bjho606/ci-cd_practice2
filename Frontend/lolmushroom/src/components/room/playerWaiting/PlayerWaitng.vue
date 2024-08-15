@@ -46,6 +46,7 @@ const getSessionConnection = async (sessionId, userName) => {
       console.log('subSession과 Connection을 성공적으로 만들어 냈습니다.')
       console.log('WebSocket 연결을 진행해 드릴게요:) Group Chatting을 즐기세요!')
       sessionStore.setSubSessionId(sessionId)
+      userStore.userOvToken = response.data.result['ovToken']
       webSocketAPI.connect({
         sessionId: sessionStore.getSubSessionId,
         onMessageReceived: onSubSessionMessageReceived,
@@ -136,7 +137,7 @@ const changeRoomName = async (index) => {
 <template>
   <div class="room-list-container">
     <div class="room-list">
-      <v-container
+      <div
         v-for="(room, index) in activeRooms"
         :key="room.sessionId"
         class="group-container"
@@ -147,7 +148,7 @@ const changeRoomName = async (index) => {
           @onChangeName="changeRoomName(index)"
           @onJoinOrLeave="handleRoomClick(index)"
         />
-      </v-container>
+      </div>
       <v-container
         v-if="activeRooms.length < roomStore.maxRoomCount && !isUserStarted"
         class="add-group-container"
@@ -175,8 +176,9 @@ const changeRoomName = async (index) => {
 }
 
 .group-container {
-  max-width: 250px;
-  height: 250px;
-  flex-shrink: 0;
+  min-width: 250px;
+  padding: 16px;
+  /* max-height: 200px; */
+  /* flex-shrink: 0; */
 }
 </style>
