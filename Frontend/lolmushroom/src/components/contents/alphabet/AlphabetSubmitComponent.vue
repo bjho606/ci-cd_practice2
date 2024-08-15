@@ -5,6 +5,7 @@ import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useUserStore } from '@/stores/userStore'
+import Alphabet_Contents from '@/assets/Alphabet_Contents.png'
 import ContentsLoading from '../ContentsLoading.vue'
 import sessionAPI from '@/api/session'
 import contentsAPI from '@/api/contents'
@@ -15,8 +16,6 @@ const router = useRouter()
 const store = useAlphabetStore()
 const sessionStore = useSessionStore()
 const contentsStore = useContentsStore()
-const contentsInfo = contentsStore.contents[3]
-const showLoading = ref(false)
 const userStore = useUserStore()
 const quizWord = ref('')
 const isDisabled = ref(false)
@@ -24,7 +23,13 @@ const showAlert = reactive({
   blank: false,
   korean: false
 })
-// const showAlter = ref('')
+/**
+ * IMP : Loading Info
+ */
+const contentsInfo = contentsStore.contents[3]
+const instructionsText =
+  '1. 출제자가 되어 단어를 제출해보세요<br>2. 다른 참여자들은 단어를 맞추면 됩니다<br>3. 다른 사람들보다 빨리 많이 맞혀봅시다!'
+const showLoading = ref(false)
 
 // 세션에 참가한 유저 정보를 요청하는 함수
 const response = await sessionAPI.getSubSessionInfo(
@@ -91,14 +96,11 @@ onMounted(async () => {
     onEventReceived: onWordReceived,
     subscriptions: ['word']
   })
-  const hasShownLoading = localStorage.getItem('hasShownLoading_AlphaBet')
-  if (!hasShownLoading) {
-    showLoading.value = true
-    localStorage.setItem('hasShownLoading_AlphaBet', 'true')
-    setTimeout(() => {
-      showLoading.value = false
-    }, 5000) // 5초 동안 모달을 표시
-  }
+
+  showLoading.value = true
+  setTimeout(() => {
+    showLoading.value = false
+  }, 5000) // 5초 동안 모달을 표시
 })
 </script>
 
@@ -107,7 +109,13 @@ onMounted(async () => {
       공통 컴포넌트인 헤더 넣어야됨
   </div> -->
   <v-dialog v-model="showLoading" persistent max-width="1200">
-    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+    <ContentsLoading
+      :contentsInfo="contentsInfo"
+      :contentsImage="Alphabet_Contents"
+      :instructionsText="instructionsText"
+      :time="'5'"
+      :countText="'초 후에 시작합니다!'"
+    />
   </v-dialog>
   <div class="container">
     <WaitingHeader
@@ -166,7 +174,11 @@ onMounted(async () => {
           :disabled="isDisabled"
         />
       </div>
-      <button class="submit" @click="submitQuizWord()">제출하기</button>
+      <button class="submit" @click="submitQuizWord()"
+        :style="{ backgroundColor: isDisabled ? '#DFEAD9' : '#24a319'}"
+        :disabled="isDisabled">
+        {{ isDisabled ? '제출완료' : '제출하기' }}
+      </button>
     </div>
   </div>
 </template>
@@ -212,10 +224,12 @@ onMounted(async () => {
   border-radius: 10px 0 0 10px;
   background-color: #fcee59d5;
   font-weight: bold;
+  font-size: 20px;
   letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .info-text {
   margin: 0;
@@ -224,11 +238,12 @@ onMounted(async () => {
   border-radius: 0 10px 10px 0;
   background-color: #d4d4d474;
   font-weight: bold;
-  font-size: 40px;
+  font-size: 30px;
   letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .playContainer {
   margin-top: 10px;
@@ -258,14 +273,19 @@ onMounted(async () => {
   background-image: url('../../../../src/assets/image/smile_face.svg');
   margin-right: 10px;
 }
+.inputText::placeholder{
+  font-size: 20px;
+  padding: 10px;
+}
 .inputText {
   flex: 1;
   height: 60px;
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 25px; /* 원하는 폰트 크기로 조정 */
+  font-size: 30px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
+  letter-spacing: 5px;
 }
 
 /* 선택적: WebKit 브라우저(Chrome, Safari 등)의 자동 채우기 스타일 제거 */
@@ -281,7 +301,6 @@ onMounted(async () => {
   font-size: 32px;
   width: 292px;
   height: 94px;
-  background-color: #24a319;
   border-radius: 20px;
   color: #fff;
   display: flex;
