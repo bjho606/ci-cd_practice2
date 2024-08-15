@@ -1,4 +1,4 @@
-``<script setup>
+<script setup>
   import axios from 'axios'
   import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
   import { OpenVidu } from 'openvidu-browser'
@@ -9,7 +9,6 @@
 
   axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-  // const { VITE_API_BASE_URL } = import.meta.env;
   const { VITE_OPENVIDU_URL } = import.meta.env;
   const { VITE_OPENVIDU_SECRET } = import.meta.env;
 
@@ -23,7 +22,7 @@
   const state = reactive({
     // OpenVidu 관련 상태 관리
     OV: null,
-    session: sessionStore.sessionId,
+    session: sessionStore.subSessionId,
     mainStreamManager: null,
     publisher: null,
     subscribers: [],
@@ -117,6 +116,7 @@
     if (state.mainStreamManager === stream) return
     state.mainStreamManager = stream
 
+    // 
     state.subscribers.forEach(subscriber => {
       if (subscriber === state.mainStreamManager) {
         subscriber.publishAudio(true)
@@ -194,8 +194,8 @@
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
-    <div id="video-container" class="col-md-6">
+    <div id="video-container" class="col-md-6" style="display: none;">
+    <!-- <div id="video-container" class="col-md-6"> -->
       <UserVideo :stream-manager="state.publisher"/>
       <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
     </div>
