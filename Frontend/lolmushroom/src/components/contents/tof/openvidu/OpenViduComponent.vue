@@ -194,6 +194,7 @@
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
+    {{ store.targetUserToken }}
     <div id="video-container" class="col-md-6" style="display: none;">
     <!-- <div id="video-container" class="col-md-6"> -->
       <UserVideo :stream-manager="state.publisher"/>
