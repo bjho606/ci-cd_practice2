@@ -75,6 +75,9 @@ export const useBallStore = defineStore('ballStore', {
         })
       })
       return totalBalls.sort((a, b) => b.size - a.size)
+    },
+    getUserGroup: (state) => {
+      return state.userGroup
     }
   }
 })

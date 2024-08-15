@@ -90,6 +90,12 @@ onMounted(() => {
   background-color: #e7ffde;
   align-items: center;
   height: 100%; /* 화면 전체 높이를 차지 */
+  /* 드래그블 방지 */
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none
+
 }
 
 .content-container {

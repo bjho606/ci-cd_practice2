@@ -7,7 +7,8 @@ import GreenBallComponent from '@/components/contents/BallGrow/GreenBallComponen
 const ballStore = useBallStore()
 const props = defineProps({
   isMain: Boolean,
-  groupId: String
+  groupId: String,
+  rank: Number
 })
 
 const isMine = computed(() => ballStore.getIsMyBall(props.groupId))
@@ -18,7 +19,7 @@ const containerClass = computed(() => (props.isMain ? 'main-container' : 'sub-co
 
 <template>
   <div :class="containerClass">
-    <div class="ball-name">{{ groupName }}</div>
+    <div class="ball-name">{{ groupName }} 그룹  <span v-if="!isMain">- {{ props.rank }}등</span></div>
     <div class="ball-container">
       <GreenBallComponent v-if="isMine" :health="currentSize" :isMain="isMain" />
       <BlueBallComponent v-else :health="currentSize" :isMain="isMain" />

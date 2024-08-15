@@ -2,7 +2,11 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore'
+import { useRoomStore } from '@/stores/roomStore'
 import BallContent from './BallContent.vue'
+import spark from '@/assets/image/spark.png'
+import swooshSound from '@/assets/swoosh.mp3'
+import hitSound from '@/assets/hit.mp3'
 
 const props = defineProps({
   timeOut: Number
@@ -42,8 +46,17 @@ const onReturnClick = () => {
   ballStore.onReturnClick()
 }
 
-const handleKeydown = (event) => {
+// 키보드 입력시에도 효과를 준다.
+const handleKeyup = (event) => {
   if (event.code === 'Space') {
+    console.log(isMine)
+    if (isMine.value == true) {
+      const audio = new Audio(hitSound)
+      audio.play()
+    } else {
+      const audio = new Audio(swooshSound)
+      audio.play()
+    }
     onBallClick()
   }
 }
@@ -56,11 +69,11 @@ onMounted(() => {
       clearInterval(intervalId)
     }
   }, 1000)
-  window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('keyup', handleKeydown)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('keyup', handleKeyup)
 })
 </script>
 
@@ -75,7 +88,7 @@ onBeforeUnmount(() => {
       class="click-effect"
       :style="{ left: `${effect.x - 50}px`, top: `${effect.y - 50}px` }"
     >
-      <v-img src="src/assets/image/spark.png"></v-img>
+      <v-img :src="spark"></v-img>
     </div>
   </div>
 </template>
