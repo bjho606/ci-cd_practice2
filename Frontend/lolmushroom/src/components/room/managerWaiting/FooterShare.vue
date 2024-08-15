@@ -24,7 +24,6 @@ const shareSession = async () => {
       <v-icon class="share-icon" icon="mdi-share" />
       공유
     </v-btn>
-    <div class="share-info-text">방 코드 공유로 편리한 오리엔테이션을 만드세요</div>
   </div>
 </template>
 

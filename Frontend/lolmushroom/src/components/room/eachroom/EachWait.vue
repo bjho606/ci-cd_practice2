@@ -25,7 +25,9 @@ const statusText = computed(() => {
     </div>
   </div>
   <div class="group-status" :class="statusClass">
-    <span>{{ statusText }}</span>
+    <div class="text">
+      {{ statusText }}
+    </div>
   </div>
 </template>
 
@@ -43,14 +45,14 @@ const statusText = computed(() => {
 
 /* 준비 완료 상태 */
 .group-status.ready {
-  background-color: #1f4f16; /* 준비 완료일 때 배경색 */
+  background-color: #226e14; /* 준비 완료일 때 배경색 */
   padding: 10px;
 }
 
 /* 준비 중 상태 */
 .group-status.preparing {
   background-color: #00d200; /* 준비 중일 때 배경색 */
-  padding: 10px;
+  border-radius: 10%;
 }
 
 .group-members {

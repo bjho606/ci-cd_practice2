@@ -26,7 +26,7 @@ const currentCount = computed(() => roomStore.getTotalUserCount)
   flex-direction: row;
   justify-content: space-between;
   align-content: center;
-  background-color: #1ed013;
+  background-color: #b5ff9b;
   border-radius: 10px;
   margin-bottom: 30px;
 }
@@ -36,7 +36,7 @@ const currentCount = computed(() => roomStore.getTotalUserCount)
   min-width: 200px; /* Set the minimum width to maintain layout on smaller screens */
   max-width: 60%; /* Ensures that it doesn't grow beyond 60% */
   min-height: 60px;
-  background-color: #24a319;
+  background-color: #9ee682;
   border-radius: 10px;
   align-content: center;
   padding: 10px;

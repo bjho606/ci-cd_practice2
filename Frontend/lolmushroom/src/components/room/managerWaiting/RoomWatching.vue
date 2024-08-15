@@ -95,7 +95,9 @@ const startGame = () => {
 
 <template>
   <div class="room-waiting">
-    <ManagerHeader />
+    <div class="header-container">
+      <ManagerHeader />
+    </div>
     <WatchWaiting :currentContents="currentContents" />
     <ManagerFooter>
       <template v-slot:start>
@@ -112,5 +114,12 @@ const startGame = () => {
 div {
   text-align: center;
   font-weight: bold;
+}
+
+.header-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1%;
 }
 </style>

@@ -67,7 +67,7 @@ const formattedDuration = computed(() => {
 
 <template>
   <div class="session-button-container">
-    <button @click="startSession" class="session-button">세션 시작하기</button>
+    <button @click="startSession" class="session-button">OT 시작하기</button>
     <div class="duration-display">{{ formattedDuration }}</div>
   </div>
 </template>
@@ -97,8 +97,8 @@ const formattedDuration = computed(() => {
 }
 
 .duration-display {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
-  color: #333;
+  color: #000000;
 }
 </style>

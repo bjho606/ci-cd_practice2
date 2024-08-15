@@ -19,8 +19,8 @@ const content = computed(() => contentsStore.getPickedContents)
     </div>
     
     <!-- Green Section (설명 섹션) -->
-    <div class="green-section">
-      {{ content.description }}
+    <div class="green-section" style="white-space: pre-line;">
+        {{ content.description }}
     </div>
   </div>
   <div v-else>
@@ -67,5 +67,7 @@ const content = computed(() => contentsStore.getPickedContents)
   align-items: center;
   justify-content: center;
   padding: 0 15%;
+  font-size: small;
 }
+
 </style>

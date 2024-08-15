@@ -11,16 +11,16 @@ const startGame = () => {
 <template>
   <button class="start-session-btn" @click="startGame">
     <span class="start-session-text">컨텐츠 시작하기</span>
-    <v-icon class="start-session-icon" icon="mdi-chevron-right" />
+    <v-icon class="start-session-icon" icon="mdi-chevron-right" style="color: black;" />
   </button>
 </template>
 
 <style scoped>
 .start-session-btn {
-  width: 100%;
+  width: 80%;
   height: 100%;
-  background-color: #1f4f16;
-  color: #ffffff;
+  background-color: #9ee682;
+  color: #000000;
   padding: 20px;
   border: none;
   border-radius: 10px;

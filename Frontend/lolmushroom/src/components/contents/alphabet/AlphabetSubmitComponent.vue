@@ -111,8 +111,8 @@
   </div>
   <div class="playContainer">
     <div>
-      <v-alert title="초성 게임!" text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert.blank" class="warning-alert"/>
-      <v-alert title="초성 게임!" text="온전한 한국어 단어로 적어주세요." type="warning" v-if="showAlert.korean" class="warning-alert"/>
+      <v-alert  text="입력 창을 모두 채워주세요." type="warning" v-if="showAlert.blank" class="warning-alert"/>
+      <v-alert text="한글로만 적어주세요" type="warning" v-if="showAlert.korean" class="warning-alert"/>
     </div>
     <div class="userInput" :style="{ backgroundColor: isDisabled ? '#d3d3d3' : '#fff' }">
       <div class="emojiField"></div>
@@ -136,7 +136,7 @@
 .container{
   display: flex;
   flex-direction: column;
-  background-color: #E7FFDE;
+  background-color: #ffffff;
   height: 100%;
 }
 .header{
@@ -155,7 +155,7 @@
 }
 
 .progress-bar{
-  width: 1000px;
+  width: 300px;
   height: 69px;
 }
 
@@ -166,6 +166,7 @@
   border-radius: 5px;
   margin-top: 20px;
 }
+
 .info-category{
   margin: 0;
   height: 60px;
@@ -175,6 +176,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-weight: bolder;
+  font-size: larger;
 
 }
 .info-text{
@@ -182,10 +185,12 @@
   height: 60px;
   width: 600px;
   border-radius: 0 10px 10px 0;
-  background-color: #00FF00;
+  background-color: #59ac59;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-weight: bolder;
+  font-size: larger;
   
 }
 .playContainer {
@@ -200,14 +205,14 @@
 
 .userInput{
   width: 571px;
-  height: 134px;
+  height: 100px;
   border-radius: 20px;
   background-color: #fff;
   border: 2px solid black;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 3px;
+  padding: 1.5%;
 }
 .emojiField{
   width: 60px;
@@ -221,9 +226,10 @@
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 16px; /* 원하는 폰트 크기로 조정 */
+  font-size: 25px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
 }
+
 
 /* 선택적: WebKit 브라우저(Chrome, Safari 등)의 자동 채우기 스타일 제거 */
 .inputText:-webkit-autofill,
@@ -237,7 +243,7 @@
 .submit{
   width: 682px;
   height: 94px;
-  background-color: #1F4F16;
+  background-color: #3da42a;
   border-radius: 20px;
   color: #fff;
   display: flex;

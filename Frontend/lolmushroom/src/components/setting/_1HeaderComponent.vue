@@ -3,7 +3,7 @@
 <template>
   <div class="custom-button">
     <div class="left-part">컨텐츠 목록</div>
-    <div class="right-part">컨텐츠의 + 버튼을 클릭해서 나만의 큐레이션을 구성해보세요 !</div>
+    <div class="right-part">컨텐츠의 +버튼을 클릭해서 큐레이션을 구성해보세요!</div>
   </div>
 </template>
 
@@ -32,5 +32,6 @@
   padding: 10px 20px;
   font-size: small;
   font-weight: bolder;
+  width: 100%;
 }
 </style>
