@@ -1,15 +1,20 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
+import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useRoomStore } from '@/stores/roomStore'
 import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
+import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import BallMain from './BallMain.vue'
 import BallGroup from './BallGroup.vue'
 
-const roomStore = useRoomStore()
 const ballStore = useBallStore()
+const contentsStore = useContentsStore()
+const roomStore = useRoomStore()
 const sessionStore = useSessionStore()
+const contentsInfo = contentsStore.contents[6]
+const showLoading = ref(false)
 const firstDescription = '공 키우기'
 const secondDescription = '우리 그룹의 공을 최대한 크게 만드세요!'
 const thirdDescription = 'Tip: 클릭 대신 스페이스바를 누를 수 있답니다 !'
@@ -30,10 +35,22 @@ onMounted(() => {
     sessionStore.subSessionId,
     activeGroups.value
   )
+  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  if (!hasShownLoading) {
+    showLoading.value = true
+    localStorage.setItem('hasShownLoading', 'true')
+
+    setTimeout(() => {
+      showLoading.value = false
+    }, 5000) // 5초 동안 모달을 표시
+  }
 })
 </script>
 
 <template>
+  <v-dialog v-model="showLoading" persistent max-width="1200">
+    <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
+  </v-dialog>
   <div class="main-container">
     <WaitingHeader
       :first-description="firstDescription"

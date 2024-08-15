@@ -4,6 +4,7 @@ import { useAlphabetStore } from '@/stores/alphabetStore'
 import { useBallStore } from '@/stores/ballStore'
 import { useContentsStore } from '@/stores/contentsStore'
 import { useSessionStore } from '@/stores/sessionStore'
+import { useUserStore } from '@/stores/userStore'
 import { useRoomStore } from '@/stores/roomStore'
 import { useTOFStore } from '@/stores/tofStore'
 import Swal from 'sweetalert2'
@@ -17,9 +18,10 @@ import FooterShare from './FooterShare.vue'
 
 const alphabetStore = useAlphabetStore()
 const ballStore = useBallStore()
-const roomStore = useRoomStore()
 const contentsStore = useContentsStore()
 const sessionStore = useSessionStore()
+const userStore = useUserStore()
+const roomStore = useRoomStore()
 const TOFStore = useTOFStore()
 const showShareFooter = ref(true)
 
@@ -55,7 +57,7 @@ const callNextContents = async (isStart) => {
 const socketMapping = computed(() => contentsStore.getSocketMapping)
 watch(currentContents, (newContentsId, oldContentsId) => {
   if (oldContentsId) {
-    webSocketAPI.unsubscribeGame(socketMapping[oldContentsId])
+    webSocketAPI.unsubscribeGame(socketMapping.value[oldContentsId])
   }
   if (newContentsId) {
     switch (newContentsId) {
@@ -93,6 +95,25 @@ const startGame = () => {
   }).then((result) => {
     if (result.isConfirmed) {
       callNextContents(true)
+      userStore.setIsStarted()
+      showShareFooter.value = false
+    }
+  })
+}
+
+const startNextGame = () => {
+  Swal.fire({
+    title: '다음 게임을 시작하시겠습니까?',
+    icon: 'question',
+    color: 'black',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: '시작',
+    cancelButtonText: '취소'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      callNextContents(false)
     }
   })
 }
@@ -104,7 +125,12 @@ const startGame = () => {
     <adminWatchWaiting :currentContents="currentContents" />
     <ManagerFooter>
       <template v-slot:start>
-        <FooterStart @start-game="startGame" />
+        <FooterStart
+          v-if="userStore.getIsStarted"
+          @start-game="startNextGame"
+          :buttonLabel="'다음 컨텐츠로'"
+        />
+        <FooterStart v-else @start-game="startGame" :buttonLabel="'컨텐츠 시작하기'" />
       </template>
       <template v-slot:share v-if="showShareFooter">
         <FooterShare />

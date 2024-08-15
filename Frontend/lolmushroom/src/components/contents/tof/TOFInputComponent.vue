@@ -10,8 +10,6 @@ import sessionAPI from '@/api/session'
 import webSocketAPI from '@/api/webSocket'
 import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
-import ButtonComponent from '@/components/common/ButtonComponent.vue'
-import TOFAppBar from '@/components/contents/tof/TOFAppBar.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -139,7 +137,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-dialog v-model="showLoading" persistent max-width="1000">
+  <v-dialog v-model="showLoading" persistent max-width="1200">
     <ContentsLoading :contentsInfo="contentsInfo" :time="'5'" :countText="'초 후에 시작합니다!'" />
   </v-dialog>
   <!-- 진술을 제출했을 때 -->

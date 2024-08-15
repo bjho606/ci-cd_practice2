@@ -147,7 +147,7 @@ watch(currentContents, (newContentsId, oldContentsId) => {
         webSocketAPI.unsubscribeInput('next')
         break
       case '4':
-        webSocketAPI.unsubscribeInput('workd')
+        webSocketAPI.unsubscribeInput('word')
         webSocketAPI.unsubscribeInput('guess')
         break
       case '7':
@@ -158,7 +158,6 @@ watch(currentContents, (newContentsId, oldContentsId) => {
     }
   }
   if (newContentsId && routeMapping[newContentsId]) {
-    console.log(newContentsId)
     userStore.setIsStarted()
     contentsStore.setContentsFinish(null)
     router.push({
@@ -181,7 +180,7 @@ watch(
     if (group && group.isFinish) {
       router.push({
         name: 'mainSession',
-        params: { sessionId: sessionStore.sessionId, subSessionId: sessionStore.subSessionId }
+        params: { sessionId: sessionStore.sessionId }
       })
     }
   },
