@@ -174,7 +174,11 @@ onMounted(async () => {
           :disabled="isDisabled"
         />
       </div>
-      <button class="submit" @click="submitQuizWord()">제출하기</button>
+      <button class="submit" @click="submitQuizWord()"
+        :style="{ backgroundColor: isDisabled ? '#DFEAD9' : '#24a319'}"
+        :disabled="isDisabled">
+        {{ isDisabled ? '제출완료' : '제출하기' }}
+      </button>
     </div>
   </div>
 </template>
@@ -220,10 +224,12 @@ onMounted(async () => {
   border-radius: 10px 0 0 10px;
   background-color: #fcee59d5;
   font-weight: bold;
+  font-size: 20px;
   letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .info-text {
   margin: 0;
@@ -232,11 +238,12 @@ onMounted(async () => {
   border-radius: 0 10px 10px 0;
   background-color: #d4d4d474;
   font-weight: bold;
-  font-size: 40px;
+  font-size: 30px;
   letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .playContainer {
   margin-top: 10px;
@@ -266,14 +273,19 @@ onMounted(async () => {
   background-image: url('../../../../src/assets/image/smile_face.svg');
   margin-right: 10px;
 }
+.inputText::placeholder{
+  font-size: 20px;
+  padding: 10px;
+}
 .inputText {
   flex: 1;
   height: 60px;
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 25px; /* 원하는 폰트 크기로 조정 */
+  font-size: 30px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
+  letter-spacing: 5px;
 }
 
 /* 선택적: WebKit 브라우저(Chrome, Safari 등)의 자동 채우기 스타일 제거 */
@@ -289,7 +301,6 @@ onMounted(async () => {
   font-size: 32px;
   width: 292px;
   height: 94px;
-  background-color: #24a319;
   border-radius: 20px;
   color: #fff;
   display: flex;

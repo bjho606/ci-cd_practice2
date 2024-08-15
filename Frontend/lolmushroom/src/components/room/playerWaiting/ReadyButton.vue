@@ -18,24 +18,30 @@ const handleClick = () => {
 </script>
 
 <template>
-  <v-btn
-    :style="{
-      backgroundColor: isReady ? '#000000' : '#D9D9D9',
-      color: isReady ? '#FFFFFF' : '#000000'
-    }"
-    @click="handleClick"
-    class="ready-btn"
-  >
-    <div>
-      {{ isReady ? '준비완료' : '준비' }}
-      <p v-if="!isGroupTeamLeader" class="warning">해당 팀장만 준비완료가 가능합니다!</p>
-    </div>
-  </v-btn>
+  <div class="ready-btn-div">
+    <v-btn
+      :style="{
+        backgroundColor: isReady ? '#000000' : '#D9D9D9',
+        color: isReady ? '#FFFFFF' : '#000000'
+      }"
+      @click="handleClick"
+      class="ready-btn"
+    >
+      <div>
+        {{ isReady ? '준비완료' : '준비' }}
+        <p v-if="!isGroupTeamLeader" class="warning">해당 팀장만 준비완료가 가능합니다!</p>
+      </div>
+    </v-btn>
+  </div>
 </template>
 
 <style scoped>
+.ready-btn-div {
+  width: 100%;
+}
+
 .ready-btn {
-  position: relative;
+  /* position: relative; */
   width: 100%;
 }
 
@@ -43,7 +49,7 @@ const handleClick = () => {
 .warning {
   display: none;
   position: absolute;
-  width: 320px;
+  width: 300px;
   padding: 0px;
   left: 50%;
   transform: translateX(-50%);
