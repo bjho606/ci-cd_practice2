@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoomStore } from '@/stores/roomStore'
-import waitingHeader from './WaitingHeader.vue'
+import WaitingHeader from './WaitingHeader.vue'
 import PlayerWaitng from './PlayerWaitng.vue'
 
 const roomStore = useRoomStore()
@@ -14,7 +14,7 @@ const text3 =
 <template>
   <div class="background">
     <!-- 대기화면 소개 글 추가-->
-    <waitingHeader
+    <WaitingHeader
       :first-description="text1"
       :second-description="text2"
       :third-description="text3"

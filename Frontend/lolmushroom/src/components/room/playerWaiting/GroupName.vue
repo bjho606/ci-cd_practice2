@@ -23,11 +23,12 @@ const handleClick = () => {
 
 <style scoped>
 .group-name {
-  background-color: #66ff4f;
+  background-color: #fff58a64;
   font-size: larger;
   font-weight: bold;
-  min-height: 60px;
+  /* min-height: 100px; */
   margin-bottom: 10px;
+  height: 100%;
   width: 100%;
 }
 

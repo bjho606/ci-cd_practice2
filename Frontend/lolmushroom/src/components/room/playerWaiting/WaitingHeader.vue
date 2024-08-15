@@ -44,6 +44,7 @@ const props = defineProps({
   border-radius: 5px 0px 0px 5px;
   background-color: #90ff77;
   font-size: x-large;
+  font-weight: bold;
 }
 .second {
   background-color: #ceffbc;
@@ -52,7 +53,7 @@ const props = defineProps({
 .third {
   border-radius: 0px 5px 5px 0px;
   background-color: #e7ffde;
-  font-size: x-small;
+  font-size: small;
 }
 .content-wrapper {
   display: flex;

@@ -8,16 +8,12 @@
     answer: Number,
   })
 
-  const store = useTOFStore()
-  const expanded = ref({})
+const store = useTOFStore()
+  
+const correctRate = computed(() => {
+  return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
+})
 
-  const correctRate = computed(() => {
-    return store.submitUserCount !== 0 ? store.chosenArray[props.answer].length / store.submitUserCount : 0;
-  })
-
-  const toggleList = (choice) => {
-    expanded.value[choice] = !expanded.value[choice]
-  }
 </script>
 
 <template>
@@ -27,54 +23,23 @@
     <v-row>
       <v-col v-for="i in 4" :key="i" cols="6">
         <v-card
-        class="mx-5 card-border"
+        class="card-border"
           :class="{
             'correct-card': props.answer === i,
             'selected-card': props.answer !== i && selectedAnswer === i
           }"
         > 
-          <div>{{ store.statements[i-1] }}</div>
-          <div>{{ store.chosenArray[i].length }}명</div>
+          <div class="statement">{{ store.statements[i-1] }}</div>
+          <div class="count">{{ store.chosenArray[i].length }}명</div>
         </v-card>
       </v-col>
     </v-row>
 
     <div class="selectResult-div">
       <div class="correctRate-div">정답률: {{ correctRate * 100 }}%</div>
+      <div>총 참여자 수: {{ store.submitUserCount }} / {{ store.totalUserCount-1 }} 명</div>
     </div>
   </v-container>
-
-  <!-- <v-container>
-    <v-row>
-      <v-col v-for="i in 4" :key="i" cols="6">
-        <v-card
-          class="mx-5 card-border"
-          prepend-avatar="../../../../src/assets/image/thinking_face.svg"
-          :title="`${store.statements[i-1]}-${store.chosenArray[i].length}명`"
-        />
-      </v-col>
-    </v-row>
-    <v-card v-for="i in 4" :key="i">
-      <v-card-title>
-        <v-icon :icon="`mdi-numeric-${i}-circle-outline`" v-show="answer!==i"></v-icon>
-        <v-icon :icon="`mdi-numeric-${i}-circle-outline`" color="red" v-show="answer===i"></v-icon>
-        {{ store.statements[i-1] }} - {{ store.chosenArray[i].length }}명
-        <span @click="toggleList(i)">
-          {{ expanded[i] ? '▲' : '▼' }}
-        </span>
-      </v-card-title>
-      <v-expand-transition>
-        <v-card-text v-if="expanded[i]">
-          <ul>
-            <li v-for="nickname in store.chosenArray[i]" :key="nickname">
-              {{ nickname }}
-            </li>
-          </ul>
-        </v-card-text>
-      </v-expand-transition>
-      <v-divider class="border-opacity-55"></v-divider>
-    </v-card>
-  </v-container> -->
 
 </template>
 
@@ -96,7 +61,22 @@ li {
 .card-border {
   display: flex;
   flex-direction: row;
-  
+  min-height: 50px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.card-border .statement {
+  flex-grow: 1;
+  height: 100%;
+  font-size: 1.5em;
+}
+
+.card-border .count {
+  height: 100%;
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 .tof-result-div {
@@ -105,8 +85,8 @@ li {
 }
 
 .selectResult-div {
-  padding: 12px;
-  margin: 12px;
+  padding: 20px 0;
+  margin: 20px 0;
 }
 
 .correctRate-div {
@@ -115,11 +95,11 @@ li {
 }
 
 .correct-card {
-  background-color: green;
+  background-color: #24A319;
 }
 
 .selected-card {
-  background-color: red;
+  background-color: rgba(238, 85, 85, 0.706);
 }
 
 </style>

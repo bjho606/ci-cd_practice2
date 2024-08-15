@@ -160,7 +160,7 @@ onMounted(async () => {
         <input
           v-html="quizWord"
           class="inputText"
-          :placeholder="isDisabled ? '작성 완료' : '카테고리에 관한 입력을 해주세요!'"
+          :placeholder="isDisabled ? '작성 완료' : '카테고리에 관한 단어를 입력해주세요!'"
           v-model="quizWord"
           @keyup.enter="submitQuizWord()"
           :disabled="isDisabled"
@@ -200,7 +200,7 @@ onMounted(async () => {
 
 .info {
   display: flex;
-  width: 600px;
+  width: 700px;
   height: 60px;
   border-radius: 5px;
   margin-top: 20px;
@@ -208,9 +208,11 @@ onMounted(async () => {
 .info-category {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 350px;
   border-radius: 10px 0 0 10px;
-  background-color: #ceffbc;
+  background-color: #fcee59d5;
+  font-weight: bold;
+  letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -218,9 +220,12 @@ onMounted(async () => {
 .info-text {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 550px;
   border-radius: 0 10px 10px 0;
-  background-color: #00ff00;
+  background-color: #d4d4d474;
+  font-weight: bold;
+  font-size: 40px;
+  letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -236,21 +241,22 @@ onMounted(async () => {
 }
 
 .userInput {
-  width: 571px;
-  height: 100px;
+  width: 600px;
+  height: 134px;
   border-radius: 20px;
   background-color: #fff;
   border: 2px solid black;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 1.5%;
+  padding: 3px 15px;
 }
 .emojiField {
   width: 60px;
   height: 60px;
   /* background-color: #1F4F16; */
   background-image: url('../../../../src/assets/image/smile_face.svg');
+  margin-right: 10px;
 }
 .inputText {
   flex: 1;
@@ -272,9 +278,10 @@ onMounted(async () => {
 }
 
 .submit {
-  width: 682px;
+  font-size: 32px;
+  width: 292px;
   height: 94px;
-  background-color: #1f4f16;
+  background-color: #24a319;
   border-radius: 20px;
   color: #fff;
   display: flex;

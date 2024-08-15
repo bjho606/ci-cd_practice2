@@ -226,17 +226,19 @@ onMounted(async () => {
 
 .info {
   display: flex;
-  width: 600px;
+  width: 700px;
   height: 60px;
   border-radius: 5px;
-  margin-top: 80px;
+  margin-top: 20px;
 }
 .info-category {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 350px;
   border-radius: 10px 0 0 10px;
-  background-color: #ceffbc;
+  background-color: #fcee59d5;
+  font-weight: bold;
+  letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -244,9 +246,12 @@ onMounted(async () => {
 .info-text {
   margin: 0;
   height: 60px;
-  width: 600px;
+  width: 550px;
   border-radius: 0 10px 10px 0;
-  background-color: #00ff00;
+  background-color: #d4d4d474;
+  font-weight: bold;
+  font-size: 40px;
+  letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -262,7 +267,7 @@ onMounted(async () => {
 }
 
 .userInput {
-  width: 571px;
+  width: 600px;
   height: 134px;
   border-radius: 20px;
   background-color: #fff;
@@ -270,21 +275,21 @@ onMounted(async () => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 3px;
+  padding: 3px 15px;
 }
-
 .emojiField1 {
   width: 60px;
   height: 60px;
   /* background-color: #1F4F16; */
   background-image: url('../../../../src/assets/image/thinking_face.svg');
+  margin-right: 10px;
 }
 
 .emojiField2 {
   width: 60px;
   height: 60px;
-  /* background-color: #1F4F16; */
   background-image: url('../../../../src/assets/image/smile_face.svg');
+  margin-right: 10px;
 }
 .initialBox {
   flex: 1;
@@ -303,7 +308,7 @@ onMounted(async () => {
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 16px; /* 원하는 폰트 크기로 조정 */
+  font-size: 25px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
 }
 

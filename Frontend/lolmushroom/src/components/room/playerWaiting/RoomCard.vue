@@ -35,7 +35,7 @@ const handleJoinOrLeaveClick = () => {
 </script>
 
 <template>
-  <div class="group-card">
+  <div class="group-card-div">
     <div :class="['group-info', { 'group-info--strong-border': isGroupMember }]">
       <!-- ReadyButton과 JoinButton을 isUserStarted가 false일 때만 표시 -->
       <ReadyButton
@@ -43,16 +43,19 @@ const handleJoinOrLeaveClick = () => {
         :isReady="room.isReady"
         :isGroupTeamLeader="isGroupTeamLeader"
         @onClick="handleReadyClick"
+        class="group-ready-btn"
       />
       <GroupName
         :groupName="room.groupName"
         :isGroupMember="isGroupMember"
         @onClick="handleChangeNameClick"
+        class="group-name-btn"
       />
       <JoinButton
         v-if="!isUserStarted"
         :isGroupMember="isGroupMember"
         @onClick="handleJoinOrLeaveClick"
+        class="group-join-btn"
       />
     </div>
     <UserGroup :users="room.users" :groupName="room.groupName" />
@@ -60,16 +63,30 @@ const handleJoinOrLeaveClick = () => {
 </template>
 
 <style scoped>
-.group-card {
+.group-card-div {
+  height: 100%;
+  width: 100%;
+}
+
+.group-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
   width: 100%;
-  background-color: #fff2f7;
+  height: 100%;
 }
 
 .group-info--strong-border {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.group-ready-btn {
+  flex: 1;
+}
+.group-name-btn {
+  flex: 3;
+}
+.group-join-btn {
+  flex: 1;
 }
 </style>
