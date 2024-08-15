@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <div v-if="users.length > 0" class="user-list">
-    <div v-for="user in users" :key="user" class="user-container" min-width="180">
+    <div v-for="user in users" :key="user" class="user-container" min-width="200">
       <div class="user-groupname">
         {{ groupName }}
       </div>
@@ -41,7 +41,7 @@ const props = defineProps({
 }
 
 .user-groupname {
-  flex: 2;
+  flex: 3;
   align-content: center;
   text-align: center;
   font-weight: bold;
@@ -51,7 +51,7 @@ const props = defineProps({
 }
 
 .user-name {
-  flex: 1;
+  flex: 2;
   text-align: center;
   font-size: 1.2em;
   font-weight: bold;

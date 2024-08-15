@@ -149,152 +149,169 @@ onMounted(async () => {
     />
   </v-dialog>
   <!-- 진술을 제출했을 때 -->
-  <v-container fluid v-if="!isSubmit" style="width: 70%" class="my-5">
+  <div fluid v-if="!isSubmit" class="container">
     <WaitingHeader
       first-description="진실 혹은 거짓"
       second-description="진실 3개와 거짓 1개로 나를 소개해 보세요!"
       third-description="카메라가 켜지면 자신을 소개해 보세요."
     />
     <div class="progress-linear-container">
-      <v-progress-linear
-        bg-color="#FFFFFF"
-        color="#24A319"
-        height="30"
-        max="4"
-        min="0"
-        :model-value="statementsCount"
-        rounded
-        style="border: #000000 2px solid; width: 50%"
-      >
-        <strong style="color: #000000">{{ statementsCount }} / 4</strong>
-      </v-progress-linear>
+      <div class="progress-bar">
+        <v-progress-linear
+          bg-color="#FFFFFF"
+          color="#24A319"
+          height="30"
+          max="4"
+          min="0"
+          :model-value="statementsCount"
+          rounded
+          style="border: #000000 2px solid;"
+        >
+          <strong style="color: #000000">{{ statementsCount }} / 4</strong>
+        </v-progress-linear>
+      </div>
     </div>
 
-    <v-alert
-      title="진실? 혹은 거짓!"
-      text="입력 창을 모두 채워주세요."
-      type="warning"
-      v-if="showAlter"
-      class="warning-alert"
-    />
-    <v-form ref="form" fast-fail @submit.prevent class="mt-5">
-      <v-container>
-        <v-row>
-          <v-col cols="12" md="1">
-            <v-chip variant="elevated" color="#00FF00"> 진실 </v-chip>
-          </v-col>
-          <v-col cols="12" md="5">
-            <v-text-field
-              v-model="statements.firstTrue"
-              color="blue"
-              placeholder="나의 정보 중 진실을 알려주세요."
-              variant="solo"
-              @keyup.enter="
-                submitStatements(
-                  statements.firstTrue,
-                  statements.secondTrue,
-                  statements.thirdTrue,
-                  statements.firstFalse
-                )
-              "
-            />
-            <template v-slot:prepend-inner>
-              <img
-                src="../../../../src/assets/image/smile_face.svg"
-                alt="custom icon"
-                class="input-icon"
+    <div class="playContainer">
+      <div>
+        <v-alert
+          title="진실? 혹은 거짓!"
+          text="입력 창을 모두 채워주세요."
+          type="warning"
+          v-if="showAlter"
+          class="warning-alert"
+        />
+      </div>
+      <v-form ref="form" fast-fail @submit.prevent class="w-100">
+        <v-container>
+          <v-row>
+            <v-col cols="12" md="1">
+              <v-chip variant="elevated" color="#00FF00"> 진실 </v-chip>
+            </v-col>
+            <v-col cols="12" md="5">
+              <v-text-field
+                v-model="statements.firstTrue"
+                color="blue"
+                placeholder="나의 정보 중 진실을 알려주세요."
+                variant="solo"
+                @keyup.enter="
+                  submitStatements(
+                    statements.firstTrue,
+                    statements.secondTrue,
+                    statements.thirdTrue,
+                    statements.firstFalse
+                  )
+                "
               />
-            </template>
-          </v-col>
+              <template v-slot:prepend-inner>
+                <img
+                  src="../../../../src/assets/image/smile_face.svg"
+                  alt="custom icon"
+                  class="input-icon"
+                />
+              </template>
+            </v-col>
 
-          <v-col cols="12" md="5">
-            <v-text-field
-              v-model="statements.secondTrue"
-              placeholder="나의 정보 중 진실을 알려주세요."
-              variant="solo"
-              @keyup.enter="
-                submitStatements(
-                  statements.firstTrue,
-                  statements.secondTrue,
-                  statements.thirdTrue,
-                  statements.firstFalse
-                )
-              "
-            />
-          </v-col>
+            <v-col cols="12" md="5">
+              <v-text-field
+                v-model="statements.secondTrue"
+                placeholder="나의 정보 중 진실을 알려주세요."
+                variant="solo"
+                @keyup.enter="
+                  submitStatements(
+                    statements.firstTrue,
+                    statements.secondTrue,
+                    statements.thirdTrue,
+                    statements.firstFalse
+                  )
+                "
+              />
+            </v-col>
 
-          <v-col cols="5" offset="1">
-            <v-text-field
-              v-model="statements.thirdTrue"
-              placeholder="나의 정보 중 진실을 알려주세요."
-              variant="solo"
-              @keyup.enter="
-                submitStatements(
-                  statements.firstTrue,
-                  statements.secondTrue,
-                  statements.thirdTrue,
-                  statements.firstFalse
-                )
-              "
-            />
-          </v-col>
-        </v-row>
+            <v-col cols="5" offset="1">
+              <v-text-field
+                v-model="statements.thirdTrue"
+                placeholder="나의 정보 중 진실을 알려주세요."
+                variant="solo"
+                @keyup.enter="
+                  submitStatements(
+                    statements.firstTrue,
+                    statements.secondTrue,
+                    statements.thirdTrue,
+                    statements.firstFalse
+                  )
+                "
+              />
+            </v-col>
+          </v-row>
 
-        <v-row>
-          <v-col cols="12" md="1">
-            <v-chip variant="elevated" color="#247719"> 거짓 </v-chip>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="statements.firstFalse"
-              placeholder="나의 정보 중 거짓을 알려주세요."
-              variant="solo"
-              @keyup.enter="
-                submitStatements(
-                  statements.firstTrue,
-                  statements.secondTrue,
-                  statements.thirdTrue,
-                  statements.firstFalse
-                )
-              "
-            />
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col cols="12" md="1">
+              <v-chip variant="elevated" color="#247719"> 거짓 </v-chip>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="statements.firstFalse"
+                placeholder="나의 정보 중 거짓을 알려주세요."
+                variant="solo"
+                @keyup.enter="
+                  submitStatements(
+                    statements.firstTrue,
+                    statements.secondTrue,
+                    statements.thirdTrue,
+                    statements.firstFalse
+                  )
+                "
+              />
+            </v-col>
+          </v-row>
 
-        <div style="text-align: center">
-          <v-btn
-            class="mt-2"
-            text="제출하기"
-            size="large"
-            width="500"
-            color="#43A047"
-            rounded
-            @click="
-              submitStatements(
-                statements.firstTrue,
-                statements.secondTrue,
-                statements.thirdTrue,
-                statements.firstFalse
-              )
-            "
-          />
-        </div>
-      </v-container>
-    </v-form>
-  </v-container>
+        </v-container>
+      </v-form>
+      <div style="text-align: center">
+        <button class="submit"
+          @click="
+            submitStatements(
+              statements.firstTrue,
+              statements.secondTrue,
+              statements.thirdTrue,
+              statements.firstFalse
+            )
+          "
+          >
+          제출하기
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 진술을 제출했다면 -->
-  <v-container v-else class="waiting-container">
+  <div v-else class="waiting-container">
     <OtherUserWaitingComponent :current="store.submitUserCount" :total="store.totalUserCount" />
-  </v-container>
+  </div>
 </template>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #e7ffde;
+  height: 100%;
+}
 .waiting-container {
   text-align: center;
   background: #247719;
   opacity: 0.7;
   margin-top: 10%;
+}
+
+.playContainer {
+  height: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 수직으로 가운데 정렬 */
+  /* flex: 1; */
+  justify-content: space-around; /* 수평으로 가운데 정렬 */
 }
 
 v-text-field {
@@ -308,12 +325,29 @@ v-text-field {
 
 .progress-linear-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 20px;
+}
+.progress-bar {
+  width: 1000px;
+  height: 30px;
 }
 
 .warning-alert {
+  width: 100%;
+}
+
+.submit {
+  font-size: 32px;
+  width: 292px;
+  height: 94px;
+  border-radius: 20px;
+  background-color: #24a319;
+  color: #fff;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 </style>

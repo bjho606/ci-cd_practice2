@@ -39,7 +39,7 @@ const handleCreateGroupClick = () => {
   font-weight: bold;
 }
 .add_text {
-  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 </style>
