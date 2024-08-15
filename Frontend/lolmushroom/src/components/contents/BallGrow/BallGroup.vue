@@ -16,16 +16,19 @@ const rows = computed(() => {
 
 // 공 변경 하기
 const onChangeClick = (sessionId) => {
-  ballStore.onChangeClick(sessionId);
+  ballStore.onChangeClick(sessionId)
 }
-
 </script>
 
 <template>
   <div class="ball-group">
     <div v-for="(row, index) in rows" :key="index" class="row">
       <div v-for="ball in row" :key="ball.sessionId" class="ball-item">
-        <BallContent :groupId="ball.sessionId" :isMain="false" @click="onChangeClick(ball.sessionId)" />
+        <BallContent
+          :groupId="ball.sessionId"
+          :isMain="false"
+          @click="onChangeClick(ball.sessionId)"
+        />
       </div>
     </div>
   </div>

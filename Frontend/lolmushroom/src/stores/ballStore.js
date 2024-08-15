@@ -36,13 +36,14 @@ export const useBallStore = defineStore('ballStore', {
     onBallClick(sessionId, subSessionId) {
       const clickData = {
         mainSessionId: sessionId,
-        sessionId,
-        subSessionId,
+        sessionId: subSessionId,
         type: 'DECREASE'
       }
       if (this.currentGroup === this.userGroup) {
         clickData.type = 'INCREASE'
       }
+      console.log(clickData)
+      webSocketAPI.sendClickData('/publish/game/touch', clickData)
     },
     onChangeClick(sessionId) {
       this.currentGroup = sessionId
@@ -66,7 +67,6 @@ export const useBallStore = defineStore('ballStore', {
     },
     getTotalBalls: (state) => {
       const totalBalls = []
-      
       state.ballMap.forEach((size, sessionId) => {
         totalBalls.push({
           sessionId,

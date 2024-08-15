@@ -1,22 +1,22 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
-import { useSessionStore } from '@/stores/sessionStore';
+import { useSessionStore } from '@/stores/sessionStore'
 import BallContent from './BallContent.vue'
 
-const ballStore = useBallStore();
-const sessionStore = useSessionStore();
+const ballStore = useBallStore()
+const sessionStore = useSessionStore()
 const currentGroup = computed(() => ballStore.getCurrentGroup)
-const currentGroupName = computed(()=> ballStore.getCurrentGroupName(currentGroup.value))
-const currentBallsize = computed(()=>ballStore.getBallSize(currentGroup.value))
-
-const isMine = computed(() => ballStore.getIsMyBall(currentGroup))
+const isMine = computed(() => ballStore.getIsMyBall(currentGroup.value))
 
 /**
  * TODO Time에 대한 Value를 관리해야 한다.
  */
 const RemainTime = ref(0)
 
+/**
+ * IMP Ball에 대한 Effect 관리를 해야 한다.
+ */
 const nowClick = ref(false)
 const clickEffects = ref([])
 const addClickEffect = (event) => {
@@ -32,34 +32,34 @@ const addClickEffect = (event) => {
 }
 
 // ballClick을 할 시 ballStore로 데이터를 전송한다.
-const onBallClick = () =>{
+const onBallClick = () => {
   ballStore.onBallClick(sessionStore.sessionId, currentGroup.value)
 }
 // 다시 자신의 공으로 돌아온다.
-const backToMyBall = () => {
-  nowClick.value = true
+const onReturnClick = () => {
+  ballStore.onReturnClick()
 }
 
 const handleKeydown = (event) => {
   if (event.code === 'Space') {
-    onBallClick();
+    onBallClick()
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown);
-});
+  window.addEventListener('keydown', handleKeydown)
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown);
-});
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
   <div class="center-wrapper" @click="addClickEffect">
     <v-btn class="remainTime">남은 시간: {{ RemainTime }}초</v-btn>
     <BallContent :isMain="true" :groupId="currentGroup" @click="onBallClick" />
-    <v-btn v-if="!isMine" class="backToMyGroup" @click="backToMyBall">내 그룹으로 돌아가기</v-btn>
+    <v-btn v-if="!isMine" class="backToMyGroup" @click="onReturnClick">내 그룹으로 돌아가기</v-btn>
     <div
       v-for="effect in clickEffects"
       :key="effect.id"
