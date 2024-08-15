@@ -12,7 +12,6 @@ import ContentsLoading from '@/components/contents/ContentsLoading.vue'
 import OtherUserWaitingComponent from '@/components/common/OtherUserWaitingComponent.vue'
 import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
-
 const router = useRouter()
 const userStore = useUserStore()
 const store = useTOFStore()
@@ -126,10 +125,10 @@ onMounted(async () => {
     subscriptions: ['question']
   })
 
-  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  const hasShownLoading = localStorage.getItem('hasShownLoading_TOF')
   if (!hasShownLoading) {
     showLoading.value = true
-    localStorage.setItem('hasShownLoading', 'true')
+    localStorage.setItem('hasShownLoading_TOF', 'true')
 
     setTimeout(() => {
       showLoading.value = false
@@ -311,7 +310,7 @@ v-text-field {
   justify-content: center;
 }
 
-*{
-  background: #E7FFDE;
+* {
+  background: #e7ffde;
 }
 </style>

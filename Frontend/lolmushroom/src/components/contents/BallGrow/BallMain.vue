@@ -4,6 +4,9 @@ import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore'
 import BallContent from './BallContent.vue'
 
+const props = defineProps({
+  timeOut: Number
+})
 const ballStore = useBallStore()
 const sessionStore = useSessionStore()
 const currentGroup = computed(() => ballStore.getCurrentGroup)
@@ -12,12 +15,11 @@ const isMine = computed(() => ballStore.getIsMyBall(currentGroup.value))
 /**
  * TODO Time에 대한 Value를 관리해야 한다.
  */
-const RemainTime = ref(0)
+const RemainTime = ref(props.timeOut)
 
 /**
  * IMP Ball에 대한 Effect 관리를 해야 한다.
  */
-const nowClick = ref(false)
 const clickEffects = ref([])
 const addClickEffect = (event) => {
   const effect = {
@@ -47,6 +49,13 @@ const handleKeydown = (event) => {
 }
 
 onMounted(() => {
+  let intervalId = setInterval(() => {
+    if (RemainTime.value > 0) {
+      RemainTime.value -= 1
+    } else {
+      clearInterval(intervalId)
+    }
+  }, 1000)
   window.addEventListener('keydown', handleKeydown)
 })
 

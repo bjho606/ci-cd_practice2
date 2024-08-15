@@ -57,7 +57,6 @@ const callNextContents = async (isStart) => {
  * IMP 2.1 하위 Component는 v-if에 따라 보여주는 정보가 다르게 되고, 받는 정보가 달라진다.
  */
 const socketMapping = computed(() => contentsStore.getSocketMapping)
-const routeMapping = computed(() => contentsStore.getRouteMapping)
 watch(currentContents, (newContentsId, oldContentsId) => {
   if (oldContentsId) {
     webSocketAPI.unsubscribeGame(socketMapping.value[oldContentsId])

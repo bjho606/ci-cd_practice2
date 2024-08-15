@@ -29,17 +29,16 @@ export const useContentsStore = defineStore('contents', {
       5: null,
       6: null,
       7: 'BallGrowContainer',
-      8: null,
-      null: 'EndingPage'
+      8: null
     },
     socketMapping: {
       1: 'tf',
       2: null,
-      3: 'touch',
+      3: null,
       4: 'ini-quiz',
       5: null,
       6: null,
-      7: null,
+      7: 'touch',
       8: null
     },
 

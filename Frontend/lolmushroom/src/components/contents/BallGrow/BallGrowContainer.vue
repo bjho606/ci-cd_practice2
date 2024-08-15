@@ -52,10 +52,10 @@ onMounted(() => {
     sessionStore.subSessionId,
     activeGroups.value
   )
-  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  const hasShownLoading = localStorage.getItem('hasShownLoading_BallGrow')
   if (!hasShownLoading) {
     showLoading.value = true
-    localStorage.setItem('hasShownLoading', 'true')
+    localStorage.setItem('hasShownLoading_BallGrow', 'true')
 
     setTimeout(() => {
       showLoading.value = false
@@ -76,7 +76,7 @@ onMounted(() => {
     />
     <div class="content-container">
       <div class="left-container">
-        <BallMain />
+        <BallMain :timeOut="contentsInfo.timeOut" />
       </div>
       <div class="right-container">
         <BallGroup />

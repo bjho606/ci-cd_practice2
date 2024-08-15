@@ -360,7 +360,7 @@ const unsubscribeInput = (targetInput) => {
     console.log(`Unsubscribed from Contents ${targetInput}`)
     subscriptionMap.delete(key)
   } else {
-    console.error(`No subscription found for session ${targetInput}`)
+    console.error(`No subscription found for Contents ${targetInput}`)
   }
 }
 

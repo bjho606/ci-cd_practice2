@@ -11,7 +11,6 @@ import contentsAPI from '@/api/contents'
 import webSocketAPI from '@/api/webSocket'
 import WaitingHeader from '@/components/room/playerWaiting/WaitingHeader.vue'
 
-
 const router = useRouter()
 const store = useAlphabetStore()
 const sessionStore = useSessionStore()
@@ -92,11 +91,10 @@ onMounted(async () => {
     onEventReceived: onWordReceived,
     subscriptions: ['word']
   })
-  const hasShownLoading = localStorage.getItem('hasShownLoading')
+  const hasShownLoading = localStorage.getItem('hasShownLoading_AlphaBet')
   if (!hasShownLoading) {
     showLoading.value = true
-    localStorage.setItem('hasShownLoading', 'true')
-
+    localStorage.setItem('hasShownLoading_AlphaBet', 'true')
     setTimeout(() => {
       showLoading.value = false
     }, 5000) // 5초 동안 모달을 표시

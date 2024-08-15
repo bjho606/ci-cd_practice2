@@ -13,9 +13,8 @@ const chatStore = useChatStore()
 const sessionStore = useSessionStore()
 const roomStore = useRoomStore()
 
-const subSessionId = sessionStore.getSubSessionId
-const subSessionInfo = computed(() => roomStore.getGroupInfoBySessionId(subSessionId))
-
+const subSessionId = computed(() => sessionStore.getSubSessionId)
+const subSessionInfo = computed(() => roomStore.getGroupInfoBySessionId(subSessionId.value))
 /**
  * * 1. 사용자에게 보이는 채팅의 내용은 currentMode에 따라 다르다.
  * IMP 1.1 'All' Mode : mainSessionMessages
@@ -39,7 +38,7 @@ const currentSubtitle = computed(() =>
 
 const toggleMode = () => {
   if (chatStore.currentMode === 'All') {
-    if (subSessionInfo.value) {
+    if (subSessionId.value) {
       chatStore.setCurrentMode('Group')
     } else {
       showModal.value = true // Show modal if subSession info is not found
