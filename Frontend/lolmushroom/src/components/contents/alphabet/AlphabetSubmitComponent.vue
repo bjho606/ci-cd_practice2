@@ -93,6 +93,7 @@ onMounted(async () => {
     subscriptions: ['word']
   })
   const hasShownLoading = localStorage.getItem('hasShownLoading')
+  console.log('누구한테나 떠라', hasShownLoading)
   if (!hasShownLoading) {
     showLoading.value = true
     localStorage.setItem('hasShownLoading', 'true')

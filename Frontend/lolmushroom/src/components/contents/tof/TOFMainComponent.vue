@@ -268,7 +268,7 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 4;
+  flex: 1;
 }
 
 .text-black {
