@@ -74,7 +74,7 @@
         console.log('Session connected successfully');
   
         // --- 5) 속성과 함께 카메라 정의 ---
-        const pub = state.OV.initPublisher(undefined, {
+        const pub = state.OV.initPublisher('video-container', {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
           publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
@@ -88,6 +88,8 @@
         // 웹캠을 보여주고 퍼블리셔를 저장하는 메인 비디오를 설정
         state.mainStreamManager = pub
         state.publisher = pub
+        
+        ovToken.value = userStore.userOvToken
         
         // --- 6) 스트림 발행 ---
         state.session.publish(state.publisher)
@@ -167,8 +169,36 @@
 
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
-    window.addEventListener('beforeunload', leaveSession)
-    joinSession()
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          const newVideos = mutation.addedNodes;
+          newVideos.forEach((node) => {
+            if (node.tagName === 'VIDEO') {
+              ovToken.value = extractWebSocketURL(ovToken.value)
+              node.id = ovToken.value;
+              ovToken.value = ''
+              
+              console.log(node.id, '이게 사람id')
+              console.log(store.targetUserToken, '이게 토큰')
+              // 렌더링 완료 후 store.targetUserToken 값과 id가 일치하는 비디오만 표시
+              if (node.id === store.targetUserToken) {
+                node.style.display = 'block';  // 해당 video를 표시
+              } else {
+                node.style.display = 'none';  // 다른 video는 숨김
+              }
+            }
+          });
+        }
+      });
+    });
+
+  observer.observe(videoContainer.value, { childList: true });
+
+  window.addEventListener('beforeunload', leaveSession)
+  joinSession()
+
   })
 
   // 컴포넌트가 언마운트될 때 실행
@@ -194,11 +224,9 @@
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    {{ store.targetUserToken }}
-    <div id="video-container" class="col-md-6" style="display: none;">
-    <!-- <div id="video-container" class="col-md-6"> -->
-      <UserVideo :stream-manager="state.publisher"/>
-      <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
+    <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
+    <div id="video-container" class="col-md-6" ref="videoContainer">
+      <!-- <UserVideo :stream-manager="state.mainStreamManager" /> -->
     </div>
   </div>
 </template>
