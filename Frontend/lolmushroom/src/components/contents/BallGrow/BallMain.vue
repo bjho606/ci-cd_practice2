@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useBallStore } from '@/stores/ballStore'
 import { useSessionStore } from '@/stores/sessionStore';
 import BallContent from './BallContent.vue'
@@ -39,6 +39,20 @@ const onBallClick = () =>{
 const backToMyBall = () => {
   nowClick.value = true
 }
+
+const handleKeydown = (event) => {
+  if (event.code === 'Space') {
+    onBallClick();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <template>
