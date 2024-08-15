@@ -46,7 +46,7 @@
     // 스트림이 받아질 때..
     state.session.on('streamCreated', ({ stream }) => {
       console.log('Stream created:', stream);  // 스트림 생성 로그
-      const subscriber = state.session.subscribe(stream);
+      const subscriber = state.session.subscribe(stream, 'video-container');
       console.log('Subscriber added:', subscriber);  // 구독자 추가 로그
       state.subscribers.push(subscriber);
     })
@@ -74,7 +74,7 @@
         console.log('Session connected successfully');
   
         // --- 5) 속성과 함께 카메라 정의 ---
-        const pub = state.OV.initPublisher(undefined, {
+        const pub = state.OV.initPublisher('undefinded', {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
           publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
@@ -119,16 +119,20 @@
     // 
     state.subscribers.forEach(subscriber => {
       if (subscriber === state.mainStreamManager) {
+        subscriber.publishVideo(true)
         subscriber.publishAudio(true)
       } else {
-        subscriber.publishAudio(false)
+        subscriber.publishVideo(false)
+        subscriber.publishAudeo(false)
       }
     })
 
     if (state.publisher === state.mainStreamManager) {
-      state.publisher.publishAudio(true)
+      state.publisher.publishVideo(true)
+      state.publisher.publishAudeo(true)
     } else {
-      state.publisher.publishAudio(false)
+      state.publisher.publishVideo(false)
+      state.publisher.publishAudeo(false)
     }
   }
 
@@ -147,21 +151,20 @@
   const toggleMic = () => {
     mic.value = !mic.value
     state.publisher.publishAudio(mic.value)
+
+    state.subscribers.forEach(subscriber => {
+      subscriber.subscribeToAudio(mic.value)
+    })
   }
 
   const toggleVideo = () => {
     video.value = !video.value
+    // 여기에 내 비디오만 변화하도록 수정한다.
     state.publisher.publishVideo(video.value)
 
     state.subscribers.forEach(subscriber => {
       subscriber.subscribeToVideo(video.value)
     })
-
-    if (video.value) {
-      state.mainStreamManager = state.publisher
-    } else {
-      state.mainStreamManager = null
-    }
   }
 
 
@@ -179,10 +182,6 @@
 
 <template>
   <div id="session">
-    <div id="session-header">
-      <!-- <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession"
-        value="Leave session" /> -->
-    </div>
     <div id="main-video" class="col-md-6">
       <UserVideo :stream-manager="state.mainStreamManager" />
       <div class="d-flex">
@@ -196,8 +195,6 @@
     </div>
     <!-- <div id="video-container" class="col-md-6" style="display: none;"> -->
     <div id="video-container" class="col-md-6">
-      <UserVideo :stream-manager="state.publisher"/>
-      <UserVideo v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
     </div>
   </div>
 </template>
