@@ -51,6 +51,7 @@ import SelectedList from './_1SelectedList.vue'
   display: flex;
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-top: solid 1px rgb(199, 199, 199);
 }
 
 /* Responsive design */
