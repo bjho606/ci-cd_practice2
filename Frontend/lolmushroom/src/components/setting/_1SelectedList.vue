@@ -27,7 +27,7 @@ const onEnd = () => {
 
 <template>
   <div v-if="localSelectedContents.length === 0" class="empty-container">
-    <p class="empty-message">🎮 나만의 오리엔테이션을 구성해보자 🎮</p>
+    <p class="empty-message">나만의 오리엔테이션을 구성해보자</p>
   </div>
   <div v-else class="bottom-list">
     <VueDraggableNext
@@ -70,7 +70,7 @@ const onEnd = () => {
 
 .empty-message {
   font-size: 1.5em;
-  color: #000000;
+  color: #aaaaaa;
   text-align: center;
   font-weight: bolder;
   font-size: medium;

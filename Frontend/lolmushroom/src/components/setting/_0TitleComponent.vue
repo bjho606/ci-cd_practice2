@@ -8,7 +8,7 @@ import MeshroomImage from '@/assets/Meshroom.svg'
       <v-col cols="auto" class="d-flex align-center">
         <v-img :aspect-ratio="1" :src="MeshroomImage" width="150"></v-img>
         <div class="text-container">
-          <h1 class="title">MeshRoom</h1>
+          <h1 class="title">MESH-ROOM</h1>
           <h2 class="subtitle">당신만의 오리엔테이션을 구성해보세요!</h2>
         </div>
       </v-col>

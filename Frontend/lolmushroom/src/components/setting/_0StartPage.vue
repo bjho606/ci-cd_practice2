@@ -33,7 +33,7 @@ const onNextClick = () => {
 }
 
 .pink-section {
-  background-color: #fff2f7;
+  background-color: #e7ffde;
   height: 50%;
   display: flex;
   align-items: center;

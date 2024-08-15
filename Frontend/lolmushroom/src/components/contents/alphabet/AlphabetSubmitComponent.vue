@@ -237,14 +237,14 @@ onMounted(async () => {
 
 .userInput {
   width: 571px;
-  height: 134px;
+  height: 100px;
   border-radius: 20px;
   background-color: #fff;
   border: 2px solid black;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 3px;
+  padding: 1.5%;
 }
 .emojiField {
   width: 60px;
@@ -258,7 +258,7 @@ onMounted(async () => {
   outline: none; /* 포커스 시 나타나는 기본 테두리 제거 */
   border: none; /* 기본 테두리 제거 */
   background-color: transparent; /* 배경색 투명하게 설정 */
-  font-size: 16px; /* 원하는 폰트 크기로 조정 */
+  font-size: 25px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
 }
 

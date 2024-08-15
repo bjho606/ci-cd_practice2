@@ -69,8 +69,8 @@ const rooms = computed(() => {
   justify-content: space-between;
   border: 1px solid #00ff00;
   border-radius: 15px;
-  width: 250px;
-  height: 250px;
+  width: 230px;
+  height: 200px;
   padding: 0px 10px 0px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition:
@@ -97,7 +97,7 @@ const rooms = computed(() => {
   align-items: center;
   height: 100%;
   font-size: 70px;
-  color: #ff0000;
+  color: #ff6363;
 }
 
 .group-header {

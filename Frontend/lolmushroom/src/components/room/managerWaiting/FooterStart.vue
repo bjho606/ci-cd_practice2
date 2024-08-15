@@ -21,10 +21,10 @@ const startGame = () => {
 
 <style scoped>
 .start-session-btn {
-  width: 100%;
+  width: 80%;
   height: 100%;
-  background-color: #1f4f16;
-  color: #ffffff;
+  background-color: #9ee682;
+  color: #000000;
   padding: 20px;
   border: none;
   border-radius: 10px;

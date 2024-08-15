@@ -26,7 +26,9 @@ const isItemSelected = (item) => {
 
 <template>
   <div class="contents-list">
-    <HeaderComponent />
+    <div class="header">
+      <HeaderComponent />
+    </div>
     <div v-for="(category, index) in groupedContents" :key="index" class="category-section">
       <div class="category-title">{{ category.category }}</div>
       <div class="category-items">
@@ -53,7 +55,7 @@ const isItemSelected = (item) => {
   padding-top: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align items to the start (left) */
+  align-items: start; /* Align items to the start (left) */
 }
 
 .category-section {
