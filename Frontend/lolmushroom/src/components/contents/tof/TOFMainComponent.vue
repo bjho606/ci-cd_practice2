@@ -127,7 +127,9 @@ const onNextReceived = async (_event) => {
     index.value++
     timeUp('')
   } else if (store.targetUserToken === userStore.userOvToken) {
-    await contentsAPI.finishContents(sessionStore.subSessionId)
+    setTimeout(async () => {
+      await contentsAPI.finishContents(sessionStore.subSessionId)
+    }, 3000); 
   }
 }
 
