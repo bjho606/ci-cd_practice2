@@ -41,7 +41,6 @@ public class KafkaTouchMeshConsumer {
             if (touchEvent.getType() == TouchDto.TouchType.DECREASE) {
                 if (currSize - 1 < 0) {
                     redisTemplate.opsForValue().set(key, 0);
-
                 } else {
                     redisTemplate.opsForValue().set(key, currSize - 1);
                 }
