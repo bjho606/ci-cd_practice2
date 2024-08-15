@@ -10,7 +10,7 @@ const content = computed(() => contentsStore.getPickedContents)
   <div v-if="content" class="contents-card-shadow contents-card">
     <!-- 이미지 섹션 -->
     <div class="image-section">
-      <v-img :src="content.imgUrl"  max-width="300px" max-height="300px" style="border: 2px solid black; border-radius: 10%;"></v-img>
+      <v-img :src="content.imgUrl"  max-width="100%" max-height="100%" style="border: 2px solid black; border-radius: 10%;"></v-img>
     </div>
 
     <!-- 제목 섹션 -->
@@ -35,6 +35,8 @@ const content = computed(() => contentsStore.getPickedContents)
   flex-direction: column;
   height: 100%;
   margin-left: 10px;
+  justify-content: center;
+  align-items: center;
 }
 
 .contents-card-shadow {
@@ -50,6 +52,10 @@ const content = computed(() => contentsStore.getPickedContents)
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 300px;
+  height: 220px;
+  margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 .title-section {
@@ -61,13 +67,14 @@ const content = computed(() => contentsStore.getPickedContents)
 }
 
 .green-section {
-  flex: 0.4;
+  flex: 1;
   background-color: #e7ffde;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 15%;
-  font-size: small;
+  font-size: medium;
+  font-weight: bold;
 }
 
 </style>

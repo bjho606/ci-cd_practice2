@@ -41,6 +41,8 @@ const onChangeClick = (sessionId) => {
 .ball-group {
   max-height: 700px;
   overflow-y: auto; /* 내용이 넘칠 때 스크롤바가 나타나도록 설정 */
+  margin-right: 100px;
+  margin-top: 30px;
 }
 
 .row {

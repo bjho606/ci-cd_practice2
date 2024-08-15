@@ -130,10 +130,8 @@ onMounted(async () => {
 
     <div class="statusContainer">
       <div class="info">
-        <div class="info-category"><h1>카테고리</h1></div>
-        <div class="info-text">
-          <h1>{{ alliIniQuizInfos[index]['categoryName'] }}</h1>
-        </div>
+        <div class="info-category">카테고리</div>
+        <div class="info-text">{{ alliIniQuizInfos[index]['categoryName'] }}</div>
       </div>
     </div>
     <div class="playContainer">
@@ -241,10 +239,12 @@ onMounted(async () => {
   border-radius: 10px 0 0 10px;
   background-color: #fcee59d5;
   font-weight: bold;
+  font-size: 20px;
   letter-spacing: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .info-text {
   margin: 0;
@@ -253,11 +253,12 @@ onMounted(async () => {
   border-radius: 0 10px 10px 0;
   background-color: #d4d4d474;
   font-weight: bold;
-  font-size: 40px;
+  font-size: 30px;
   letter-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 .playContainer {
   margin-top: 10px;
@@ -305,6 +306,10 @@ onMounted(async () => {
   padding: 10px; /* 내부 여백 추가 */
   text-align: center;
 }
+.inputText::placeholder{
+  font-size: 20px;
+  padding: 10px;
+}
 .inputText {
   flex: 1;
   height: 60px;
@@ -313,6 +318,7 @@ onMounted(async () => {
   background-color: transparent; /* 배경색 투명하게 설정 */
   font-size: 25px; /* 원하는 폰트 크기로 조정 */
   padding: 10px; /* 내부 여백 추가 */
+  letter-spacing: 5px;
 }
 
 /* 정답 확인창 스타일 */

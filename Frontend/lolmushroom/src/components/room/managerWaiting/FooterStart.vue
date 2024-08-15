@@ -21,7 +21,7 @@ const startGame = () => {
 
 <style scoped>
 .start-session-btn {
-  width: 80%;
+  width: 60%;
   height: 100%;
   background-color: #9ee682;
   color: #000000;
@@ -32,7 +32,7 @@ const startGame = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative; /* This allows us to position the icon independently */
+  position: relative /* This allows us to position the icon independently */
 }
 
 .start-session-text {

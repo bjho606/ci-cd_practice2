@@ -137,7 +137,7 @@ const changeRoomName = async (index) => {
 <template>
   <div class="room-list-container">
     <div class="room-list">
-      <v-container
+      <div
         v-for="(room, index) in activeRooms"
         :key="room.sessionId"
         class="group-container"
@@ -148,7 +148,7 @@ const changeRoomName = async (index) => {
           @onChangeName="changeRoomName(index)"
           @onJoinOrLeave="handleRoomClick(index)"
         />
-      </v-container>
+      </div>
       <v-container
         v-if="activeRooms.length < roomStore.maxRoomCount && !isUserStarted"
         class="add-group-container"
@@ -176,8 +176,9 @@ const changeRoomName = async (index) => {
 }
 
 .group-container {
-  max-width: 250px;
-  height: 250px;
-  flex-shrink: 0;
+  min-width: 250px;
+  padding: 16px;
+  /* max-height: 200px; */
+  /* flex-shrink: 0; */
 }
 </style>

@@ -13,7 +13,7 @@ const onRemoveClick = () => {
 
 <template>
   <div class="content-card">
-    <img :src="item.imgUrl" alt="Content Thumbnail" class="thumbnail" />
+    <img :src="item.imgUrl" alt="Content Thumbnail" class="thumbnail" style="width: 100%; height: 100px;"/>
     <button class="delete-btn" @click="onRemoveClick">✖</button>
     <div class="content-info">
       <div>{{ item.contentTitle }}</div>
@@ -30,7 +30,7 @@ const onRemoveClick = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid rgb(196, 196, 196);
+  border: 1px solid rgb(96, 96, 96);
   transition: transform 0.2s;
 }
 
@@ -71,7 +71,9 @@ const onRemoveClick = () => {
 
 .content-info {
   display: flex;
-  font-size: 11px;
+  font-size: 15px;
   justify-content: center;
+  font-weight: 900;
+  border-top: 1px solid black;
 }
 </style>
