@@ -43,9 +43,9 @@ const size = computed(() => {
   const minSize = 100 // 최소 크기
   const maxSize = 400 // 최대 크기
   const defaultHealth = 500 // 기본 체력
-  const tmp = minSize + (props.health / defaultHealth) * (maxSize - minSize) >= 400
+  const calculatedSize = minSize + (props.health / defaultHealth) * (maxSize - minSize)
   return (
-    (tmp >= 400 ? 400 : minSize + (props.health / defaultHealth) * (maxSize - minSize)) * scaleValue
+    (calculatedSize >= 400 ? 400 : minSize + (props.health / defaultHealth) * (maxSize - minSize)) * scaleValue
   )
 })
 

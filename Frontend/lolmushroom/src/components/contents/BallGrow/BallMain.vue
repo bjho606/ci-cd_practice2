@@ -82,8 +82,10 @@ onBeforeUnmount(() => {
 <template>
   <div class="center-wrapper">
     <div class="remainTime">남은 시간 : {{ RemainTime }} 초</div>
-    <BallContent :isMain="true" :groupId="currentGroup" @click="onBallClick" />
-    <v-btn v-if="!isMine" class="backToMyGroup" @click="onReturnClick">내 그룹으로 돌아가기</v-btn>
+    <div class="main-container">
+      <BallContent :isMain="true" :groupId="currentGroup" @click="onBallClick" />
+      <v-btn v-if="!isMine" class="backToMyGroup" @click="onReturnClick">내 그룹으로 돌아가기</v-btn>
+    </div>
     <div
       v-for="effect in clickEffects"
       :key="effect.id"
@@ -141,28 +143,27 @@ onBeforeUnmount(() => {
   font-size: 20px; /* 글씨 크기 조정 */
 }
 
-.myBallContainer {
-  background-color: #fff2f7;
+.main-container {
+  position: relative; /* 버튼 위치 기준 */
   width: 600px;
   height: 400px;
-  margin-bottom: 20px; /* Add spacing between container and button */
+  background-color: #fff2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  border: 1px solid black;
 }
 
 .backToMyGroup {
-  margin-top: 30px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
   background-color: #24a319;
   color: white;
-  width: 490px;
-  height: 100px !important;
-  border-radius: 20px;
-}
-
-/* 공 중앙으로 이동 */
-.initBallState {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40vh;
+  width: 200px;
+  height: 50px;
+  border-radius: 10px;
 }
 
 /* 이미지의 클릭 이벤트만 허용하고 부모 div는 무시하게 설정 */

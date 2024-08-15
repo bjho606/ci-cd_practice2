@@ -19,7 +19,8 @@ const containerClass = computed(() => (props.isMain ? 'main-container' : 'sub-co
 
 <template>
   <div :class="containerClass">
-    <div class="ball-name"> {{ groupName }} 그룹 <span v-if="!isMain">- {{ props.rank }}등</span></div>
+    <div class="ball-name"> {{ groupName }} 그룹</div>
+    <div class="ball-rank" v-if="!isMain">{{ props.rank }}등</div>
     <div class="ball-container">
       <GreenBallComponent v-if="isMine" :health="currentSize" :isMain="isMain" />
       <BlueBallComponent v-else :health="currentSize" :isMain="isMain" />
@@ -51,13 +52,21 @@ const containerClass = computed(() => (props.isMain ? 'main-container' : 'sub-co
 }
 
 .ball-name {
+  position : absolute;
+  top : 10px;
+  left : 10px;
   padding: 5px;
-  font-size: medium;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center; /* 텍스트를 중앙 정렬 */
-  margin-bottom: 5%;
+  font-size: x-large;
+}
+
+.ball-rank {
+  position: absolute;
+  top:10px;
+  right: 10px;
+  padding: 5px;
+  font-size: larger;
+  background-color: rgb(213, 79, 79);
+  border-radius: 50%;
 }
 
 .ball-container {
