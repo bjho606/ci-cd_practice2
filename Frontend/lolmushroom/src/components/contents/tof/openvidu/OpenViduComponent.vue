@@ -81,7 +81,7 @@
         console.log('Session connected successfully');
   
         // --- 5) 속성과 함께 카메라 정의 ---
-        const pub = state.OV.initPublisher('undefined', {
+        const pub = state.OV.initPublisher('video-container', {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
           publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
@@ -95,6 +95,8 @@
         // 웹캠을 보여주고 퍼블리셔를 저장하는 메인 비디오를 설정
         state.mainStreamManager = pub
         state.publisher = pub
+        
+        ovToken.value = userStore.userOvToken
         
         // --- 6) 스트림 발행 ---
         state.session.publish(state.publisher)
@@ -218,7 +220,7 @@ const extractWebSocketURL = (data) => {
     </div>
     <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
     <div id="video-container" class="col-md-6" ref="videoContainer">
-      <UserVideo :stream-manager="state.mainStreamManager" />
+      <!-- <UserVideo :stream-manager="state.mainStreamManager" /> -->
     </div>
   </div>
 </template>
