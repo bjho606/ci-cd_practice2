@@ -310,8 +310,4 @@ v-text-field {
   display: flex;
   justify-content: center;
 }
-
-*{
-  background: #E7FFDE;
-}
 </style>
