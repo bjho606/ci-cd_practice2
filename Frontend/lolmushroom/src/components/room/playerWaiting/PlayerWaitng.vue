@@ -162,11 +162,12 @@ const changeRoomName = async (index) => {
 <style scoped>
 .room-list-container {
   width: 100%;
-  height: 100%;
+  height: 90%;
   overflow-x: auto;
   display: flex;
   flex-wrap: nowrap;
-  padding: 20px;
+  padding: 20px;  
+  scrollbar-color: #888; 
 }
 
 .room-list {

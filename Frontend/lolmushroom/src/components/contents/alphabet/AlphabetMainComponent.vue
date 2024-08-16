@@ -102,6 +102,8 @@ watch(index, async (newIndex) => {
     setTimeout(async () => {
       await contentsAPI.finishContents(sessionStore.subSessionId)
     }, 3000);
+    // 결과 나오기 
+    turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
   }
 })
 
