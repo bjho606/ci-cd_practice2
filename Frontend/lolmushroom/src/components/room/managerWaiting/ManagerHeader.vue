@@ -13,7 +13,7 @@ const currentCount = computed(() => roomStore.getTotalUserCount)
     </div>
     <div class="room-waiting-count-info">
       현재 인원
-      <span>{{ currentCount }} / 60</span>
+      <span>{{ currentCount-1}} / 60</span>
     </div>
   </header>
 </template>
