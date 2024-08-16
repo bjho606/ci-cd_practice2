@@ -176,7 +176,10 @@ const extractWebSocketURL = (data) => {
             if (node.tagName === 'VIDEO') {
               ovToken.value = extractWebSocketURL(ovToken.value)
               node.id = ovToken.value;
+              ovToken.value = ''
               
+              console.log(node.id, '이게 비디오의 ovtoken')
+              console.log(node.id, '이게 발표자의 ovtoken')
               // 렌더링 완료 후 store.targetUserToken 값과 id가 일치하는 비디오만 표시
               if (node.id === store.targetUserToken) {
                 node.style.display = 'block';  // 해당 video를 표시
@@ -214,9 +217,7 @@ const extractWebSocketURL = (data) => {
         <v-icon v-show="mic===false" icon="mdi-microphone-off" size="x-large" @click="toggleMic()"/>
       </div>
     </div>
-    <!-- <div id="video-container" class="col-md-6" ref="videoContainer" style="display: none;"> -->
     <div id="video-container" class="col-md-6" ref="videoContainer">
-      <!-- <UserVideo :stream-manager="state.mainStreamManager" /> -->
     </div>
   </div>
 </template>
