@@ -1,5 +1,6 @@
 <!-- GroupName.vue -->
 <script setup>
+import autorenew from '@/assets/image/autorenew.svg'
 const props = defineProps({
   groupName: String,
   isGroupMember: Boolean
@@ -17,7 +18,7 @@ const handleClick = () => {
 <template>
   <div class="group-name-div">
     <v-btn class="group-name" @click="handleClick">
-      <v-img src="src/assets/image/autorenew.svg" class="icon" />
+      <v-img :src="autorenew" class="icon" />
       {{ groupName }}
     </v-btn>
   </div>
