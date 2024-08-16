@@ -87,6 +87,12 @@ const onGuessReceived = (event) => {
     guessWords.value = []
     index.value += 1
   }
+  // 마지막 정답 
+  else if(result== true && turn.ownerOvToken === userStore.userOvToken ){
+    turn.answer = submittedWord
+    turn.winner = userName
+    isCorrected.value = true
+  }
 }
 
 // index 값이 증가할 때마다 관련 값 갱신
@@ -102,9 +108,8 @@ watch(index, async (newIndex) => {
     setTimeout(async () => {
       await contentsAPI.finishContents(sessionStore.subSessionId)
     }, 3000);
-    // 결과 나오기 
-    turn.ownerOvToken = alliIniQuizInfos[newIndex]['ovToken']
-  }
+  
+  } 
 })
 
 onMounted(async () => {
