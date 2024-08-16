@@ -29,11 +29,6 @@
     subscribers: [],
   })
 
-  const assignVideoId = (subscriber) => {
-    const userId = subscriber.stream.connection.data
-    subscriber.element.id = userId
-  }
-
   const joinSession = async () => {
     // --- 1) OpenVidu 객체 얻기 ---
     state.OV = new OpenVidu(VITE_OPENVIDU_URL, VITE_OPENVIDU_SECRET)
@@ -174,8 +169,7 @@ const extractWebSocketURL = (data) => {
           const newVideos = mutation.addedNodes;
           newVideos.forEach((node) => {
             if (node.tagName === 'VIDEO') {
-              ovToken.value = extractWebSocketURL(ovToken.value)
-              node.id = ovToken.value;
+              node.id = extractWebSocketURL(ovToken.value)
               ovToken.value = ''
               
               console.log(node.id, '이게 비디오의 ovtoken')
