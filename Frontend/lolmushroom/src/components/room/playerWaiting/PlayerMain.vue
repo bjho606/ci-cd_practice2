@@ -25,7 +25,7 @@ const text3 =
 
 <style scoped>
 .background {
-  background-color: #fff2f7;
+  background-color: #e7ffde;
   height: 100%;
   width: 100%;
 }
