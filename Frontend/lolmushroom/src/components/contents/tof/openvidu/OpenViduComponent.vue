@@ -76,7 +76,7 @@
         console.log('Session connected successfully');
   
         // --- 5) 속성과 함께 카메라 정의 ---
-        const pub = state.OV.initPublisher('video-container', {
+        const pub = state.OV.initPublisher('undefinded', {
           audioSource: undefined, // The source of audio. If undefined default microphone
           videoSource: undefined, // The source of video. If undefined default webcam
           publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
@@ -117,14 +117,6 @@
   }
 
   watch(() => store.targetUserToken, (newToken) => {
-    // console.log(store.targetUserToken, newToken, '이규석')
-    // const userVideo = document.querySelector('UserVideo');
-    // if (userVideo.id === newToken) {
-    //   userVideo.style.display = 'block';  // 해당 UserVideo를 표시
-    // } else {
-    //   userVideo.style.display = 'none';  // UserVideo를 숨김
-    // }
-
     const videos = videoContainer.value.querySelectorAll('video');
     videos.forEach((video) => {
       if (video.id === newToken) {
@@ -212,6 +204,7 @@ const extractWebSocketURL = (data) => {
       </div>
     </div>
     <div id="video-container" class="col-md-6" ref="videoContainer">
+      <user-video :stream-manager="state.mainStreamManager"/>
     </div>
   </div>
 </template>
